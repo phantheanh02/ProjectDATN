@@ -1,0 +1,7 @@
+.vs
+Debug
+TrainingFramework/Debug/
+Utilities/Debug/
+Release
+TrainingFramework/Release/
+Utilities/Release/
