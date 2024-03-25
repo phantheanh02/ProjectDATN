@@ -39,8 +39,8 @@ private:
 	std::unordered_map<GLint, BoxBullet> m_bulletList;
 
 	// Utilities
-	void LoadObject(int count, std::ifstream& file);
-	void LoadCamera(int count, std::ifstream& file);
-	void LoadEnemies(int count, std::ifstream& file);
-	void LoadBullet(int count, std::ifstream& file);
+	void LoadObject(std::ifstream& file);
+	void LoadCamera(std::ifstream& file);
+	void LoadEnemies(std::ifstream& file);
+	void LoadBullet(std::ifstream& file);
 };

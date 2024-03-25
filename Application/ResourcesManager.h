@@ -51,8 +51,8 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Model>>		m_modelList;
 	std::unordered_map<std::string, std::shared_ptr<Shaders>>	m_shaderList;
 	std::unordered_map<std::string, std::shared_ptr<Texture>>	m_textureList;
-	std::unordered_map<GLint, std::shared_ptr<Sound>>	m_soundList;
-	std::unordered_map<GLint, TTF_Font*>				m_fontList;
+	std::unordered_map<GLint, std::shared_ptr<Sound>>			m_soundList;
+	std::unordered_map<GLint, TTF_Font*>						m_fontList;
 
 	// Utilities
 	void LoadModel(std::ifstream& filePtr);

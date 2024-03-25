@@ -48,11 +48,11 @@ void SceneManager::LoadElements(const std::string& filename)
 		return;
 	}
 	std::string typeStr;
-	GLint count = 0, type;
+	GLint type;
 	bool valid = true;
 	do
 	{
-		if (!(fscene >> typeStr >> count))
+		if (!(fscene >> typeStr))
 		{
 			break;
 		}
@@ -60,16 +60,16 @@ void SceneManager::LoadElements(const std::string& filename)
 		switch (type)
 		{
 		case ET_CAMERA:
-			LoadCamera(count, fscene);
+			LoadCamera(fscene);
 			break;
 		case ET_OBJECT:
-			LoadObject(count, fscene);
+			LoadObject(fscene);
 			break;
 		case ET_ENEMY:
-			LoadEnemies(count, fscene);
+			LoadEnemies(fscene);
 			break;
 		case ET_BULLET:
-			LoadBullet(count, fscene);
+			LoadBullet(fscene);
 			break;
 		default:
 			std::cerr << "Scene file format error, abort loading elements";
@@ -129,84 +129,90 @@ BoxBullet SceneManager::GetBoxBullet(GLint bullet_id)
 	return BoxBullet();
 }
 
-void SceneManager::LoadObject(int count, std::ifstream& file)
+void SceneManager::LoadObject(std::ifstream& file)
 {
 	Vector3 pos, rt, sc;
 	GLint id, modelId, textureId, shaderId;
 	std::string skipStr;
-	for (int i = 0; i < count; ++i)
+	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
+	while (skipStr != "$")
 	{
-		file >> skipStr >> id >> skipStr >> modelId >> skipStr >> textureId >> skipStr >> shaderId;
-		file >> skipStr >> pos.x >> pos.y >> pos.z;
-		file >> skipStr >> rt.x >> rt.y >> rt.z;
-		file >> skipStr >> sc.x >> sc.y >> sc.z;
-		auto model = ResourcesManager::GetInstance()->GetModel(modelId);
-		auto shader = ResourcesManager::GetInstance()->GetShader(shaderId);
-		auto texture = ResourcesManager::GetInstance()->GetTexture(textureId);
-		auto obj = std::make_shared<Sprite2D>(id, model, shader, texture);
-		obj->SetPos(pos);
-		obj->SetScale(sc);
-		obj->SetRotation(rt);
-		m_objectList.insert(std::make_pair(id, obj));
+		file >> skipStr;
+		//file >> skipStr >> id >> skipStr >> modelId >> skipStr >> textureId >> skipStr >> shaderId;
+		//file >> skipStr >> pos.x >> pos.y >> pos.z;
+		//file >> skipStr >> rt.x >> rt.y >> rt.z;
+		//file >> skipStr >> sc.x >> sc.y >> sc.z;
+		//auto model = ResourcesManager::GetInstance()->GetModel(modelId);
+		//auto shader = ResourcesManager::GetInstance()->GetShader(shaderId);
+		//auto texture = ResourcesManager::GetInstance()->GetTexture(textureId);
+		//auto obj = std::make_shared<Sprite2D>(id, model, shader, texture);
+		//obj->SetPos(pos);
+		//obj->SetScale(sc);
+		//obj->SetRotation(rt);
+		//m_objectList.insert(std::make_pair(id, obj));
 	}
 }
 
-void SceneManager::LoadCamera(int count, std::ifstream& file)
+void SceneManager::LoadCamera(std::ifstream& file)
 {
 	std::string skipStr;
 	Vector3 pos;
 	GLint id;
 	GLfloat nr, fr, fov, mspeed, rspeed;
-	for (int i = 0; i < count; ++i)
+	file >> skipStr;
+	while (skipStr != "$")
 	{
-		file >> skipStr >> id;
-		file >> skipStr >> pos.x >> pos.y >> pos.z;
-		file >> skipStr >> nr >> skipStr >> fr;
-		file >> skipStr >> fov;
-		file >> skipStr >> mspeed;
-		file >> skipStr >> rspeed;
-		auto camera = std::make_shared<Camera>(id, pos, nr, fr, fov, rspeed, mspeed);
-		m_cameraList.insert(std::make_pair(id, camera));
+		file >> skipStr;
+		//file >> skipStr >> id;
+		//file >> skipStr >> pos.x >> pos.y >> pos.z;
+		//file >> skipStr >> nr >> skipStr >> fr;
+		//file >> skipStr >> fov;
+		//file >> skipStr >> mspeed;
+		//file >> skipStr >> rspeed;
+		//auto camera = std::make_shared<Camera>(id, pos, nr, fr, fov, rspeed, mspeed);
+		//m_cameraList.insert(std::make_pair(id, camera));
 	}
 }
 
-void SceneManager::LoadEnemies(int count, std::ifstream& file)
+void SceneManager::LoadEnemies(std::ifstream& file)
 {
 	std::string skipStr;
 	BoxEnemy box;
 	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
-
-	for (int i = 0; i < count; i++)
+	file >> skipStr;
+	while (skipStr != "$")
 	{
 		BoxEnemy box;
-		file >> box.id >> box.imgSize.x >> box.imgSize.y >> box.boxSize.x >> box.boxSize.y;
+		box.id = std::stoi(skipStr);
+		file >> box.imgSize.x >> box.imgSize.y >> box.boxSize.x >> box.boxSize.y >> skipStr;
 		m_enemiesList.insert(std::make_pair(box.id, box));
 	}
 }
 
-void SceneManager::LoadBullet(int count, std::ifstream& file)
+void SceneManager::LoadBullet(std::ifstream& file)
 {
 	std::string skipStr;
 	BoxBullet box;
 	file >> skipStr >> skipStr >> skipStr;
-
-	for (int i = 0; i < count; i++)
+	file >> skipStr;
+	while (skipStr != "$")
 	{
 		BoxBullet box;
-		file >> box.id >> box.imgSize.x >> box.imgSize.y;
+		box.id = std::stoi(skipStr);
+		file >> box.imgSize.x >> box.imgSize.y >> skipStr;
 		m_bulletList.insert(std::make_pair(box.id, box));
 	}
 }
 
 int ParseElementType(const std::string& type)
 {
-	if (type == "#Objects:")
+	if (type == "#Objects")
 		return ET_OBJECT;
-	if (type == "#Cameras:")
+	if (type == "#Cameras")
 		return ET_CAMERA;
-	if (type == "#Enemies:")
+	if (type == "#Enemies")
 		return ET_ENEMY;
-	if (type == "#Bullets:")
+	if (type == "#Bullets")
 		return ET_BULLET;
 	return ET_INVALID;
 }
