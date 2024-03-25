@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Boss.cpp">
+      <Filter>Source File\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Source File\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemies.cpp">
+      <Filter>Source File\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GSCredit.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GSIntro.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GSHighScore.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GSMenu.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GSPlay.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GSSetting.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateMachine.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateBase.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Source File\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source File\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcesManager.cpp">
+      <Filter>Source File\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source File\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite2D.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteAnimation.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="b2Utilities.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="GSMap.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>Source File\GameEngine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfigClass.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="Boss.h">
+      <Filter>Source File\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Source File\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemies.h">
+      <Filter>Source File\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GSCredit.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GSHighScore.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GSIntro.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GSMenu.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GSPlay.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GSSetting.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateMachine.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateBase.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Source File\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcesManager.h">
+      <Filter>Source File\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Source File\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite2D.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Source File\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteAnimation.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="b2Utilities.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="GSMap.h">
+      <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
+      <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source File">
+      <UniqueIdentifier>{b5c0acc9-630c-467f-90a7-7bf914ac80d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File\GameObject">
+      <UniqueIdentifier>{654fe640-c600-4456-9a53-2e02a2937169}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File\GameManager">
+      <UniqueIdentifier>{a05f6169-453f-424b-a483-a0a77cf23447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File\GameState">
+      <UniqueIdentifier>{ef0263d6-32a0-430f-9164-dc83d95a6140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source File\GameEngine">
+      <UniqueIdentifier>{88792382-9fd1-4d0b-89b7-f4bed426d126}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

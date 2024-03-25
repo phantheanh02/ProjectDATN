@@ -1,0 +1,1 @@
+NativeHeapLeakageFinder.exe TrainingFramework.exe -top:10 -hidesystemstack -ignoresingleallocs
