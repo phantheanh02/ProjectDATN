@@ -1,18 +1,15 @@
-#Models: 1
+#Models
 ID 0
 FILE "Rectangle.nfg"
+$
 
-#2D_Textures: 86
+#2D_Textures
 ID 0
 FILE "intro.png"
 WRAP REPEAT
 FILTER NEAREST
 ID 1
 FILE "bg_intro.png"
-WRAP REPEAT
-FILTER NEAREST
-ID 2
-FILE "Woman1.png"
 WRAP REPEAT
 FILTER NEAREST
 ID 3
@@ -347,14 +344,16 @@ ID 88
 FILE "GSMap/Space_Stars.png"
 WRAP REPEAT
 FILTER NEAREST
+$
 
-#Shaders: 2
+#Shaders
 ID 0
 FLIE "TextureShader"
 ID 1
 FILE "Animation"
+$
 
-#Sounds: 9
+#Sounds
 ID 0
 FILE "Cowboy_OVERWORLD.wav"
 ID 1
@@ -373,11 +372,13 @@ ID 7
 FILE "player_hit.wav"
 ID 8
 FILE "enemy_hit.wav"
+$
 
-#Fonts: 2
+#Fonts
 ID 0
 FILE "Minecraft.ttf"
 SIZE 80
 ID 1
 FILE "Roboto-Regular.ttf"
 SIZE 120
+$

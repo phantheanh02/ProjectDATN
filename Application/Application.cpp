@@ -24,10 +24,10 @@ int Init ( ESContext *esContext )
 	// init
 	ResourcesManager::Construct();
 	ResourcesManager::GetInstance()->Init();
-	ResourcesManager::GetInstance()->LoadResources("resources.data");
+	ResourcesManager::GetInstance()->LoadResources("RM.data");
 	SceneManager::Construct();
 	SceneManager::GetInstance()->Init();
-	SceneManager::GetInstance()->LoadElements("scene.data");
+	SceneManager::GetInstance()->LoadElements("SM.data");
 	GameStateMachine::Construct();
 	GameStateMachine::GetInstance()->Init();
 	GameStateMachine::GetInstance()->PushState(StateType::STATE_INTRO);

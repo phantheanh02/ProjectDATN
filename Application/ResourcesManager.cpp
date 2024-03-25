@@ -72,7 +72,7 @@ void ResourcesManager::LoadResources(const std::string& filename)
 	bool valid = true;
 	do
 	{
-		if (!(resourcesFile >> skipStr >> count))
+		if (!(resourcesFile >> skipStr))
 		{
 			break;
 		}
@@ -80,19 +80,19 @@ void ResourcesManager::LoadResources(const std::string& filename)
 		switch (type)
 		{
 		case RT_MODEL:
-			LoadModel(count, resourcesFile);
+			LoadModel(resourcesFile);
 			break;
 		case RT_SHADER:
-			LoadShader(count, resourcesFile);
+			LoadShader(resourcesFile);
 			break;
 		case RT_TEXTURE:
-			LoadTexture(count, resourcesFile);
+			LoadTexture(resourcesFile);
 			break;
 		case RT_SOUND:
-			LoadSound(count, resourcesFile);
+			LoadSound(resourcesFile);
 			break;
 		case RT_TTF_FONT:
-			LoadFont(count, resourcesFile);
+			LoadFont(resourcesFile);
 			break;
 		case RT_INVALID:
 			valid = false;
@@ -219,26 +219,27 @@ void ResourcesManager::ResumeAllSounds()
 
 GLint ParseResourceType(const std::string& type)
 {
-	if (type == "#Models:")
+	if (type == "#Models")
 		return RT_MODEL;
-	if (type == "#Shaders:")
+	if (type == "#Shaders")
 		return RT_SHADER;
-	if (type == "#2D_Textures:")
+	if (type == "#2D_Textures")
 		return RT_TEXTURE;
-	if (type == "#Sounds:")
+	if (type == "#Sounds")
 		return RT_SOUND;
-	if (type == "#Fonts:")
+	if (type == "#Fonts")
 		return RT_TTF_FONT;
 	return RT_INVALID;
 }
 
-void ResourcesManager::LoadModel(GLint count, std::ifstream& filePtr)
+void ResourcesManager::LoadModel(std::ifstream& filePtr)
 {
 	std::string skipStr, filename;
 	GLint id;
-	for (int i = 0; i < count; ++i)
+	filePtr >> skipStr;
+	while (skipStr != "$")
 	{
-		filePtr >> skipStr >> id >> skipStr >> filename;
+		filePtr >> id >> skipStr >> filename >> skipStr;
 		filename.erase(std::remove_if(filename.begin(), filename.end(), [](char c) {return c == '\"'; }), filename.end());
 		std::string file = Globals::modelPath + filename;
 		std::cout << "Load model: " << file << "\n";
@@ -249,13 +250,14 @@ void ResourcesManager::LoadModel(GLint count, std::ifstream& filePtr)
 	}
 }
 
-void ResourcesManager::LoadShader(GLint count, std::ifstream& filePtr)
+void ResourcesManager::LoadShader(std::ifstream& filePtr)
 {
 	std::string skipStr, filename, vs, fs;
 	GLint id;
-	for (int i = 0; i < count; ++i)
+	filePtr >> skipStr;
+	while (skipStr != "$")
 	{
-		filePtr >> skipStr >> id >> skipStr >> filename;
+		filePtr  >> id >> skipStr >> filename >> skipStr;
 		filename.erase(std::remove_if(filename.begin(), filename.end(), [](char c) {return c == '\"'; }), filename.end());
 		std::cout << "Load shader: " << filename << "\n";
 		vs = Globals::shaderPath + filename + ".vert";
@@ -270,13 +272,14 @@ void ResourcesManager::LoadShader(GLint count, std::ifstream& filePtr)
 	}
 }
 
-void ResourcesManager::LoadTexture(GLint count, std::ifstream& filePtr)
+void ResourcesManager::LoadTexture(std::ifstream& filePtr)
 {
 	std::string skipStr, filename, wrap, filter;
 	GLint id;
-	for (int i = 0; i < count; ++i)
+	filePtr >> skipStr;
+	while (skipStr != "$")
 	{
-		filePtr >> skipStr >> id >> skipStr >> filename >> skipStr >> wrap >> skipStr >> filter;
+		filePtr >> id >> skipStr >> filename >> skipStr >> wrap >> skipStr >> filter >> skipStr;
 		filename.erase(std::remove_if(filename.begin(), filename.end(), [](char c) {return c == '\"'; }), filename.end());
 		std::string file = Globals::texturePath + filename;
 		std::cout << "Load texture: " << filename << "\n";
@@ -304,13 +307,14 @@ void ResourcesManager::LoadTexture(GLint count, std::ifstream& filePtr)
 	}
 }
 
-void ResourcesManager::LoadSound(GLint count, std::ifstream& filePtr)
+void ResourcesManager::LoadSound(std::ifstream& filePtr)
 {
 	std::string skipStr, filename;
 	GLint id;
-	for (int i = 0; i < count; ++i)
+	filePtr >> skipStr;
+	while (skipStr != "$")
 	{
-		filePtr >> skipStr >> id >> skipStr >> filename;
+		filePtr  >> id >> skipStr >> filename >> skipStr;
 		filename.erase(std::remove_if(filename.begin(), filename.end(), [](char c) {return c == '\"'; }), filename.end());
 		filename = Globals::soundPath + filename;
 		std::cout << "Load sound: " << filename << "\n";
@@ -320,13 +324,14 @@ void ResourcesManager::LoadSound(GLint count, std::ifstream& filePtr)
 	}
 }
 
-void ResourcesManager::LoadFont(GLint count, std::ifstream& filePtr)
+void ResourcesManager::LoadFont(std::ifstream& filePtr)
 {
 	std::string skipStr, filename;
 	GLint id, size;
-	for (int i = 0; i < count; i++)
+	filePtr >> skipStr;
+	while (skipStr != "$")
 	{
-		filePtr >> skipStr >> id >> skipStr >> filename >> skipStr >> size;
+		filePtr >> id >> skipStr >> filename >> skipStr >> size >> skipStr;
 		filename.erase(std::remove_if(filename.begin(), filename.end(), [](char c) {return c == '\"'; }), filename.end());
 		filename = Globals::fontPath + filename;
 		std::cout << "Load font: " << filename << "\n";

@@ -55,9 +55,9 @@ private:
 	std::unordered_map<GLint, TTF_Font*>				m_fontList;
 
 	// Utilities
-	void LoadModel(GLint count, std::ifstream& filePtr);
-	void LoadShader(GLint count, std::ifstream& filePtr);
-	void LoadTexture(GLint count, std::ifstream& filePtr);
-	void LoadSound(GLint count, std::ifstream& filePtr);
-	void LoadFont(GLint count, std::ifstream& filePtr);
+	void LoadModel(std::ifstream& filePtr);
+	void LoadShader(std::ifstream& filePtr);
+	void LoadTexture(std::ifstream& filePtr);
+	void LoadSound(std::ifstream& filePtr);
+	void LoadFont(std::ifstream& filePtr);
 };
