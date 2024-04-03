@@ -25,3 +25,10 @@ IDTexture WidthImg HeightImg
 29 43.2 8
 42 12 12
 $
+
+#Maps
+1 map1.txt
+2 map2.txt
+3 map3.txt
+4 map4.txt
+$

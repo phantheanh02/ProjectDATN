@@ -71,6 +71,9 @@ void SceneManager::LoadElements(const std::string& filename)
 		case ET_BULLET:
 			LoadBullet(fscene);
 			break;
+		case ET_MAP:
+			LoadMap(fscene);
+			break;
 		default:
 			std::cerr << "Scene file format error, abort loading elements";
 			valid = false;
@@ -129,6 +132,48 @@ BoxBullet SceneManager::GetBoxBullet(GLint bullet_id)
 	return BoxBullet();
 }
 
+MapInfo SceneManager::GetMapInfo(GLint map_id)
+{
+	for (auto it : m_mapList)
+	{
+		if (it.id == map_id)
+		{
+			return it;
+		}
+	}
+	std::cerr << "ERR: Map with id " << map_id << " not found!\n";
+	return MapInfo();
+}
+
+MapInfo SceneManager::GetCurrentMapInfo()
+{
+	return m_currentMap;
+}
+
+void SceneManager::SetCurrentMap(int maptype)
+{
+	switch (maptype)
+	{
+	case 0: // MT_BAREN
+		m_currentMap = GetMapInfo(1);
+		break;
+	case 1: // MT_ICE
+		m_currentMap = GetMapInfo(2);
+		break;
+	case 2: // MT_LAVA
+		m_currentMap = GetMapInfo(3);
+		break;
+	case 3: // MT_BLACK_HOLE
+		m_currentMap = GetMapInfo(4);
+		break;
+	case 4: // MT_TERRAN
+		m_currentMap = GetMapInfo(4);
+		break;
+	default:
+		break;
+	}
+}
+
 void SceneManager::LoadObject(std::ifstream& file)
 {
 	Vector3 pos, rt, sc;
@@ -177,7 +222,6 @@ void SceneManager::LoadCamera(std::ifstream& file)
 void SceneManager::LoadEnemies(std::ifstream& file)
 {
 	std::string skipStr;
-	BoxEnemy box;
 	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
 	file >> skipStr;
 	while (skipStr != "$")
@@ -204,6 +248,102 @@ void SceneManager::LoadBullet(std::ifstream& file)
 	}
 }
 
+void SceneManager::LoadMap(std::ifstream& file)
+{
+	std::string skipStr, filemap;
+	int id = 0;
+	file >> skipStr;
+	while (skipStr != "$")
+	{
+		id = std::stoi(skipStr);
+		file >> filemap >> skipStr;
+		std::string path = Globals::scenePath + filemap;
+		std::ifstream fFile(path);
+		if (!fFile.is_open())
+		{
+			std::cerr << "Error opening file " << path << "\n";
+			return;
+		}
+		MapInfo map = LoadElementsMap(fFile);
+		map.id = id;
+		m_mapList.push_back(map);
+	}
+}
+
+MapInfo SceneManager::LoadElementsMap(std::ifstream& file)
+{
+	MapInfo map;
+	std::string skipStr;
+	file >> skipStr >> map.idTexture >> skipStr >> map.sizeByTile.x >> map.sizeByTile.y >> map.minTile >> map.maxTile;
+	std::string typeStr;
+	GLint type;
+	do
+	{
+		if (!(file >> typeStr))
+		{
+			break;
+		}
+		type = ParseElementType(typeStr);
+		switch (type)
+		{
+		case MT_PLANES:
+			LoadPlanesMap(file, map);
+			break;
+		case MT_ENEMIES:
+			LoadEnemiesMap(file, map);
+			break;
+		case MT_ITEMS:
+			LoadItemsMap(file, map);
+			break;
+		default:
+			std::cerr << "Map file format error, abort loading elements";
+			file.close();
+			return map;
+		}
+	} while (true);
+	file.close();
+	return map;
+}
+
+void SceneManager::LoadPlanesMap(std::ifstream& file, MapInfo& map)
+{
+	std::string skipStr;
+	float x, y, z, w;
+	file >> skipStr;
+	while (skipStr != "$")
+	{
+		x = std::stoi(skipStr);
+		file >> y >> z >> w >> skipStr;
+		map.plane.push_back(Vector4(x, y, z, w));
+	}
+}
+
+void SceneManager::LoadEnemiesMap(std::ifstream& file, MapInfo& map)
+{
+	std::string skipStr;
+	int x, y, z;
+	file >> skipStr;
+	while (skipStr != "$")
+	{
+		x = std::stoi(skipStr);
+		file >> y >> z >> skipStr;
+		map.enemies.push_back(Vector3(x, y, z));
+	}
+}
+
+void SceneManager::LoadItemsMap(std::ifstream& file, MapInfo& map)
+{
+	std::string skipStr;
+	int x, y, z;
+	file >> skipStr >> skipStr >> skipStr >> skipStr;
+	while (skipStr != "$")
+	{
+		x = std::stoi(skipStr);
+		file >> y >> z >> skipStr;
+		map.items.push_back(Vector3(x, y, z));
+	}
+}
+
 int ParseElementType(const std::string& type)
 {
 	if (type == "#Objects")
@@ -214,5 +354,13 @@ int ParseElementType(const std::string& type)
 		return ET_ENEMY;
 	if (type == "#Bullets")
 		return ET_BULLET;
+	if (type == "#Maps")
+		return ET_MAP;
+	if (type == "#PlanesMap")
+		return MT_PLANES;
+	if (type == "#EnemiesMap")
+		return MT_ENEMIES;
+	if (type == "#ItemsMap")
+		return MT_ITEMS;
 	return ET_INVALID;
 }

@@ -12,6 +12,10 @@ enum ElementType
 	ET_OBJECT,
 	ET_ENEMY,
 	ET_BULLET,
+	ET_MAP,
+	MT_PLANES,
+	MT_ENEMIES,
+	MT_ITEMS,
 	ET_INVALID = -1
 };
 
@@ -23,24 +27,40 @@ public:
 	void Init();
 	void CleanUp();
 	void LoadElements(const std::string& filename);
-	std::shared_ptr<Camera> GetCamera(GLint camera_id);
-	std::shared_ptr<Sprite2D> GetObject(GLint object_id);
-	BoxEnemy GetBoxEnemy(GLint enemy_id);
-	BoxBullet GetBoxBullet(GLint bullet_id);
+
+	std::shared_ptr<Camera>		GetCamera(GLint camera_id);
+	std::shared_ptr<Sprite2D>	GetObject(GLint object_id);
+	BoxEnemy					GetBoxEnemy(GLint enemy_id);
+	BoxBullet					GetBoxBullet(GLint bullet_id);
+	MapInfo						GetMapInfo(GLint map_id);
+	MapInfo						GetCurrentMapInfo();
+
+	void						SetCurrentMap(int maptype);
 
 	bool m_init;
 	GLint m_soundVolume;
 	GLint m_lastNonZeroSoundVolume;
 
 private:
-	std::unordered_map<GLint, std::shared_ptr<Camera>> m_cameraList;
-	std::unordered_map<GLint, std::shared_ptr<Sprite2D>> m_objectList;
-	std::unordered_map<GLint, BoxEnemy> m_enemiesList;
-	std::unordered_map<GLint, BoxBullet> m_bulletList;
+	std::unordered_map<GLint, std::shared_ptr<Camera>>		m_cameraList;
+	std::unordered_map<GLint, std::shared_ptr<Sprite2D>>	m_objectList;
+	std::unordered_map<GLint, BoxEnemy>						m_enemiesList;
+	std::unordered_map<GLint, BoxBullet>					m_bulletList;
+	std::vector<MapInfo>									m_mapList;
+	MapInfo													m_currentMap;
 
 	// Utilities
 	void LoadObject(std::ifstream& file);
 	void LoadCamera(std::ifstream& file);
 	void LoadEnemies(std::ifstream& file);
 	void LoadBullet(std::ifstream& file);
+
+	// Load map
+	void LoadMap(std::ifstream& file);
+	MapInfo LoadElementsMap(std::ifstream& file);
+	void LoadPlanesMap(std::ifstream& file, MapInfo& map);
+	void LoadEnemiesMap(std::ifstream& file, MapInfo& map);
+	void LoadItemsMap(std::ifstream& file, MapInfo &map);
+
+
 };

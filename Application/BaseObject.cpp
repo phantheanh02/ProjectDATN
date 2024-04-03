@@ -31,6 +31,17 @@ BaseObject::~BaseObject()
 	m_camera.reset();
 }
 
+bool BaseObject::HasTouchMouse(GLfloat x, GLfloat y, bool bIsPressed)
+{
+	if ((m_pos.x <= x) && (x <= m_pos.x + m_scale.x)
+		&& (m_pos.y <= y) && (y <= m_pos.y + m_scale.y)
+		&& bIsPressed)
+	{
+		return true;
+	}
+	return false;
+}
+
 void BaseObject::Set2DSize(GLint x, GLint y)
 {
 	auto scale = Vector3(x, y, 1.0f);

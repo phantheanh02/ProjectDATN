@@ -8,6 +8,7 @@ class Sprite2D : public BaseObject
 public:
 	using BaseObject::BaseObject;
 	Sprite2D(const char* filename);
+	Sprite2D(GLint textureID);
 	~Sprite2D();
 
 	void Draw() override;

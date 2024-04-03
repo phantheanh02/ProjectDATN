@@ -12,6 +12,15 @@ Sprite2D::Sprite2D(const char* filename) :
 {
 }
 
+Sprite2D::Sprite2D(GLint textureID):
+	BaseObject(0,
+		ResourcesManager::GetInstance()->GetModel(0),
+		ResourcesManager::GetInstance()->GetShader(0),
+		ResourcesManager::GetInstance()->GetTexture(textureID))
+{
+
+}
+
 Sprite2D::~Sprite2D()
 {
 }

@@ -16,6 +16,8 @@ public:
 	virtual void Draw() = 0;
 	virtual void Update(GLfloat deltaTime) = 0;
 
+	bool HasTouchMouse(GLfloat x, GLfloat y, bool bIsPressed);
+
 	inline void AttachCamera(std::shared_ptr<Camera> camera) { m_camera = camera; };
 	inline void SetRotation(Vector3 rotation) { m_rotation = rotation; };
 	inline void SetScale(Vector3 scale) { m_scale = scale; };
@@ -35,7 +37,7 @@ protected:
 	std::shared_ptr<Texture> m_texture;
 	std::shared_ptr<Camera> m_camera;
 
-	GLint m_id;
+	GLint	m_id;
 	Vector3 m_pos;
 	GLfloat m_alpha;
 	Vector3 m_scale = Vector3(1.0f, 1.0f, 1.0f);

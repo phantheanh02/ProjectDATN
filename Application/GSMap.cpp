@@ -15,23 +15,24 @@ void GSMap::Init()
 	m_mouse = 0;
 	m_key = 0;
 	m_mouse = 0;
+	m_typeMap = 0;
 
 	// button play
 	auto button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
-	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
+	button->Set2DSize(110, 35);
+	button->Set2DPosition(650, 40);
 	m_listButton.push_back(button);
 
 	// button back
 	button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
-	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 138);
+	button->Set2DSize(110, 35);
+	button->Set2DPosition(800, 40);
 	m_listButton.push_back(button);
 
 	// background
 	auto staticCamera = SceneManager::GetInstance()->GetCamera(1);
 	m_background = std::make_shared<SpriteAnimation>("GSMap/Space_Stars.png", 1, 4, 0.1f);
-	//m_background->AttachCamera(staticCamera);
+	m_background->AttachCamera(staticCamera);
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->Set2DPosition(0, 0);
 
@@ -69,7 +70,12 @@ void GSMap::Init()
 	planet->AttachCamera(staticCamera);
 	planet->Set2DPosition(730, 460);
 	m_listSprite2D.push_back(planet);
-	
+
+	// Circle
+	m_circleChosen = std::make_shared<Sprite2D>("GSMap/Circle.png");
+	m_circleChosen->Set2DSize(96, 96);
+	m_circleChosen->Set2DPosition(180, 540);
+	m_circleChosen->AttachCamera(staticCamera);
 }
 
 void GSMap::Update(float deltaTime)
@@ -82,13 +88,14 @@ void GSMap::Draw()
 	m_background->Draw();
 	for (auto it : m_listButton)
 	{
-		//it->Draw();
+		it->Draw();
 	}
 
 	for (auto it : m_listSprite2D)
 	{
 		it->Draw();
 	}
+	m_circleChosen->Draw();
 }
 
 void GSMap::Pause()
@@ -113,7 +120,6 @@ void GSMap::OnKey(unsigned char key, bool pressed)
 
 void GSMap::OnMouseClick(int x, int y, unsigned char key, bool pressed)	
 {
-	printf("x: %d; y: %d\n", x, y);
 	for (auto& button : m_listButton)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))
@@ -122,15 +128,28 @@ void GSMap::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			switch (button->m_type)
 			{
 			case BUTTON_PLAY:
+				SceneManager::GetInstance()->SetCurrentMap(m_typeMap);
+				GameStateMachine::GetInstance()->PopState();
 				GameStateMachine::GetInstance()->PushState(StateType::STATE_PLAY);
-				break;
+				return;
 			case BUTTON_BACK:
 				GameStateMachine::GetInstance()->PopState();
-				break;
+				return;
 			default:
 				break;
 			}
 		};
+	}
+
+	for (int it = 0; it < m_listSprite2D.size(); it++)
+	{
+		if (m_listSprite2D[it]->HasTouchMouse(x, y, pressed))
+		{
+			//GameStateMachine::GetInstance()->PopState();
+			m_typeMap = it;
+			m_circleChosen->Set2DPosition(m_listSprite2D[it]->Get2DPosition().x, m_listSprite2D[it]->Get2DPosition().y);
+			return;
+		}
 	}
 }
 

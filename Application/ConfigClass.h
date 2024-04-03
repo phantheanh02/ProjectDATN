@@ -78,3 +78,16 @@ struct BoxBullet
 	GLint id;
 	Vector2 imgSize;
 };
+
+struct MapInfo
+{
+	GLint id;
+	GLint idTexture;
+	GLint minTile;
+	GLint maxTile;
+	Vector2 sizeByTile;
+	std::vector<Vector4>	plane;		// x, y: position; z, w : size
+	std::vector<Vector3>	enemies;	// x: id texture; y, z: position
+	std::vector<Vector3>	items;		// x" id texture; y, z: position
+};
+

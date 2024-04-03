@@ -5,6 +5,8 @@
 #include "Button.h"
 #include <memory>
 
+
+
 class GSMap final : public GameStateBase
 {
 public:
@@ -24,10 +26,12 @@ public:
 	void OnMouseMove(int x, int y) override;
 	void OnMouseScroll(int x, int y, short delta) override;
 private:
-	unsigned int m_key;
-	unsigned int m_mouse;
+	unsigned int	m_key;
+	unsigned int	m_mouse;
+	int				m_typeMap;
 
 	std::vector<std::shared_ptr<Button>>	m_listButton;
 	std::vector<std::shared_ptr<Sprite2D>>	m_listSprite2D;
 	std::shared_ptr<SpriteAnimation>		m_background;
+	std::shared_ptr<Sprite2D>				m_circleChosen;
 };
