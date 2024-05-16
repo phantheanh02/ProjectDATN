@@ -15,7 +15,7 @@ SpriteAnimation::SpriteAnimation(GLint id, std::shared_ptr<Model> model, std::sh
 
 SpriteAnimation::SpriteAnimation(const char* filename, GLint numAction, GLint numFrame, GLfloat timeBtwFrame) :
 	BaseObject(0,
-		ResourcesManager::GetInstance()->GetModel(0),
+		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT),
 		ResourcesManager::GetInstance()->GetShader(1),
 		ResourcesManager::GetInstance()->GetTexture(filename))
 {

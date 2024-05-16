@@ -31,6 +31,7 @@ public:
 	void CleanUp();
 	void LoadResources(const std::string& filename);
 
+	std::shared_ptr<Model>		GetModel(ModelType type);
 	std::shared_ptr<Model>		GetModel(GLint id);
 	std::shared_ptr<Shaders>	GetShader(GLint id);
 	std::shared_ptr<Texture>	GetTexture(GLint id);
@@ -39,7 +40,6 @@ public:
 
 	std::shared_ptr<Shaders>	GetShader(const char* name);
 	std::shared_ptr<Texture>	GetTexture(const char* name);
-	std::shared_ptr<Model>		GetModel(const char* name);
 
 	void SetMasterVolume(int volume);
 	void PauseAllSounds();
@@ -48,7 +48,7 @@ public:
 	
 	bool m_init;
 private:
-	std::unordered_map<std::string, std::shared_ptr<Model>>		m_modelList;
+	std::unordered_map<GLint, std::shared_ptr<Model>>		m_modelList;
 	std::unordered_map<std::string, std::shared_ptr<Shaders>>	m_shaderList;
 	std::unordered_map<std::string, std::shared_ptr<Texture>>	m_textureList;
 	std::unordered_map<GLint, std::shared_ptr<Sound>>			m_soundList;

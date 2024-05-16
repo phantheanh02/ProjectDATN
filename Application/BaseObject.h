@@ -17,19 +17,24 @@ public:
 	virtual void Update(GLfloat deltaTime) = 0;
 
 	bool HasTouchMouse(GLfloat x, GLfloat y, bool bIsPressed);
-
+	void FlipHorizontal();
+	void FlipVertical();
+	void CalculateWVPMatrix();
 	inline void AttachCamera(std::shared_ptr<Camera> camera) { m_camera = camera; };
+
+	inline void SetModel(std::shared_ptr<Model> model) { m_model = model; };
 	inline void SetRotation(Vector3 rotation) { m_rotation = rotation; };
 	inline void SetScale(Vector3 scale) { m_scale = scale; };
 	inline void SetPos(Vector3 pos) { m_pos = pos; };
 	inline void SetTransparency(GLfloat alpha) { m_alpha = alpha; };
-	void Set2DSize(GLint x, GLint y);
-	void Set2DPosition(GLint x, GLint y);
-	void Set2DScale(GLfloat x, GLfloat y);
-	void SetTexture(std::shared_ptr<Texture> texture);
-	void FlipHorizontal();
-	void FlipVertical();
-	void CalculateWVPMatrix();
+	void		Set2DSize(GLint x, GLint y);
+	void		Set2DSizeByTile(GLfloat width, GLfloat height);
+	void		Set2DPosition(GLint x, GLint y);
+	void		Set2DPositionByTile(GLfloat x, GLfloat y);
+	void		Set2DScale(GLfloat x, GLfloat y);
+	void		SetTexture(std::shared_ptr<Texture> texture);
+
+
 
 protected:
 	std::shared_ptr<Model> m_model;

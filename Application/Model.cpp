@@ -77,3 +77,8 @@ GLint Model::LoadModel(const std::string& filename)
 
 	return 0;
 }
+
+ModelType Model::GetType()
+{
+	return (ModelType)m_id;
+}

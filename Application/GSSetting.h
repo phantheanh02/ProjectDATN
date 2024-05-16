@@ -28,14 +28,13 @@ public:
 	void OnMouseClick(int x, int y, unsigned char key, bool pressed) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseScroll(int x, int y, short delta) override;
+
 private:
-	float m_time;
 	GLint m_currentVolume;
 	GLint m_lastNonZeroVolume;
 	bool m_volumeChanged;
 	std::shared_ptr<Sprite2D> m_background;
 	std::shared_ptr<Text> m_textVolumeLevel;
-	std::shared_ptr<Texture> m_soundOnIcon, m_muteIcon, m_lastTexture;
 	std::shared_ptr<Button> m_buttonSoundToggle;
 	std::vector<std::shared_ptr<Text>> m_listText;
 	std::vector<std::shared_ptr<Button>> m_listButton;

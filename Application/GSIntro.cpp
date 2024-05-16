@@ -13,16 +13,11 @@ void GSIntro::Init()
 {
 	m_time = 2.0f;
 
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
-	auto shader = ResourcesManager::GetInstance()->GetShader(0);
-	auto texture = ResourcesManager::GetInstance()->GetTexture(0);
-
-	m_intro = std::make_shared<Sprite2D>(2, model, shader, texture);
+	m_intro = std::make_shared<Sprite2D>("intro.png");
 	m_intro->Set2DSize(864, 42);
 	m_intro->Set2DPosition(Globals::screenWidth / 2 - 864 / 2.0f, Globals::screenHeight / 2 - 21);
 
-	texture = ResourcesManager::GetInstance()->GetTexture(1);
-	m_bgIntro = std::make_shared<Sprite2D>(2, model, shader, texture);
+	m_bgIntro = std::make_shared<Sprite2D>("bg_intro.png");
 	m_bgIntro->Set2DSize(Globals::screenWidth , Globals::screenHeight);
 	m_bgIntro->Set2DPosition(0, 0);
 }

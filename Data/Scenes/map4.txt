@@ -1,4 +1,4 @@
-#TextureID: 93
+#TextureID: 28
 
 #TileSize 
 180 40 18 60

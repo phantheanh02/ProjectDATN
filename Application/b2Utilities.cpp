@@ -6,7 +6,8 @@
 #include "Globals.h"
 #include "Boss.h"
 #include "Item.h"
-
+#include "box2d.h"
+#include "Player.h"
 void ContactListener::BeginContact(b2Contact* contact)
 {
 	auto fixtureA = contact->GetFixtureA();
@@ -65,7 +66,7 @@ void ContactListener::PlayerOnGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
-	player->m_onGround = true;
+	//player->m_onGround = true;
 	player = nullptr;
 }
 
@@ -74,7 +75,7 @@ void ContactListener::PlayerOnAir(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
-	player->m_onGround = false;
+	//player->m_onGround = false;
 	player = nullptr;
 }
 

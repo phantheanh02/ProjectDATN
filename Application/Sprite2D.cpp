@@ -3,10 +3,11 @@
 #include "Vertex.h"
 #include "Globals.h"
 #include "ResourcesManager.h"
+#include "BaseObject.h"
 
 Sprite2D::Sprite2D(const char* filename) : 
 	BaseObject(0, 
-		ResourcesManager::GetInstance()->GetModel(0), 
+		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT), 
 		ResourcesManager::GetInstance()->GetShader(0), 
 		ResourcesManager::GetInstance()->GetTexture(filename))
 {
@@ -14,7 +15,7 @@ Sprite2D::Sprite2D(const char* filename) :
 
 Sprite2D::Sprite2D(GLint textureID):
 	BaseObject(0,
-		ResourcesManager::GetInstance()->GetModel(0),
+		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT),
 		ResourcesManager::GetInstance()->GetShader(0),
 		ResourcesManager::GetInstance()->GetTexture(textureID))
 {

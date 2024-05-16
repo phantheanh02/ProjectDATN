@@ -17,12 +17,9 @@ void GSSetting::Init()
 	m_currentVolume = SM->m_soundVolume;
 	m_lastNonZeroVolume = SM->m_lastNonZeroSoundVolume;
 
-	auto model = RM->GetModel(0);
-	auto shader = RM->GetShader(0);
-	auto texture = RM->GetTexture(64);
-	auto staticCamera = SM->GetCamera(1);
+	auto staticCamera = SM->GetCamera(CameraType::STATIC_CAMERA);
 
-	m_background = std::make_shared<Sprite2D>(0, model, shader, texture);
+	m_background = std::make_shared<Sprite2D>("state_background.png");
 	m_background->Set2DPosition(-10, -10);
 	m_background->Set2DSize(1200, 900);
 	m_background->AttachCamera(staticCamera);
@@ -66,54 +63,48 @@ void GSSetting::Init()
 	m_listText.push_back(m_textVolumeLevel);
 
 	// init buttons
-	texture = RM->GetTexture(69);
-	auto buttonSave = std::make_shared<Button>(model, shader, texture, BUTTON_SAVE);
-	buttonSave->AttachCamera(staticCamera);
-	buttonSave->Set2DPosition(244, 584);
-	buttonSave->Set2DSize(220, 70);
+	auto button = std::make_shared<Button>("btn_save.png", BUTTON_SAVE);
+	button->Set2DPosition(244, 584);
+	button->Set2DSize(220, 70);
+	m_listButton.push_back(button);
 
-	texture = RM->GetTexture(70);
-	auto buttonCancel = std::make_shared<Button>(model, shader, texture, BUTTON_CANCEL);
-	buttonCancel->AttachCamera(staticCamera);
-	buttonCancel->Set2DPosition(548, 584);
-	buttonCancel->Set2DSize(220, 70);
+	button = std::make_shared<Button>("btn_cancel.png", BUTTON_CANCEL);
+	button->Set2DPosition(548, 584);
+	button->Set2DSize(220, 70);
+	m_listButton.push_back(button);
 
-	texture = RM->GetTexture(65);
-	auto buttonDecVolume = std::make_shared<Button>(model, shader, texture, BUTTON_BACK);
-	buttonDecVolume->AttachCamera(staticCamera);
-	buttonDecVolume->Set2DPosition(470, 348);
-	buttonDecVolume->Set2DSize(60, 60);
+	button = std::make_shared<Button>("Icons/icon_back.png", BUTTON_BACK);
+	button->Set2DPosition(470, 348);
+	button->Set2DSize(60, 60);
+	m_listButton.push_back(button);
 
-	texture = RM->GetTexture(66);
-	auto buttonIncVolume = std::make_shared<Button>(model, shader, texture, BUTTON_NEXT);
-	buttonIncVolume->AttachCamera(staticCamera);
-	buttonIncVolume->Set2DPosition(667, 348);
-	buttonIncVolume->Set2DSize(60, 60);
+	button = std::make_shared<Button>("Icons/icon_next.png", BUTTON_NEXT);
+	button->Set2DPosition(667, 348);
+	button->Set2DSize(60, 60);
+	m_listButton.push_back(button);
 
-	m_soundOnIcon = RM->GetTexture(67);
-	m_muteIcon = RM->GetTexture(68);
-	texture = m_currentVolume <= 0 ? m_muteIcon : m_soundOnIcon;
-	m_buttonSoundToggle = std::make_shared<Button>(model, shader, texture, BUTTON_SOUND);
-	m_buttonSoundToggle->AttachCamera(staticCamera);
+	if (m_currentVolume <= 0)
+	{
+		m_buttonSoundToggle = std::make_shared<Button>("Icons/icon_sound_off.png", BUTTON_SOUND);
+	}
+	else
+	{
+		m_buttonSoundToggle = std::make_shared<Button>("Icons/icon_sound_on.png", BUTTON_SOUND);
+	}
 	m_buttonSoundToggle->Set2DPosition(570, 250);
 	m_buttonSoundToggle->Set2DSize(50, 50);
 
-	m_listButton.push_back(buttonSave);
-	m_listButton.push_back(buttonCancel);
-	m_listButton.push_back(buttonDecVolume);
-	m_listButton.push_back(buttonIncVolume);
-	m_listButton.push_back(m_buttonSoundToggle);
 }
 
 void GSSetting::Update(float deltaTime)
 {
 	if (m_currentVolume == 0)
 	{
-		m_buttonSoundToggle->SetTexture(m_muteIcon);
+		m_buttonSoundToggle->SetTexture(ResourcesManager::GetInstance()->GetTexture("Icons/icon_sound_off.png"));
 	}
 	else
 	{
-		m_buttonSoundToggle->SetTexture(m_soundOnIcon);
+		m_buttonSoundToggle->SetTexture(ResourcesManager::GetInstance()->GetTexture("Icons/icon_sound_on.png"));
 	}
 	if (m_volumeChanged)
 	{

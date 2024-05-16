@@ -7,7 +7,7 @@
 Text::Text(GLuint id)
 {
 	m_id = id;
-	m_model = ResourcesManager::GetInstance()->GetModel(0);
+	m_model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	m_shader = ResourcesManager::GetInstance()->GetShader(0);
 	m_textTextureId = 0;
 	m_texture = nullptr;

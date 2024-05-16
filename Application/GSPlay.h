@@ -8,11 +8,7 @@
 #include "GameStateMachine.h"
 #include "Button.h"
 #include "Player.h"
-#include "ConfigClass.h"
 
-constexpr auto VELOCITY_ITERATION = 8;
-constexpr auto POSITION_ITERATION = 3;
-constexpr auto MOVEMENT_SPEED = 7.0f;
 
 class GSPlay final : public GameStateBase
 {
@@ -35,20 +31,22 @@ public:
 
 	void Update2DDrawPosition();
 	void LoadMap();
+
 private:
+	// Kry/mouse event
 	unsigned int	m_key;
 	unsigned int	m_mouse;
 
-	std::vector<std::shared_ptr<Button>>	m_listButton;
+	// background
 	std::shared_ptr<Sprite2D>				m_background;
+	std::vector<std::shared_ptr<Button>>	m_listButton;
 
+	// camera
 	std::shared_ptr<Camera>					m_dynamicCamera;
 	std::shared_ptr<Camera>					m_staticCamera;
 	Vector4									m_cameraPositionBoudaries;
 
-	std::shared_ptr<Player>					m_player;
-	GLint									m_lastPlayerHorizontalDirection;
-	GLfloat									m_lastJumpTime;
+	// map
 	MapInfo									m_map;
 
 	// box2d
@@ -57,5 +55,8 @@ private:
 	ContactListener*						m_contactListener;
 	b2Vec2									m_gravity;
 	GLfloat									m_timeStep;
+
+	// Player
+	std::shared_ptr<Player>					m_player;
 };
 	

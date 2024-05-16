@@ -42,5 +42,5 @@ private:
 	std::shared_ptr<SpriteAnimation> m_bulletAnimation;
 	GLint		m_currentDirection;
 	Vector2		size2D;
-	GLint		m_tileSizeByPixel = TILESIZEBYPIXEL;
+	GLint		m_tileSizeByPixel = tileSizeByPixel;
 };

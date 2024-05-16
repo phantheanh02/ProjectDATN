@@ -5,12 +5,17 @@
 #include <memory>
 #include "Sprite2D.h"
 
-constexpr auto HEIGHT_ENEMY = 30;
-constexpr auto DETECTION_DISTANCE = 8.0f;
-constexpr auto DETECTION_DISTANCE_SNIPER = 8.0f;
-constexpr auto HEIGHT_BULLET = 10.0f;
-constexpr auto ENEMY_SIZE = 0.75f;
-constexpr auto BULLET_SIZE = 0.1f;
+
+enum PlayerAction
+{
+	IDLE = 0x1,
+	RUNNING = 0x2,
+	JUMPING = 0x4,
+	SHOOTING = 0x8,
+	ON_AIR = 0x10,
+	DEAD = 0x200
+};
+
 
 enum TypeBullet
 {
@@ -83,8 +88,8 @@ struct MapInfo
 {
 	GLint id;
 	GLint idTexture;
-	GLint minTile;
-	GLint maxTile;
+	GLint minTileSize;
+	GLint maxTileSize;
 	Vector2 sizeByTile;
 	std::vector<Vector4>	plane;		// x, y: position; z, w : size
 	std::vector<Vector3>	enemies;	// x: id texture; y, z: position

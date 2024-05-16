@@ -19,6 +19,11 @@ enum ElementType
 	ET_INVALID = -1
 };
 
+enum CameraType
+{
+	STATIC_CAMERA,
+	DYNAMIC_CAMERA,
+};
 
 class SceneManager final : public SingletonDclp<SceneManager>
 {
@@ -28,7 +33,7 @@ public:
 	void CleanUp();
 	void LoadElements(const std::string& filename);
 
-	std::shared_ptr<Camera>		GetCamera(GLint camera_id);
+	std::shared_ptr<Camera>		GetCamera(CameraType camera);
 	std::shared_ptr<Sprite2D>	GetObject(GLint object_id);
 	BoxEnemy					GetBoxEnemy(GLint enemy_id);
 	BoxBullet					GetBoxBullet(GLint bullet_id);
@@ -42,7 +47,7 @@ public:
 	GLint m_lastNonZeroSoundVolume;
 
 private:
-	std::unordered_map<GLint, std::shared_ptr<Camera>>		m_cameraList;
+	std::unordered_map<CameraType, std::shared_ptr<Camera>>	m_cameraList;
 	std::unordered_map<GLint, std::shared_ptr<Sprite2D>>	m_objectList;
 	std::unordered_map<GLint, BoxEnemy>						m_enemiesList;
 	std::unordered_map<GLint, BoxBullet>					m_bulletList;

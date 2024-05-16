@@ -5,13 +5,13 @@
 Button::Button(std::shared_ptr<Model> model, std::shared_ptr<Shaders> shader, std::shared_ptr<Texture> texture, ButtonType type) :
 	Sprite2D(0, model, shader, texture), m_type(type)
 {
-	m_camera = SceneManager::GetInstance()->GetCamera(1);
+	m_camera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
 }
 
 Button::Button(const char* filename, ButtonType type) :
 	Sprite2D(filename), m_type(type)
 {
-	m_camera = SceneManager::GetInstance()->GetCamera(1);
+	m_camera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
 }
 
 Button::Button()

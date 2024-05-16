@@ -14,55 +14,39 @@ void GSMenu::Init()
 	m_key = 0;
 	m_mouse = 0;
 
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
-	auto shader = ResourcesManager::GetInstance()->GetShader(0);
-	auto texture = ResourcesManager::GetInstance()->GetTexture("btn_play.png");
-	auto staticCamera = SceneManager::GetInstance()->GetCamera(1);
-
 	// button play
-	std::shared_ptr<Button> buttonPlay = std::make_shared<Button>(model, shader, texture, BUTTON_PLAY);
-	buttonPlay->Set2DSize(220, 70);
-	buttonPlay->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
-	buttonPlay->AttachCamera(staticCamera);
+	std::shared_ptr<Button> button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
+	m_listButton.push_back(button);
 
-	// button exit
-	texture = ResourcesManager::GetInstance()->GetTexture(4);
-	std::shared_ptr<Button> buttonExit = std::make_shared<Button>(model, shader, texture, BUTTON_EXIT);
-	buttonExit->Set2DSize(220, 70);
-	buttonExit->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 138);
-	buttonExit->AttachCamera(staticCamera);
+	// button quit
+	button = std::make_shared<Button>("btn_quit.png", BUTTON_EXIT);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 138);
+	m_listButton.push_back(button);
 
 	// button setting
-	texture = ResourcesManager::GetInstance()->GetTexture(61);
-	auto buttonSetting = std::make_shared<Button>(model, shader, texture, BUTTON_SETTING);
-	buttonSetting->Set2DSize(220, 70);
-	buttonSetting->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 111);
-	buttonSetting->AttachCamera(staticCamera);
+	button = std::make_shared<Button>("btn_setting.png", BUTTON_SETTING);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 111);
+	m_listButton.push_back(button);
 
 	// button highscore
-	texture = ResourcesManager::GetInstance()->GetTexture(63);
-	auto buttonHighscore = std::make_shared<Button>(model, shader, texture, BUTTON_HIGHSCORE);
-	buttonHighscore->Set2DSize(220, 70);
-	buttonHighscore->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 28);
-	buttonHighscore->AttachCamera(staticCamera);
+	button = std::make_shared<Button>("btn_highscore.png", BUTTON_HIGHSCORE);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 28);
+	m_listButton.push_back(button);
 
 	// button credit
-	texture = ResourcesManager::GetInstance()->GetTexture(62);
-	auto buttonCredit = std::make_shared<Button>(model, shader, texture, BUTTON_CREDIT);
-	buttonCredit->Set2DSize(220, 70);
-	buttonCredit->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 55);
-	buttonCredit->AttachCamera(staticCamera);
-
-	m_listButton.push_back(buttonPlay);
-	m_listButton.push_back(buttonExit);
-	m_listButton.push_back(buttonSetting);
-	m_listButton.push_back(buttonHighscore);
-	m_listButton.push_back(buttonCredit);
+	button = std::make_shared<Button>("btn_credit.png", BUTTON_CREDIT);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 55);
+	m_listButton.push_back(button);
 
 	// background
-	texture = ResourcesManager::GetInstance()->GetTexture("bg_menu.png");
-	m_background = std::make_shared<Sprite2D>(0, model, shader, texture);
-	m_background->AttachCamera(staticCamera);
+	m_background = std::make_shared<Sprite2D>("bg_menu.png");
+	m_background->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->Set2DPosition(0, 0);
 }

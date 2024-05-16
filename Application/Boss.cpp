@@ -18,7 +18,7 @@ Boss::Boss(b2World* world)
 	m_health			= 15.0f;
 	m_damage			= 0;
 	m_timeBarDisplay	= 0.0f;
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(1);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(34);
 	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 8, 0.1f);

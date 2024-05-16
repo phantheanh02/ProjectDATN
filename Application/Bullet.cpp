@@ -20,7 +20,7 @@ Bullet::Bullet(b2World* world, FixtureTypes bulletType)
 	bulletBodyDef.bullet = true;
 	m_bulletBody = world->CreateBody(&bulletBodyDef);
 	m_bulletBody->SetGravityScale(0.0f);
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(0);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(26);
 	m_bulletSprite = std::make_shared<Sprite2D>(0, model, shader, texture);
@@ -62,7 +62,7 @@ Bullet::Bullet(b2World* world)
 	m_bulletBody = world->CreateBody(&bulletBodyDef);
 	m_bulletBody->SetGravityScale(0.0f);
 
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(0);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(26);
 	m_bulletSprite = std::make_shared<Sprite2D>(0, model, shader, texture);

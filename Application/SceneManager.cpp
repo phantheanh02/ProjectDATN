@@ -16,8 +16,8 @@ void SceneManager::Init()
 	// static camera for UI
 	std::shared_ptr<Camera> staticCamera = std::make_shared<Camera>(1);
 
-	m_cameraList.insert(std::make_pair(0, dynamicCamera));
-	m_cameraList.insert(std::make_pair(1, staticCamera));
+	m_cameraList.insert(std::make_pair(CameraType::DYNAMIC_CAMERA, dynamicCamera));
+	m_cameraList.insert(std::make_pair(CameraType::STATIC_CAMERA, staticCamera));
 
 	m_soundVolume = 100;
 	m_lastNonZeroSoundVolume = 100;
@@ -84,14 +84,18 @@ void SceneManager::LoadElements(const std::string& filename)
 	fscene.close();
 }
 
-std::shared_ptr<Camera> SceneManager::GetCamera(GLint camera_id)
+
+std::shared_ptr<Camera> SceneManager::GetCamera(CameraType camera)
 {
-	auto it = m_cameraList.find(camera_id);
-	if (it != m_cameraList.end())
+	switch (camera)
 	{
-		return it->second;
+	case STATIC_CAMERA:
+		return m_cameraList[STATIC_CAMERA];
+	case DYNAMIC_CAMERA:
+		return m_cameraList[DYNAMIC_CAMERA];
+	default:
+		return nullptr;
 	}
-	std::cerr << "ERR: Camera with id " << camera_id << " not found!\n";
 	return nullptr;
 }
 
@@ -274,7 +278,7 @@ MapInfo SceneManager::LoadElementsMap(std::ifstream& file)
 {
 	MapInfo map;
 	std::string skipStr;
-	file >> skipStr >> map.idTexture >> skipStr >> map.sizeByTile.x >> map.sizeByTile.y >> map.minTile >> map.maxTile;
+	file >> skipStr >> map.idTexture >> skipStr >> map.sizeByTile.x >> map.sizeByTile.y >> map.minTileSize >> map.maxTileSize;
 	std::string typeStr;
 	GLint type;
 	do

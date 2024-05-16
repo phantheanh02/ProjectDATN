@@ -6,7 +6,7 @@
 
 Enemies::Enemies(GLint id): m_id(id)
 {
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(1);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(12);
 	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 5, 0.15f);
@@ -16,7 +16,7 @@ Enemies::Enemies(GLint id): m_id(id)
 
 Enemies::Enemies(GLint id, GLint idTexture): m_id(id)
 {
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(1);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(idTexture);
 	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 5, 0.15f);
@@ -43,7 +43,7 @@ void Enemies::Intro()
 	m_currentDirection = 1;
 	m_health = 3.0f;
 	m_timeBarDisplay = 0.0f;
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(0);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(57);
 	m_hpBar = std::make_shared<Sprite2D>(0, model, shader, texture);

@@ -12,10 +12,12 @@ public:
 	inline static const std::string soundPath = "../Data/Sounds/";
 	inline static const std::string scenePath = "../Data/Scenes/";
 	inline static const std::string fontPath = "../Data/Fonts/"; 
+	
 };
 
-constexpr auto TILESIZEBYPIXEL = 44;
+static int tileSizeByPixel = 44;
 
+// key define
 #define KEY_LEFT		VK_LEFT
 #define KEY_RIGHT		VK_RIGHT
 #define KEY_UP			VK_UP
@@ -29,3 +31,17 @@ constexpr auto TILESIZEBYPIXEL = 44;
 #define KEY_D			'D'
 #define KEY_E			'E'
 #define KEY_J			'J'
+
+// other
+#define HP_MAX						50
+#define ARMOR_MAX					100
+#define NUMBER_BULLET_MAX			100
+#define HEIGHT_ENEMY				30
+#define DETECTION_DISTANCE			8.0f
+#define DETECTION_DISTANCE_SNIPER	8.0f
+#define HEIGHT_BULLET				10.0f
+#define ENEMY_SIZE					0.75f
+#define BULLET_SIZE					0.1f
+#define VELOCITY_ITERATION			8
+#define POSITION_ITERATION			3
+#define MOVEMENT_SPEED				7.0f

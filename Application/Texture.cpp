@@ -2,8 +2,9 @@
 #include <iostream>
 #include <algorithm>
 #include "Texture.h"
-#define STB_IMAGE_IMPLEMENTATION 
 #include "stb_image.h"
+
+#define STB_IMAGE_IMPLEMENTATION 
 
 Texture::Texture() : m_textureId(0)
 {

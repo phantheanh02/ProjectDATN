@@ -5,9 +5,9 @@
 
 Item::Item(b2World* world, GLint idTexture, GLfloat posX, GLfloat posY)
 {
-	m_tileSizeByPixel = TILESIZEBYPIXEL;
+	m_tileSizeByPixel = tileSizeByPixel;
 
-	auto model = ResourcesManager::GetInstance()->GetModel(0);
+	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(0);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(idTexture);
 

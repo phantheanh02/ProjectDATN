@@ -105,16 +105,25 @@ void ResourcesManager::LoadResources(const std::string& filename)
 	resourcesFile.close();
 }
 
-std::shared_ptr<Model> ResourcesManager::GetModel(GLint id)
+std::shared_ptr<Model> ResourcesManager::GetModel(ModelType type)
 {
-	for (auto it : m_modelList)
+	switch (type)
 	{
-		if (it.second->GetID() == id)
-			return it.second;
+	case R_RETANGLE_TOPRIGHT:
+		return m_modelList[0];
+	case R_RETANGLE_CENTER:
+		return m_modelList[1];
+	case L_RETANGLE_TOPRIGHT:
+		return m_modelList[2];
+	case L_RETANGLE_CENTER:
+		return m_modelList[3];
+	default:
+		break;
 	}
 
-	std::cerr << "ERR: Model with id " << id << " not found!\n";
+	std::cerr << "ERR: Model " << type << " not found!\n";
 	return nullptr;
+	return std::shared_ptr<Model>();
 }
 
 std::shared_ptr<Shaders> ResourcesManager::GetShader(GLint id)
@@ -183,14 +192,14 @@ std::shared_ptr<Texture> ResourcesManager::GetTexture(const char* name)
 	return nullptr;
 }
 
-std::shared_ptr<Model> ResourcesManager::GetModel(const char* name)
+std::shared_ptr<Model> ResourcesManager::GetModel(GLint id)
 {
-	auto it = m_modelList.find(name);
+	auto it = m_modelList.find(id);
 	if (it != m_modelList.end())
 	{
 		return it->second;
 	}
-	std::cerr << "ERR: Model with name " << name << " not found!\n";
+	std::cerr << "ERR: Model with id " << id << " not found!\n";
 	return nullptr;
 }
 
@@ -246,7 +255,7 @@ void ResourcesManager::LoadModel(std::ifstream& filePtr)
 		std::shared_ptr<Model> model = std::make_shared<Model>();
 		model->LoadModel(file);
 		model->SetID(id);
-		m_modelList.insert(std::make_pair(filename, model));
+		m_modelList.insert(std::make_pair(id, model));
 	}
 }
 
@@ -279,30 +288,17 @@ void ResourcesManager::LoadTexture(std::ifstream& filePtr)
 	filePtr >> skipStr;
 	while (skipStr != "$")
 	{
-		filePtr >> id >> skipStr >> filename >> skipStr >> wrap >> skipStr >> filter >> skipStr;
+		filePtr >> id >> skipStr >> filename >> skipStr;
 		filename.erase(std::remove_if(filename.begin(), filename.end(), [](char c) {return c == '\"'; }), filename.end());
 		std::string file = Globals::texturePath + filename;
 		std::cout << "Load texture: " << filename << "\n";
+
 		auto texture = std::make_shared<Texture>();
 		texture->LoadTexture(file);
 		texture->SetID(id);
+		texture->SetWrap(GL_REPEAT);
+		texture->SetFilter(GL_NEAREST);
 
-		if (wrap == "CLAMP")
-		{
-			texture->SetWrap(GL_CLAMP_TO_EDGE);
-		}
-		else if (wrap == "REPEAT")
-		{
-			texture->SetWrap(GL_REPEAT);
-		}
-		if (filter == "LINEAR")
-		{
-			texture->SetFilter(GL_LINEAR);
-		}
-		else if (filter == "NEAREST")
-		{
-			texture->SetFilter(GL_NEAREST);
-		}
 		m_textureList.insert(std::make_pair(filename, texture));
 	}
 }

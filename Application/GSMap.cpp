@@ -30,7 +30,7 @@ void GSMap::Init()
 	m_listButton.push_back(button);
 
 	// background
-	auto staticCamera = SceneManager::GetInstance()->GetCamera(1);
+	auto staticCamera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
 	m_background = std::make_shared<SpriteAnimation>("GSMap/Space_Stars.png", 1, 4, 0.1f);
 	m_background->AttachCamera(staticCamera);
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
