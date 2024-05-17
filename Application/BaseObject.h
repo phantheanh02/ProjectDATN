@@ -34,7 +34,9 @@ public:
 	void		Set2DScale(GLfloat x, GLfloat y);
 	void		SetTexture(std::shared_ptr<Texture> texture);
 
-
+	std::shared_ptr<Model>		GetModel() { return m_model; };
+	std::shared_ptr<Shaders>	GetShader() { return m_shader; };
+	std::shared_ptr<Texture>	GetTexture() { return m_texture; };
 
 protected:
 	std::shared_ptr<Model> m_model;
@@ -47,9 +49,7 @@ protected:
 	GLfloat m_alpha;
 	Vector3 m_scale = Vector3(1.0f, 1.0f, 1.0f);
 	Vector3 m_rotation = Vector3(0.0f, 0.0f, 0.0f);
-	Vector3 m_translation = Vector3(0.0f, 0.0f, 0.0f);
-	Vector3 m_flip = Vector3(0.0f, 0.0f, 0.0f);
-	Vector3 m_transAfterFlip = Vector3(0.0f, 0.0f, 0.0f);
+	Vector3 m_translation = Vector3(0.0f, 0.0f, 0.0f);;
 	Matrix m_wvpMatrix;
-	bool m_changed, m_flippedX, m_flippedY;
+	bool m_changed;
 };

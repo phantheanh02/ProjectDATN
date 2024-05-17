@@ -110,15 +110,17 @@ void GSPlay::HandleEvent()
 	if (m_key & (1 << 0))
 	{
 		// key w
+		m_player->SetAction(JUMPING);
 	}
 	if (m_key & (1 << 2))
 	{
 		// key s
+		m_player->SetAction(PlayerAction::RUNNING);
 	}
 	if (!(m_key & 0xF))
 	{
 		// none of movement key is pressed
-		
+		m_player->SetAction(IDLE);
 	}
 	
 	// check if on air

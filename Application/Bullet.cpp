@@ -69,7 +69,7 @@ Bullet::Bullet(b2World* world)
 
 	shader = ResourcesManager::GetInstance()->GetShader(1);
 	texture = ResourcesManager::GetInstance()->GetTexture(30);
-	m_bulletAnimation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 9, 0.1f);
+	m_bulletAnimation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 9, 0.1f);
 	m_bulletAnimation->Set2DSize(1.0f * m_tileSizeByPixel, 1.0f * m_tileSizeByPixel);
 }
 

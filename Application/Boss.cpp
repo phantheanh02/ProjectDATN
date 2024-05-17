@@ -21,7 +21,7 @@ Boss::Boss(b2World* world)
 	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(1);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(34);
-	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 8, 0.1f);
+	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 8, 0.1f);
 
 	SetTexture(TypeBossAction::IDLE_BOSS);
 

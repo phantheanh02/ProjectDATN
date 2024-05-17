@@ -11,7 +11,17 @@ enum PlayerDirection
 	BOTTOM,
 	LEFT,
 	RIGHT,
-	NONE = -1
+	NONE_DIRECT = -1
+};
+
+enum PlayerAction
+{
+	IDLE		= 29,
+	RUNNING		= 30,
+	JUMPING		= 31,
+	CROUCH		= 32,
+	DEAD		= 33,
+	NONE_ACTION	= -1
 };
 
 class Player
@@ -33,6 +43,7 @@ public:
 	void Set2DSizeByTile(GLfloat width, GLfloat height);
 	void SetTileSize(GLint tileSize);
 	void SetDirection(PlayerDirection direction);
+	void SetAction(PlayerAction action);
 
 	void			GetItem(GLint typeItem);
 	inline Vector2	Get2DPositon() { return m_pos; };
@@ -46,6 +57,8 @@ private:
 
 	PlayerDirection						m_direction;
 	bool								m_isRightDirection;
+
+	PlayerAction						m_currentAction;
 	std::shared_ptr<SpriteAnimation>	m_actionAnimation;
 
 	// box2d

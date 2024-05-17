@@ -9,7 +9,7 @@ Enemies::Enemies(GLint id): m_id(id)
 	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(1);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(12);
-	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 5, 0.15f);
+	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 5, 0.15f);
 
 	Intro();
 }
@@ -19,7 +19,7 @@ Enemies::Enemies(GLint id, GLint idTexture): m_id(id)
 	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
 	auto shader = ResourcesManager::GetInstance()->GetShader(1);
 	auto texture = ResourcesManager::GetInstance()->GetTexture(idTexture);
-	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 1, 5, 0.15f);
+	m_animation = std::make_shared<SpriteAnimation>(0, model, shader, texture, 5, 0.15f);
 	
 	Intro();
 }

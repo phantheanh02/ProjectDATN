@@ -5,18 +5,6 @@
 #include <memory>
 #include "Sprite2D.h"
 
-
-enum PlayerAction
-{
-	IDLE = 0x1,
-	RUNNING = 0x2,
-	JUMPING = 0x4,
-	SHOOTING = 0x8,
-	ON_AIR = 0x10,
-	DEAD = 0x200
-};
-
-
 enum TypeBullet
 {
 	PLAYER_BULLET,

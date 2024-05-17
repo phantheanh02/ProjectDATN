@@ -94,6 +94,9 @@ void ResourcesManager::LoadResources(const std::string& filename)
 		case RT_TTF_FONT:
 			LoadFont(resourcesFile);
 			break;
+		case RT_DEFANIMATION:
+			LoadDefAnimation(resourcesFile);
+			break;
 		case RT_INVALID:
 			valid = false;
 			break;
@@ -170,6 +173,21 @@ TTF_Font* ResourcesManager::GetFont(GLint id)
 	return nullptr;
 }
 
+std::shared_ptr<SpriteAnimation> ResourcesManager::GetAnimation(GLint id)
+{
+	auto it = m_animationList.find(id);
+	if (it != m_animationList.end())
+	{
+		auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
+		auto shader = ResourcesManager::GetInstance()->GetShader(1);
+		auto texture = ResourcesManager::GetInstance()->GetTexture(id);
+		auto animation = std::make_shared<SpriteAnimation>(it->second.idTexture, model, shader, texture, it->second.numFrames, it->second.timeBtwFrame);
+		return animation;
+	}
+	std::cerr << "ERR: Animation with id " << id << " not found!\n";
+	return nullptr;
+}
+
 std::shared_ptr<Shaders> ResourcesManager::GetShader(const char* name)
 {
 	auto it = m_shaderList.find(name);
@@ -238,6 +256,8 @@ GLint ParseResourceType(const std::string& type)
 		return RT_SOUND;
 	if (type == "#Fonts")
 		return RT_TTF_FONT;
+	if (type == "#DefAnimation")
+		return RT_DEFANIMATION;
 	return RT_INVALID;
 }
 
@@ -338,5 +358,21 @@ void ResourcesManager::LoadFont(std::ifstream& filePtr)
 			return;
 		}
 		m_fontList.insert(std::make_pair(id, font));
+	}
+}
+
+void ResourcesManager::LoadDefAnimation(std::ifstream& filePtr)
+{
+	std::string skipStr, filename;
+	GLint id, numFrames;
+	GLfloat timeFrame;
+	filePtr >> skipStr >> skipStr >> skipStr >> skipStr;
+	while (skipStr != "$")
+	{
+		id = atoi(skipStr.c_str());
+		filePtr >> numFrames >> timeFrame >> skipStr;
+		std::cout << "Load animation with id texture: " << id << "\n";
+		DefAnimation animation(id, numFrames, timeFrame);
+		m_animationList.insert(std::make_pair(id, animation));
 	}
 }

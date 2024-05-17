@@ -24,8 +24,6 @@ BaseObject::BaseObject(GLint id, std::shared_ptr<Model> model, std::shared_ptr<S
 	m_shader = shaders;
 	m_texture = texture;
 	m_changed = true;
-	m_flippedX = false;
-	m_flippedY = false;
 	m_camera = SceneManager::GetInstance()->GetCamera(CameraType::DYNAMIC_CAMERA);
 }
 
@@ -52,8 +50,6 @@ void BaseObject::Set2DSize(GLint x, GLint y)
 {
 	auto scale = Vector3(x, y, 1.0f);
 	SetScale(scale);
-	m_transAfterFlip.y = m_flippedX ? (float)y : 0;
-	m_transAfterFlip.x = m_flippedY ? (float)x : 0;
 	m_changed = true;
 }
 
@@ -64,8 +60,6 @@ void BaseObject::Set2DSizeByTile(GLfloat width, GLfloat height)
 
 	auto scale = Vector3(width, height, 1.0f);
 	SetScale(scale);
-	m_transAfterFlip.y = m_flippedX ? height : 0;
-	m_transAfterFlip.x = m_flippedY ? width : 0;
 	m_changed = true;
 }
 
@@ -99,18 +93,6 @@ void BaseObject::SetTexture(std::shared_ptr<Texture> texture)
 
 void BaseObject::FlipHorizontal()
 {
-	if (!m_flippedX)
-	{
-		m_flip.x += 3.14159f;
-		m_flippedX = true;
-	}
-	else
-	{
-		m_flip.x = 0.0f;
-		m_flippedX = false;
-	}
-	m_transAfterFlip.y = m_flippedX ? m_scale.y : 0;
-	m_changed = true;
 }
 
 void BaseObject::FlipVertical()
@@ -139,11 +121,11 @@ void BaseObject::CalculateWVPMatrix()
 {
 	Matrix S, R, Rx, Ry, Rz, T, V, P;
 	S.SetScale(m_scale);
-	Rx.SetRotationX(m_rotation.x + m_flip.x);
-	Ry.SetRotationY(m_rotation.y + m_flip.y);
+	Rx.SetRotationX(m_rotation.x);
+	Ry.SetRotationY(m_rotation.y);
 	Rz.SetRotationZ(m_rotation.z);
 	R = Rz * Rx * Ry;
-	T.SetTranslation(m_translation + m_transAfterFlip);
+	T.SetTranslation(m_translation);
 	V = m_camera->GetViewMatrix();
 	P = m_camera->GetProjectionMatrix();
 	m_wvpMatrix = S * R * T * V * P;

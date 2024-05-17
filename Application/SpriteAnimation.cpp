@@ -3,33 +3,27 @@
 #include "Vertex.h"
 #include "ResourcesManager.h"
 
-SpriteAnimation::SpriteAnimation(GLint id, std::shared_ptr<Model> model, std::shared_ptr<Shaders> shader, std::shared_ptr<Texture> texture, GLint numAction, GLint numFrame, GLfloat timeBtwFrame) : BaseObject(id, model, shader, texture)
+SpriteAnimation::SpriteAnimation(GLint id, std::shared_ptr<Model> model, std::shared_ptr<Shaders> shader, std::shared_ptr<Texture> texture, GLint numFrame, GLfloat timeBtwFrame) 
+	: BaseObject(id, model, shader, texture)
+	, m_defAnimation(id, numFrame, timeBtwFrame)
 {
-	m_currentAction = m_currentFrame = 0;
-	m_numActions = numAction;
-	m_numFrames = numFrame;
-	m_timeBtwFrame = timeBtwFrame;
-	m_currFrameTime = timeBtwFrame;
 	m_changed = true;
 }
 
-SpriteAnimation::SpriteAnimation(const char* filename, GLint numAction, GLint numFrame, GLfloat timeBtwFrame) :
-	BaseObject(0,
+SpriteAnimation::SpriteAnimation(const char* filename, GLint numFrame, GLfloat timeBtwFrame) 
+	: BaseObject(0,
 		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT),
 		ResourcesManager::GetInstance()->GetShader(1),
 		ResourcesManager::GetInstance()->GetTexture(filename))
+	, m_defAnimation(ResourcesManager::GetInstance()->GetTexture(filename)->GetID(), numFrame, timeBtwFrame)
 {
-	m_currentAction = m_currentFrame = 0;
-	m_numActions = numAction;
-	m_numFrames = numFrame;
-	m_timeBtwFrame = timeBtwFrame;
-	m_currFrameTime = timeBtwFrame;
 	m_changed = true;
 }
 
+
 void SpriteAnimation::SetAction(GLint action)
 {
-	m_currentAction = action;
+	m_defAnimation.currentAction = action;
 }
 
 void SpriteAnimation::Draw()
@@ -76,22 +70,22 @@ void SpriteAnimation::Draw()
 
 	if (m_shader->uniformNumActions != -1)
 	{
-		glUniform1f(m_shader->uniformNumActions, (GLfloat)m_numActions);
+		glUniform1f(m_shader->uniformNumActions, (GLfloat)m_defAnimation.numActions);
 	}
 
 	if (m_shader->uniformNumFrames != -1)
 	{
-		glUniform1f(m_shader->uniformNumFrames, (GLfloat)m_numFrames);
+		glUniform1f(m_shader->uniformNumFrames, (GLfloat)m_defAnimation.numFrames);
 	}
 
 	if (m_shader->uniformCurrAction != -1)
 	{
-		glUniform1f(m_shader->uniformCurrAction, (GLfloat)m_currentAction);
+		glUniform1f(m_shader->uniformCurrAction, (GLfloat)m_defAnimation.currentAction);
 	}
 
 	if (m_shader->uniformCurrFrame != -1)
 	{
-		glUniform1f(m_shader->uniformCurrFrame, (GLfloat)m_currentFrame);
+		glUniform1f(m_shader->uniformCurrFrame, (GLfloat)m_defAnimation.currentFrame);
 	}
 
 	glDrawElements(GL_TRIANGLES, m_model->GetNumIndices(), GL_UNSIGNED_INT, 0);
@@ -104,38 +98,38 @@ void SpriteAnimation::Draw()
 void SpriteAnimation::Update(float deltaTime)
 {
 	// change frame
-	if (m_currFrameTime <= 0)
+	if (m_defAnimation.currFrameTime <= 0)
 	{
-		m_currFrameTime = m_timeBtwFrame;
-		m_currentFrame++;
-		m_currentFrame = m_currentFrame >= m_numFrames ? 0 : m_currentFrame;
+		m_defAnimation.currFrameTime = m_defAnimation.timeBtwFrame;
+		m_defAnimation.currentFrame++;
+		m_defAnimation.currentFrame = m_defAnimation.currentFrame >= m_defAnimation.numFrames ? 0 : m_defAnimation.currentFrame;
 	}
-	m_currFrameTime -= deltaTime;
+	m_defAnimation.currFrameTime -= deltaTime;
 }
 
 void SpriteAnimation::SetNumFrame(GLint numFrame)
 {
-	m_numFrames = numFrame;
+	m_defAnimation.numFrames = numFrame;
 }
 
 void SpriteAnimation::SetCurrentFrame(GLint currentFrame)
 {
-	m_currentFrame = currentFrame;
+	m_defAnimation.currentFrame = currentFrame;
 }
 
 void SpriteAnimation::SetTimeBtwFrame(GLfloat time)
 {
-	m_timeBtwFrame = time;
+	m_defAnimation.timeBtwFrame = time;
 }
 
 GLfloat SpriteAnimation::TimeAction()
 {
-	return m_timeBtwFrame * m_numFrames;
+	return m_defAnimation.timeBtwFrame * m_defAnimation.numFrames;
 }
 
 bool SpriteAnimation::IsLastFrame()
 {
-	return m_currentFrame == m_numFrames - 1 ? true : false;
+	return m_defAnimation.currentFrame == m_defAnimation.numFrames - 1 ? true : false;
 }
 
 Vector2 SpriteAnimation::GetSize()
@@ -145,5 +139,5 @@ Vector2 SpriteAnimation::GetSize()
 
 GLint SpriteAnimation::GetCurrentFrame()
 {
-	return m_currentFrame;
+	return m_defAnimation.currentFrame;
 }

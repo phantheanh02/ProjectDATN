@@ -14,6 +14,7 @@ Player::Player(b2World* world)
 	: m_tileSizeByPixel(tileSizeByPixel)
 	, m_direction(PlayerDirection::RIGHT)
 	, m_isRightDirection(true)
+	, m_currentAction(PlayerAction::IDLE)
 {
 	// create player body
 	b2BodyDef playerBodyDef;
@@ -34,7 +35,7 @@ Player::Player(b2World* world)
 	m_playerBody->SetFixedRotation(true);
 
 	// animation
-	m_actionAnimation = std::make_shared<SpriteAnimation>("Character/Black/Gunner_Black_Idle.png", 1, 5, 0.1f);
+	m_actionAnimation = ResourcesManager::GetInstance()->GetAnimation(29);
 	m_actionAnimation->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
 	m_actionAnimation->Set2DPositionByTile(3, 5);
 	m_actionAnimation->Set2DSizeByTile(3, 3);
@@ -90,6 +91,21 @@ void Player::SetDirection(PlayerDirection direction)
 	{
 		m_direction = direction;
 		m_actionAnimation->FlipVertical();
+	}
+}
+
+void Player::SetAction(PlayerAction action)
+{
+	if (m_currentAction != action)
+	{
+		auto pos = m_actionAnimation->GetPosition();
+		auto size = m_actionAnimation->GetSize();
+		auto model = m_actionAnimation->GetModel();
+		m_actionAnimation = ResourcesManager::GetInstance()->GetAnimation(action);
+		m_actionAnimation->SetModel(model);
+		m_actionAnimation->Set2DPosition(pos.x, pos.y);
+		m_actionAnimation->Set2DSize(size.x, size.y);
+		m_currentAction = action;
 	}
 }
 
