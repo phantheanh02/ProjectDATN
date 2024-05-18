@@ -44,12 +44,14 @@ public:
 	void SetTileSize(GLint tileSize);
 	void SetDirection(PlayerDirection direction);
 	void SetAction(PlayerAction action);
+	void SetJumpingStatus(bool status);
 
-	void			GetItem(GLint typeItem);
-	inline Vector2	Get2DPositon() { return m_pos; };
-	inline Vector2	GetSize() {return m_size; };
-	inline b2Body*	GetPlayerBody() { return m_playerBody; };
-
+	void				GetItem(GLint typeItem);
+	inline Vector2		Get2DPositon() { return m_pos; };
+	inline Vector2		GetSize() {return m_size; };
+	inline b2Body*		GetPlayerBody() { return m_playerBody; };
+	inline PlayerAction GetCurrentAction() { return m_currentAction;};
+	inline bool			IsJumping() { return m_isJumping; };
 private:
 	Vector2								m_pos;
 	Vector2								m_size;
@@ -60,10 +62,12 @@ private:
 
 	PlayerAction						m_currentAction;
 	std::shared_ptr<SpriteAnimation>	m_actionAnimation;
+	bool								m_isJumping;
 
 	// box2d
+	b2Body* m_playerBody;
 	b2Fixture*							m_playerBodyFixture;
-	b2Body*								m_playerBody;
+	b2Fixture*							m_playerFootSensorFixture;
 
 private:
 	void HandlePlayerDie(GLfloat deltaTime);

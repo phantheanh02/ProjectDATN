@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Player.h"
 #include "ResourcesManager.h"
 #include "b2Utilities.h"
@@ -15,6 +15,7 @@ Player::Player(b2World* world)
 	, m_direction(PlayerDirection::RIGHT)
 	, m_isRightDirection(true)
 	, m_currentAction(PlayerAction::IDLE)
+	, m_isJumping(false)
 {
 	// create player body
 	b2BodyDef playerBodyDef;
@@ -33,6 +34,17 @@ Player::Player(b2World* world)
 	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_ENEMY_BULLET | FixtureTypes::FIXTURE_BOSS_BULLET | FixtureTypes::FIXTURE_ITEM;
 	m_playerBodyFixture = m_playerBody->CreateFixture(&playerFixtureDef);
 	m_playerBody->SetFixedRotation(true);
+	// Create sensor foot to check in ground
+	b2PolygonShape sensorBox;
+	b2FixtureUserData userData;
+	b2FixtureDef sensorDef;
+	sensorBox.SetAsBox(0.1f, 0.1f, b2Vec2(0, 1), 0); // sensor dưới chân
+	sensorDef.shape = &sensorBox;
+	sensorDef.isSensor = true;
+	sensorDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER_FOOT;
+	sensorDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND;
+	sensorDef.userData.pointer = (uintptr_t)this;
+	m_playerFootSensorFixture = m_playerBody->CreateFixture(&sensorDef);
 
 	// animation
 	m_actionAnimation = ResourcesManager::GetInstance()->GetAnimation(29);
@@ -47,7 +59,10 @@ Player::~Player()
 
 void Player::Update(float deltaTime)
 {
-	m_actionAnimation->Update(deltaTime);
+	if (!m_isJumping)
+	{
+		m_actionAnimation->Update(deltaTime);
+	}
 	m_actionAnimation->Set2DPositionByTile(m_playerBody->GetPosition().x, m_playerBody->GetPosition().y);
 }
 
@@ -106,7 +121,17 @@ void Player::SetAction(PlayerAction action)
 		m_actionAnimation->Set2DPosition(pos.x, pos.y);
 		m_actionAnimation->Set2DSize(size.x, size.y);
 		m_currentAction = action;
+		if (action == PlayerAction::JUMPING)
+		{
+			m_actionAnimation->SetCurrentFrame(m_actionAnimation->GetNumFrames() - 1); // Set is final frame
+			m_isJumping = true;
+		}
 	}
+}
+
+void Player::SetJumpingStatus(bool status)
+{
+	m_isJumping = status;
 }
 
 void Player::GetItem(GLint typeItem)

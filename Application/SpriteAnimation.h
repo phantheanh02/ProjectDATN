@@ -36,14 +36,17 @@ public:
 	void Draw() override;
 	void Update(float deltaTime) override;
 
+	bool IsLastFrame();
+
 	void SetNumFrame(GLint numFrame);
 	void SetCurrentFrame(GLint currentFrame);
 	void SetTimeBtwFrame(GLfloat time);
-	GLfloat TimeAction();
-	bool IsLastFrame();
-	Vector2 GetSize();
-	GLint	GetCurrentFrame();
-	inline Vector2 GetPosition() { return Vector2(m_pos.x, m_pos.y); };
+
+	inline GLfloat	GetTimeAction() { return m_defAnimation.timeBtwFrame * m_defAnimation.numFrames; };
+	inline Vector2	GetSize() { return Vector2(m_scale.x, m_scale.y); };
+	inline GLint	GetCurrentFrame() { return m_defAnimation.currentFrame; };
+	inline Vector2	GetPosition() { return Vector2(m_pos.x, m_pos.y); };
+	inline GLint	GetNumFrames() { return m_defAnimation.numFrames; };
 private:
 	DefAnimation	m_defAnimation;
 };

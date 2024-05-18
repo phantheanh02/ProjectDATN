@@ -41,14 +41,14 @@ void Sprite2D::Draw()
 
 	if (m_shader->positionAttribute != -1)
 	{
-		glEnableVertexAttribArray(m_shader->positionAttribute);
 		glVertexAttribPointer(m_shader->positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+		glEnableVertexAttribArray(m_shader->positionAttribute);
 	}
 
 	if (m_shader->uvAttribute != -1)
 	{
-		glEnableVertexAttribArray(m_shader->uvAttribute);
 		glVertexAttribPointer(m_shader->uvAttribute, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Vector3) * 4));
+		glEnableVertexAttribArray(m_shader->uvAttribute);
 	}
 
 	if (m_shader->uniformWVP != -1)

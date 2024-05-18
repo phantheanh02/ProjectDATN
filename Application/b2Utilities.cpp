@@ -66,7 +66,7 @@ void ContactListener::PlayerOnGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
-	//player->m_onGround = true;
+	player->SetJumpingStatus(false);;
 	player = nullptr;
 }
 
@@ -75,7 +75,7 @@ void ContactListener::PlayerOnAir(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
-	//player->m_onGround = false;
+	player->SetJumpingStatus(true);
 	player = nullptr;
 }
 

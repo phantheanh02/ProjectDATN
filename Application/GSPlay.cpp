@@ -25,7 +25,7 @@ void GSPlay::Init()
 	m_timeStep = 1.0f / devMode.dmDisplayFrequency;
 
 	// Box2d
-	m_gravity = { 0.0f, 20.0f };
+	m_gravity = { 0.0f, 30.0f };
 	// create world with gravity
 	m_world = std::make_shared<b2World>(m_gravity);
 	m_contactListener = new ContactListener();
@@ -91,50 +91,57 @@ void GSPlay::HandleEvent()
 {
 	auto currentVelocity = m_player->GetPlayerBody()->GetLinearVelocity();
 	float desiredVel = 0, velChange, impulse;
-	bool isPlayerDirectionChange = false;
 
 	if (m_key & (1 << 1))
 	{
 		// move left
 		desiredVel = b2Max(currentVelocity.x - 0.25f, -MOVEMENT_SPEED);
 		m_player->SetDirection(PlayerDirection::LEFT);
-		isPlayerDirectionChange = true;
 	}
 	if (m_key & (1 << 3))
 	{
 		// move right
 		desiredVel = b2Min(currentVelocity.x + 0.25f, MOVEMENT_SPEED);
 		m_player->SetDirection(PlayerDirection::RIGHT);
-		isPlayerDirectionChange = true;
 	}
-	if (m_key & (1 << 0))
+	if (desiredVel != 0 && !m_player->IsJumping())
 	{
-		// key w
-		m_player->SetAction(JUMPING);
-	}
-	if (m_key & (1 << 2))
-	{
-		// key s
 		m_player->SetAction(PlayerAction::RUNNING);
 	}
-	if (!(m_key & 0xF))
-	{
-		// none of movement key is pressed
-		m_player->SetAction(IDLE);
-	}
-	
-	// check if on air
-	
-	if (isPlayerDirectionChange)
-	{
-		//m_player->HandleEvent();
-	}
-
 	// apply force to move
 	velChange = desiredVel - currentVelocity.x;
 	impulse = m_player->GetPlayerBody()->GetMass() * velChange; //disregard time factor
 	m_player->GetPlayerBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_player->GetPlayerBody()->GetWorldCenter(), true);
 
+	if (m_key & (1 << 0))
+	{
+		// key w
+	}
+	if (m_key & (1 << 2))
+	{
+		// key s
+	}
+
+	// JUMP: key space
+	if (m_key & (1 << 4) && !m_player->IsJumping() && m_player->GetCurrentAction() != PlayerAction::JUMPING)
+	{
+		m_player->SetAction(PlayerAction::JUMPING);
+		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
+		float jumpHeight = 3.0f;
+		auto impulse = m_player->GetPlayerBody()->GetMass() * sqrt(2 * m_gravity.y * jumpHeight);
+		m_player->GetPlayerBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
+	}
+
+
+	if (!(m_key & 0xF))
+	{
+		// none of movement key is pressed
+		m_player->SetAction(PlayerAction::IDLE);
+	}
+	if (m_player->IsJumping())
+	{
+		m_player->SetAction(PlayerAction::JUMPING);
+	}
 }
 
 void GSPlay::OnKey(unsigned char key, bool pressed)

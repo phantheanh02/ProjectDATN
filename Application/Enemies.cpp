@@ -179,13 +179,13 @@ void Enemies::SetTexture(GLint typeAction)
 		m_animation->SetNumFrame(3);
 		m_animation->SetCurrentFrame(0);
 		m_animation->SetTimeBtwFrame(0.1f);
-		m_coolDown = m_animation->TimeAction();
+		m_coolDown = m_animation->GetTimeAction();
 		break;
 	case TypeEnemyAction::FIRE_UP:
 		m_animation->SetNumFrame(3);
 		m_animation->SetCurrentFrame(0);
 		m_animation->SetTimeBtwFrame(0.1f);
-		m_coolDown = m_animation->TimeAction();
+		m_coolDown = m_animation->GetTimeAction();
 		break;
 	case TypeEnemyAction::DIE:
 		m_animation->SetNumFrame(4);
@@ -196,7 +196,7 @@ void Enemies::SetTexture(GLint typeAction)
 		m_animation->SetNumFrame(5);
 		m_animation->SetCurrentFrame(0);
 		m_animation->SetTimeBtwFrame(0.1f);
-		m_coolDown = m_animation->TimeAction();
+		m_coolDown = m_animation->GetTimeAction();
 		break;
 	case TypeEnemyAction::RPGMOD_FIRE:
 		m_animation->SetNumFrame(5);

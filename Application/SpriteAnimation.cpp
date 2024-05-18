@@ -122,22 +122,8 @@ void SpriteAnimation::SetTimeBtwFrame(GLfloat time)
 	m_defAnimation.timeBtwFrame = time;
 }
 
-GLfloat SpriteAnimation::TimeAction()
-{
-	return m_defAnimation.timeBtwFrame * m_defAnimation.numFrames;
-}
-
 bool SpriteAnimation::IsLastFrame()
 {
 	return m_defAnimation.currentFrame == m_defAnimation.numFrames - 1 ? true : false;
 }
 
-Vector2 SpriteAnimation::GetSize()
-{
-	return Vector2(m_scale.x, m_scale.y);
-}
-
-GLint SpriteAnimation::GetCurrentFrame()
-{
-	return m_defAnimation.currentFrame;
-}
