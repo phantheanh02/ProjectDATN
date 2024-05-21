@@ -43,7 +43,7 @@ public:
 private:
 	GLint		m_health;
 	GLint		m_damage;
-	GLint		m_tileSizeByPixel = tileSizeByPixel;
+	GLint		m_tileSizeByPixel;
 	BoxEnemy	m_boxInfo;
 	std::shared_ptr<SpriteAnimation> m_animation;
 	bool		m_isNewTexture;

@@ -5,14 +5,7 @@
 #include <memory>
 #include "Sprite2D.h"
 
-enum TypeBullet
-{
-	PLAYER_BULLET,
-	AR_BULLET,
-	RPG_BULLET,
-	SNIPER_BULLET,
-	ENEMY_FLY_BULLET
-};
+
 
 enum TypeEnemyAction
 {

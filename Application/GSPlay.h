@@ -8,6 +8,7 @@
 #include "GameStateMachine.h"
 #include "Button.h"
 #include "Player.h"
+#include "Bullet.h"
 
 
 class GSPlay final : public GameStateBase
@@ -58,5 +59,11 @@ private:
 
 	// Player
 	std::shared_ptr<Player>					m_player;
+
+	// Bullet
+	std::vector<std::shared_ptr<Bullet>>	m_bulletList;
+private:
+	void ActiveABullet(TypeBullet type, b2Vec2 speed, Vector2 position);
+
 };
 	

@@ -2,6 +2,8 @@
 #include "Boss.h"
 #include "b2Utilities.h"
 
+extern int tileSizeByPixel;
+
 Boss::Boss(b2World* world)
 {
 	m_bossBody			= nullptr;

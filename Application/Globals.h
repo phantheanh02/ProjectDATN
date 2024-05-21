@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "GSChooseCharacter.h"
 
 class Globals final
 {
@@ -14,8 +15,6 @@ public:
 	inline static const std::string fontPath = "../Data/Fonts/"; 
 	
 };
-
-static int tileSizeByPixel = 44;
 
 // key define
 #define KEY_LEFT		VK_LEFT
@@ -45,3 +44,4 @@ static int tileSizeByPixel = 44;
 #define VELOCITY_ITERATION			8
 #define POSITION_ITERATION			3
 #define MOVEMENT_SPEED				7.0f
+#define BULLET_COOLDOWN				0.3f

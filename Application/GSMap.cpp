@@ -34,7 +34,7 @@ void GSMap::Init()
 	m_background = std::make_shared<SpriteAnimation>("GSMap/Space_Stars.png", 4, 0.1f);
 	m_background->AttachCamera(staticCamera);
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
-	m_background->Set2DPosition(0, 0);
+	m_background->Set2DPosition(Globals::screenWidth / 2.0f, Globals::screenHeight / 2.0f);
 
 	// Planet baren
 	auto planet = std::make_shared<Sprite2D>("GSMap/Baren.png");

@@ -5,17 +5,21 @@
 #include "ConfigClass.h"
 #include "Globals.h"
 
+extern int tileSizeByPixel;
+extern CharacterType currentCharacter;
+
 Player::Player()
 {
 
 }
 
 Player::Player(b2World* world)
-	: m_tileSizeByPixel(tileSizeByPixel)
-	, m_direction(PlayerDirection::RIGHT)
+	: m_currentDirection(PlayerDirection::RIGHT)
+	, m_preDirection(PlayerDirection::RIGHT)
 	, m_isRightDirection(true)
 	, m_currentAction(PlayerAction::IDLE)
 	, m_isJumping(false)
+	, m_bulletCooldown(0)
 {
 	// create player body
 	b2BodyDef playerBodyDef;
@@ -47,8 +51,7 @@ Player::Player(b2World* world)
 	m_playerFootSensorFixture = m_playerBody->CreateFixture(&sensorDef);
 
 	// animation
-	m_actionAnimation = ResourcesManager::GetInstance()->GetAnimation(29);
-	m_actionAnimation->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
+	m_actionAnimation = std::make_shared<SpriteAnimation>(currentCharacter, 5, 0.1);
 	m_actionAnimation->Set2DPositionByTile(3, 5);
 	m_actionAnimation->Set2DSizeByTile(3, 3);
 }
@@ -64,11 +67,20 @@ void Player::Update(float deltaTime)
 		m_actionAnimation->Update(deltaTime);
 	}
 	m_actionAnimation->Set2DPositionByTile(m_playerBody->GetPosition().x, m_playerBody->GetPosition().y);
+	if (m_bulletCooldown > 0)
+	{
+		m_bulletCooldown -= deltaTime;
+	}
 }
 
 void Player::Draw()
 {
 	m_actionAnimation->Draw();
+}
+
+void Player::SetCurrentDirectionByPreDirection()
+{
+	m_currentDirection = m_preDirection;
 }
 
 void Player::Set2DPosition(GLint x, GLint y)
@@ -97,15 +109,18 @@ void Player::Set2DSizeByTile(GLfloat width, GLfloat height)
 
 void Player::SetTileSize(GLint tileSize)
 {
-	m_tileSizeByPixel = tileSize;
 }
 
 void Player::SetDirection(PlayerDirection direction)
 {
-	if (m_direction != direction)
+	if (m_currentDirection != direction)
 	{
-		m_direction = direction;
-		m_actionAnimation->FlipVertical();
+		if (direction != PlayerDirection::TOP && m_preDirection != direction)
+		{
+			m_actionAnimation->FlipVertical();
+			m_preDirection = direction;
+		}
+		m_currentDirection = direction;
 	}
 }
 
@@ -115,9 +130,31 @@ void Player::SetAction(PlayerAction action)
 	{
 		auto pos = m_actionAnimation->GetPosition();
 		auto size = m_actionAnimation->GetSize();
-		auto model = m_actionAnimation->GetModel();
-		m_actionAnimation = ResourcesManager::GetInstance()->GetAnimation(action);
-		m_actionAnimation->SetModel(model);
+		switch (action)
+		{
+		case IDLE:
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action +     currentCharacter, 5, 0.1f);
+			break;
+		case RUNNING:
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 6, 0.1f);
+			break;
+		case JUMPING:
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 2, 0.1f);
+			break;
+		case CROUCH:
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 3, 0.1f);
+			break;
+		case DEAD:
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 8, 0.1f);
+			break;
+		case FIRE_TOP:
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 1, 0.1f);
+			break;
+		case NONE_ACTION:
+			break;
+		default:
+			break;
+		}
 		m_actionAnimation->Set2DPosition(pos.x, pos.y);
 		m_actionAnimation->Set2DSize(size.x, size.y);
 		m_currentAction = action;
@@ -137,6 +174,11 @@ void Player::SetJumpingStatus(bool status)
 void Player::GetItem(GLint typeItem)
 {
 	
+}
+
+PlayerDirection Player::GetDirection()
+{
+	return m_currentDirection;
 }
 
 void Player::TakeDamage(GLint damage)

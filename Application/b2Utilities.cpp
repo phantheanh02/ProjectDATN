@@ -3,11 +3,11 @@
 #include "Bullet.h"
 #include "Enemies.h"
 #include <iostream>
-#include "Globals.h"
 #include "Boss.h"
 #include "Item.h"
 #include "box2d.h"
 #include "Player.h"
+
 void ContactListener::BeginContact(b2Contact* contact)
 {
 	auto fixtureA = contact->GetFixtureA();
@@ -103,7 +103,7 @@ void ContactListener::PlayerBulletEnemy(b2Fixture* fixtureA, b2Fixture* fixtureB
 {
 	auto playerBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_BULLET ? fixtureA : fixtureB;
 	auto pBullet = (Bullet*)playerBulletFixture->GetBody()->GetUserData().pointer;
-	pBullet->m_disabled = true;
+	//pBullet->m_disabled = true;
 	// TODO: mark enemy as dead
 	auto enemyFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_ENEMY ? fixtureA : fixtureB;
 	auto pEnenmy = (Enemies*)enemyFixture->GetBody()->GetUserData().pointer;
@@ -120,18 +120,18 @@ void ContactListener::PlayerBulletGround(b2Fixture* fixtureA, b2Fixture* fixture
 {
 	auto playerBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_BULLET ? fixtureA : fixtureB;
 	auto pBullet = (Bullet*)playerBulletFixture->GetBody()->GetUserData().pointer;
-	pBullet->m_disabled = true;
+	pBullet->SetActiveStatus(false);
 }
 
 void ContactListener::EnemyBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB)
 {
 	auto enemyBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_ENEMY_BULLET ? fixtureA : fixtureB;
 	auto pBullet = (Bullet*)enemyBulletFixture->GetBody()->GetUserData().pointer;
-	if (pBullet->m_typeBullet != RPG_BULLET)
+	/*if (pBullet->m_typeBullet != RPG_BULLET)
 	{
 		pBullet->m_disabled = true;
 	}
-	pBullet->m_isCollision = true;
+	pBullet->m_isCollision = true;*/
 	pBullet->SetBulletLinearVelocity(b2Vec2(0.0f, 0.0f));
 
 	// TODO: mark player as dead
@@ -145,11 +145,11 @@ void ContactListener::EnemyBulletGround(b2Fixture* fixtureA, b2Fixture* fixtureB
 {
 	auto enemyBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_ENEMY_BULLET ? fixtureA : fixtureB;
 	auto pBullet = (Bullet*)enemyBulletFixture->GetBody()->GetUserData().pointer;
-	if (pBullet->m_typeBullet != RPG_BULLET)
-	{
-		pBullet->m_disabled = true;
-	}
-	pBullet->m_isCollision = true;
+	//if (pBullet->m_typeBullet != RPG_BULLET)
+	//{
+	//	pBullet->m_disabled = true;
+	//}
+	//pBullet->m_isCollision = true;
 	pBullet->SetBulletLinearVelocity(b2Vec2(0.0f, 0.0f));
 }
 
@@ -157,7 +157,7 @@ void ContactListener::PlayerBulletBoss(b2Fixture* fixtureA, b2Fixture* fixtureB)
 {
 	auto playerBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_BULLET ? fixtureA : fixtureB;
 	auto pBullet = (Bullet*)playerBulletFixture->GetBody()->GetUserData().pointer;
-	pBullet->m_disabled = true;
+	//pBullet->m_disabled = true;
 	// TODO: mark boss as dead
 	auto bossFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_BOSS ? fixtureA : fixtureB;
 	auto pBoss = (Boss*)bossFixture->GetBody()->GetUserData().pointer;

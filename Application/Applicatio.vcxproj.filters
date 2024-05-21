@@ -84,6 +84,9 @@
     <ClCompile Include="BaseObject.cpp">
       <Filter>Source File\GameEngine</Filter>
     </ClCompile>
+    <ClCompile Include="GSChooseCharacter.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigClass.h" />
@@ -172,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="BaseObject.h">
       <Filter>Source File\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="GSChooseCharacter.h">
+      <Filter>Source File\GameState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

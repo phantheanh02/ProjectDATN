@@ -173,17 +173,28 @@ TTF_Font* ResourcesManager::GetFont(GLint id)
 	return nullptr;
 }
 
-std::shared_ptr<SpriteAnimation> ResourcesManager::GetAnimation(GLint id)
+std::shared_ptr<SpriteAnimation> ResourcesManager::GetAnimation(GLint id, bool character)
 {
 	auto it = m_animationList.find(id);
 	if (it != m_animationList.end())
 	{
-		auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
+		auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER);
 		auto shader = ResourcesManager::GetInstance()->GetShader(1);
 		auto texture = ResourcesManager::GetInstance()->GetTexture(id);
 		auto animation = std::make_shared<SpriteAnimation>(it->second.idTexture, model, shader, texture, it->second.numFrames, it->second.timeBtwFrame);
 		return animation;
+	} 
+
+	if (character)
+	{
+		it = m_animationList.find(29);
+		auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER);
+		auto shader = ResourcesManager::GetInstance()->GetShader(1);
+		auto texture = ResourcesManager::GetInstance()->GetTexture(id);
+		auto animation = std::make_shared<SpriteAnimation>(id, model, shader, texture, it->second.numFrames, it->second.timeBtwFrame);
+		return animation;
 	}
+	
 	std::cerr << "ERR: Animation with id " << id << " not found!\n";
 	return nullptr;
 }

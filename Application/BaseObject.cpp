@@ -8,6 +8,8 @@
 #include "Texture.h"
 #include "ResourcesManager.h"
 
+extern int tileSizeByPixel;
+
 BaseObject::BaseObject()
 {
 	m_alpha = 1.0f;

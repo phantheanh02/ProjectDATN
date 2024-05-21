@@ -3,6 +3,8 @@
 #include "ResourcesManager.h"
 #include "b2Utilities.h"
 
+extern int tileSizeByPixel;
+
 Item::Item(b2World* world, GLint idTexture, GLfloat posX, GLfloat posY)
 {
 	m_tileSizeByPixel = tileSizeByPixel;

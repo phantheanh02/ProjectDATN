@@ -109,6 +109,7 @@
     <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="GameStateBase.cpp" />
     <ClCompile Include="GameStateMachine.cpp" />
+    <ClCompile Include="GSChooseCharacter.cpp" />
     <ClCompile Include="GSCredit.cpp" />
     <ClCompile Include="GSHighScore.cpp" />
     <ClCompile Include="GSIntro.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="GameStateBase.h" />
     <ClInclude Include="GameStateMachine.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="GSChooseCharacter.h" />
     <ClInclude Include="GSCredit.h" />
     <ClInclude Include="GSHighScore.h" />
     <ClInclude Include="GSIntro.h" />

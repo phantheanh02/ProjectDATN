@@ -31,6 +31,8 @@ class SpriteAnimation : public BaseObject
 public:
 	SpriteAnimation(GLint id, std::shared_ptr<Model> model, std::shared_ptr<Shaders> shader, std::shared_ptr<Texture> texture, GLint numFrame, GLfloat timeBtwFrame);
 	SpriteAnimation(const char* filename, GLint numFrame, GLfloat timeBtwFrame);
+	SpriteAnimation(GLint idTexture, GLint numFrame, GLfloat timeBtwFrame);
+
 	void SetAction(GLint action);
 
 	void Draw() override;

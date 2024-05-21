@@ -5,6 +5,10 @@
 #include "SceneManager.h"
 #include "GameStateMachine.h"
 
+int tileSizeByPixel = 44;
+CharacterType currentCharacter = C_BLACK;
+
+
 GSMenu::~GSMenu()
 {
 }
@@ -14,34 +18,47 @@ void GSMenu::Init()
 	m_key = 0;
 	m_mouse = 0;
 
+	Vector2 posButton = Vector2(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 230);
+
 	// button play
 	std::shared_ptr<Button> button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
 	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
+	button->Set2DPosition(posButton.x, posButton.y);
 	m_listButton.push_back(button);
 
-	// button quit
-	button = std::make_shared<Button>("btn_quit.png", BUTTON_EXIT);
+	// button character
+	posButton.y += 85;
+	button = std::make_shared<Button>("btn_character.png", BUTTON_CHOOSE_CHARACTER);
 	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 138);
+	button->Set2DPosition(posButton.x, posButton.y);
 	m_listButton.push_back(button);
 
 	// button setting
+	posButton.y += 85;
 	button = std::make_shared<Button>("btn_setting.png", BUTTON_SETTING);
 	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 111);
+	button->Set2DPosition(posButton.x, posButton.y);
 	m_listButton.push_back(button);
 
 	// button highscore
+	posButton.y += 85;
 	button = std::make_shared<Button>("btn_highscore.png", BUTTON_HIGHSCORE);
 	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 28);
+	button->Set2DPosition(posButton.x, posButton.y);
 	m_listButton.push_back(button);
 
 	// button credit
+	posButton.y += 85;
 	button = std::make_shared<Button>("btn_credit.png", BUTTON_CREDIT);
 	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f + 55);
+	button->Set2DPosition(posButton.x, posButton.y);
+	m_listButton.push_back(button);
+
+	// button quit
+	posButton.y += 85;
+	button = std::make_shared<Button>("btn_quit.png", BUTTON_EXIT);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(posButton.x, posButton.y);
 	m_listButton.push_back(button);
 
 	// background
@@ -132,6 +149,9 @@ void GSMenu::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				break;
 			case BUTTON_CREDIT:
 				GameStateMachine::GetInstance()->PushState(StateType::STATE_CREDIT);
+				break;
+			case BUTTON_CHOOSE_CHARACTER:
+				GameStateMachine::GetInstance()->PushState(StateType::STATE_CHOOSECHARACTER);
 				break;
 			case BUTTON_EXIT:
 				GameStateMachine::GetInstance()->Exit();

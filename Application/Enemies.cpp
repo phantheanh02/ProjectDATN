@@ -4,6 +4,8 @@
 #include "GSPlay.h"
 #include "Globals.h"
 
+extern int tileSizeByPixel;
+
 Enemies::Enemies(GLint id): m_id(id)
 {
 	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);

@@ -27,13 +27,28 @@ Button::~Button()
 
 bool Button::HandleTouchMouse(GLfloat x, GLfloat y, bool bIsPressed)
 {
-	if ((m_pos.x <= x) && (x <= m_pos.x + m_fWidth)
-		&& (m_pos.y <= y) && (y <= m_pos.y + m_fHeight)
-		&& bIsPressed)
+	if (bIsPressed)
 	{
-		m_alpha = 0.5f;
-		return true;
+		if (m_model->GetType() == ModelType::L_RETANGLE_TOPRIGHT || m_model->GetType() == ModelType::R_RETANGLE_TOPRIGHT)
+		{
+			if ((m_pos.x <= x) && (x <= m_pos.x + m_fWidth)
+				&& (m_pos.y <= y) && (y <= m_pos.y + m_fHeight))
+			{
+				m_alpha = 0.5f;
+				return true;
+			}
+		}
+		else
+		{
+			if ((m_pos.x - m_fWidth / 2 <= x) && (x <= m_pos.x + m_fWidth / 2)
+				&& (m_pos.y - m_fHeight / 2 <= y) && (y <= m_pos.y + m_fHeight / 2))
+			{
+				m_alpha = 0.5f;
+				return true;
+			}
+		}
 	}
+	
 
 	m_alpha = 1.0f;
 
@@ -42,15 +57,26 @@ bool Button::HandleTouchMouse(GLfloat x, GLfloat y, bool bIsPressed)
 
 void Button::HandleMoveMouse(GLfloat x, GLfloat y)
 {
-	if ((m_pos.x <= x) && (x <= m_pos.x + m_fWidth)
-		&& (m_pos.y <= y) && (y <= m_pos.y + m_fHeight))
+	if (m_model->GetType() == ModelType::L_RETANGLE_TOPRIGHT || m_model->GetType() == ModelType::R_RETANGLE_TOPRIGHT)
 	{
-		m_alpha = 0.8f;
+		if ((m_pos.x <= x) && (x <= m_pos.x + m_fWidth)
+			&& (m_pos.y <= y) && (y <= m_pos.y + m_fHeight))
+		{
+			m_alpha = 0.5f;
+			return;
+		}
 	}
 	else
 	{
-		m_alpha = 1.0f;
+		if ((m_pos.x - m_fWidth / 2 <= x) && (x <= m_pos.x + m_fWidth / 2)
+			&& (m_pos.y - m_fHeight / 2 <= y) && (y <= m_pos.y + m_fHeight / 2))
+		{
+			m_alpha = 0.5f;
+			return;
+		}
 	}
+
+	m_alpha = 1.0f;
 }
 
 void Button::Set2DSize(GLint x, GLint y)

@@ -37,7 +37,8 @@ public:
 	std::shared_ptr<Model>		GetModel() { return m_model; };
 	std::shared_ptr<Shaders>	GetShader() { return m_shader; };
 	std::shared_ptr<Texture>	GetTexture() { return m_texture; };
-
+	inline GLint				GetID() { return m_id; };
+			
 protected:
 	std::shared_ptr<Model> m_model;
 	std::shared_ptr<Shaders> m_shader;

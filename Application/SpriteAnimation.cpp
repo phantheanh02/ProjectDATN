@@ -12,12 +12,23 @@ SpriteAnimation::SpriteAnimation(GLint id, std::shared_ptr<Model> model, std::sh
 
 SpriteAnimation::SpriteAnimation(const char* filename, GLint numFrame, GLfloat timeBtwFrame) 
 	: BaseObject(0,
-		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT),
+		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER),
 		ResourcesManager::GetInstance()->GetShader(1),
 		ResourcesManager::GetInstance()->GetTexture(filename))
 	, m_defAnimation(ResourcesManager::GetInstance()->GetTexture(filename)->GetID(), numFrame, timeBtwFrame)
 {
 	m_changed = true;
+}
+
+SpriteAnimation::SpriteAnimation(GLint idTexture, GLint numFrame, GLfloat timeBtwFrame)
+	: BaseObject(0,
+		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER),
+		ResourcesManager::GetInstance()->GetShader(1),
+		ResourcesManager::GetInstance()->GetTexture(idTexture))
+	, m_defAnimation(idTexture, numFrame, timeBtwFrame)
+{
+	m_changed = true;
+	m_id = idTexture;
 }
 
 

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "GSPlay.h"
 
+extern int tileSizeByPixel;
 
 GSPlay::~GSPlay()
 {
@@ -17,7 +18,6 @@ void GSPlay::Init()
 {
 	m_key = 0;
 	unsigned int	m_mouse;
-	tileSizeByPixel = 44;
 
 	// get refresh rate and set time step
 	DEVMODE devMode;
@@ -55,6 +55,11 @@ void GSPlay::Init()
 	button->AttachCamera(m_staticCamera);
 	m_listButton.push_back(button);
 
+	// Create bullet pooling
+	for (int i = 0; i < 100; i++)
+	{
+		m_bulletList.push_back(std::make_shared<Bullet>(m_world.get()));
+	}
 }
 
 void GSPlay::Update(float deltaTime)
@@ -62,6 +67,13 @@ void GSPlay::Update(float deltaTime)
 	HandleEvent();
 	m_world->Step(m_timeStep, VELOCITY_ITERATION, POSITION_ITERATION);
 	Update2DDrawPosition();
+
+	
+	for (auto it : m_bulletList)
+	{
+		it->Update(deltaTime);
+	}
+
 	m_player->Update(deltaTime);
 }
 
@@ -72,6 +84,11 @@ void GSPlay::Draw()
 	{
 		button->Draw();
 	}
+	for (auto it : m_bulletList)
+	{
+		it->Draw();
+	}
+	
 	m_player->Draw();
 }
 
@@ -113,13 +130,21 @@ void GSPlay::HandleEvent()
 	impulse = m_player->GetPlayerBody()->GetMass() * velChange; //disregard time factor
 	m_player->GetPlayerBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_player->GetPlayerBody()->GetWorldCenter(), true);
 
-	if (m_key & (1 << 0))
+	if (m_key & (1 << 0) && velChange == 0 && !m_player->IsJumping())
 	{
 		// key w
+		m_player->SetAction(PlayerAction::FIRE_TOP);
+		m_player->SetDirection(PlayerDirection::TOP);
 	}
+	else
+	{
+		m_player->SetCurrentDirectionByPreDirection();
+	}
+
 	if (m_key & (1 << 2))
 	{
 		// key s
+		m_player->SetAction(PlayerAction::CROUCH);
 	}
 
 	// JUMP: key space
@@ -127,11 +152,10 @@ void GSPlay::HandleEvent()
 	{
 		m_player->SetAction(PlayerAction::JUMPING);
 		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
-		float jumpHeight = 3.0f;
+		float jumpHeight = 5.0f;
 		auto impulse = m_player->GetPlayerBody()->GetMass() * sqrt(2 * m_gravity.y * jumpHeight);
 		m_player->GetPlayerBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
 	}
-
 
 	if (!(m_key & 0xF))
 	{
@@ -141,6 +165,28 @@ void GSPlay::HandleEvent()
 	if (m_player->IsJumping())
 	{
 		m_player->SetAction(PlayerAction::JUMPING);
+	}
+
+	// Fire
+	if (m_key & (1 << 5) && m_player->IsReadyAttack())
+	{
+		m_player->ResetCooldown();
+		b2Vec2 pos = m_player->GetPlayerBody()->GetPosition();
+		b2Vec2 speed;
+
+		switch (m_player->GetDirection())
+		{
+		case PlayerDirection::TOP:
+			speed = b2Vec2(0.0f, -20.0f);
+			break;
+		case PlayerDirection::LEFT:
+			speed = b2Vec2(-20.0f, 0.0f);
+			break;
+		case PlayerDirection::RIGHT:
+			speed = b2Vec2(20.0f, 0.0f);
+			break;
+		}
+		ActiveABullet(TypeBullet::PLAYER_BULLET, speed, Vector2(m_player->GetPlayerBody()->GetPosition().x, m_player->GetPlayerBody()->GetPosition().y));
 	}
 }
 
@@ -178,6 +224,7 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 		{
 		case KEY_W:
 			m_key ^= 1 << 0;
+			m_player->SetCurrentDirectionByPreDirection();
 			break;
 		case KEY_A:
 			m_key ^= 1 << 1;
@@ -235,6 +282,7 @@ void GSPlay::OnMouseScroll(int x, int y, short delta)
 
 	// Calculate size
 	m_background->Set2DSizeByTile(m_map.sizeByTile.x, m_map.sizeByTile.y);
+	m_player->Set2DSizeByTile(3, 3);
 }
 
 void GSPlay::Update2DDrawPosition()
@@ -285,5 +333,17 @@ void GSPlay::LoadMap()
 		obsFixDef.filter.maskBits = 0xFFFF;
 		obsBody->CreateFixture(&obsFixDef);
 		m_BodyList.push_back(obsBody);
+	}
+}
+
+void GSPlay::ActiveABullet(TypeBullet type, b2Vec2 speed, Vector2 position)
+{
+	for (auto bullet : m_bulletList)
+	{
+		if (!bullet->IsActive())
+		{
+			bullet->CreateNewBullet(type, speed, position);
+			break;
+		}
 	}
 }

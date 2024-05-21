@@ -39,7 +39,7 @@ public:
 	std::shared_ptr<Texture>	GetTexture(GLint id);
 	std::shared_ptr<Sound>		GetSound(GLint id);
 	TTF_Font*					GetFont(GLint id);
-	std::shared_ptr<SpriteAnimation> GetAnimation(GLint id);
+	std::shared_ptr<SpriteAnimation> GetAnimation(GLint id, bool character = false);
 
 	std::shared_ptr<Shaders>	GetShader(const char* name);
 	std::shared_ptr<Texture>	GetTexture(const char* name);

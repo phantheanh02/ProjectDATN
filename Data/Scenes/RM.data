@@ -85,6 +85,62 @@ ID 32
 FILE "Character/Black/Gunner_Black_Crouch.png"
 ID 33
 FILE "Character/Black/Gunner_Black_Death.png"
+ID 34
+FILE "Character/Black/Gunner_Black_Top.png"
+ID 35
+FILE "Character/Blue/Gunner_Blue_Idle.png"
+ID 36
+FILE "Character/Blue/Gunner_Blue_Run.png"
+ID 37
+FILE "Character/Blue/Gunner_Blue_Jump.png"
+ID 38
+FILE "Character/Blue/Gunner_Blue_Crouch.png"
+ID 39
+FILE "Character/Blue/Gunner_Blue_Death.png"
+ID 40
+FILE "Character/Blue/Gunner_Blue_Top.png"
+ID 41
+FILE "Character/Green/Gunner_Green_Idle.png"
+ID 42
+FILE "Character/Green/Gunner_Green_Run.png"
+ID 43
+FILE "Character/Green/Gunner_Green_Jump.png"
+ID 44
+FILE "Character/Green/Gunner_Green_Crouch.png"
+ID 45
+FILE "Character/Green/Gunner_Green_Death.png"
+ID 46
+FILE "Character/Green/Gunner_Green_Top.png"
+ID 47
+FILE "Character/Red/Gunner_Red_Idle.png"
+ID 48
+FILE "Character/Red/Gunner_Red_Run.png"
+ID 49
+FILE "Character/Red/Gunner_Red_Jump.png"
+ID 50
+FILE "Character/Red/Gunner_Red_Crouch.png"
+ID 51
+FILE "Character/Red/Gunner_Red_Death.png"
+ID 52
+FILE "Character/Red/Gunner_Red_Top.png"
+ID 53
+FILE "Character/Yellow/Gunner_Yellow_Idle.png"
+ID 54
+FILE "Character/Yellow/Gunner_Yellow_Run.png"
+ID 55
+FILE "Character/Yellow/Gunner_Yellow_Jump.png"
+ID 56
+FILE "Character/Yellow/Gunner_Yellow_Crouch.png"
+ID 57
+FILE "Character/Yellow/Gunner_Yellow_Death.png"
+ID 58
+FILE "Character/Yellow/Gunner_Yellow_Top.png"
+ID 59
+FILE "Bullet/Player_bullet.png"
+ID 60
+FILE "Icons/icon_arrow.png"
+ID 61
+FILE "btn_character.png"
 $
 
 #DefAnimation
@@ -94,7 +150,10 @@ IDTexture NumFrames TimeFrame
 31 2 0.1
 32 3 0.1
 33 8 0.1
+34 1 0.1
+59 4 0.1
 $
+
 #Sounds
 ID 0
 FILE "Cowboy_OVERWORLD.wav"

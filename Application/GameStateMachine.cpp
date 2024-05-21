@@ -7,6 +7,7 @@
 #include "GSHighScore.h"
 #include "GSCredit.h"
 #include "GSMap.h"
+#include "GSChooseCharacter.h"
 
 std::shared_ptr<GameStateBase> CreateState(StateType stateType);
 
@@ -118,6 +119,8 @@ std::shared_ptr<GameStateBase> CreateState(StateType stateType)
 	case StateType::STATE_MAP:
 		state = std::make_shared<GSMap>(stateType);
 		break;
+	case StateType::STATE_CHOOSECHARACTER:
+		state = std::make_shared<GSChooseCharacter>(stateType);
 	case StateType::STATE_INVALID:
 		break;
 	default:

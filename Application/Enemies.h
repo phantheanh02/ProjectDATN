@@ -73,7 +73,7 @@ private:
 
 	MyRayCastCallback m_rayCallback;
 	Vector2		m_boundaryMove;
-	GLint		m_tileSizeByPixel = tileSizeByPixel;
+	GLint		m_tileSizeByPixel;
 	GLint		typeAttack;
 private:
 	void		PerformRayCasting();
