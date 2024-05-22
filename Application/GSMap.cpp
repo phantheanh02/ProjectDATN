@@ -5,6 +5,8 @@
 #include "SceneManager.h"
 #include "GameStateMachine.h"
 
+extern PlanetType currentMap;
+
 GSMap::~GSMap()
 {
 }
@@ -15,7 +17,6 @@ void GSMap::Init()
 	m_mouse = 0;
 	m_key = 0;
 	m_mouse = 0;
-	m_typeMap = 0;
 
 	// button play
 	auto button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
@@ -36,6 +37,10 @@ void GSMap::Init()
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->Set2DPosition(Globals::screenWidth / 2.0f, Globals::screenHeight / 2.0f);
 
+	if (!m_listSprite2D.empty())
+	{
+		m_listSprite2D.clear();
+	}
 	// Planet baren
 	auto planet = std::make_shared<Sprite2D>("GSMap/Baren.png");
 	planet->Set2DSize(96, 96);
@@ -43,18 +48,18 @@ void GSMap::Init()
 	planet->Set2DPosition(180, 540);
 	m_listSprite2D.push_back(planet);
 
-	// Planet ice
-	planet = std::make_shared<Sprite2D>("GSMap/Ice.png");
-	planet->Set2DSize(96, 96);
-	planet->AttachCamera(staticCamera);
-	planet->Set2DPosition(450, 420);
-	m_listSprite2D.push_back(planet);
-
 	// Planet lava
 	planet = std::make_shared<Sprite2D>("GSMap/Lava.png");
 	planet->Set2DSize(96, 96);
 	planet->AttachCamera(staticCamera);
 	planet->Set2DPosition(310, 130);
+	m_listSprite2D.push_back(planet);
+
+	// Planet ice
+	planet = std::make_shared<Sprite2D>("GSMap/Ice.png");
+	planet->Set2DSize(96, 96);
+	planet->AttachCamera(staticCamera);
+	planet->Set2DPosition(450, 420);
 	m_listSprite2D.push_back(planet);
 
 	// Black hole
@@ -74,8 +79,9 @@ void GSMap::Init()
 	// Circle
 	m_circleChosen = std::make_shared<Sprite2D>("GSMap/Circle.png");
 	m_circleChosen->Set2DSize(96, 96);
-	m_circleChosen->Set2DPosition(180, 540);
 	m_circleChosen->AttachCamera(staticCamera);
+	m_circleChosen->Set2DPosition(m_listSprite2D[currentMap]->Get2DPosition().x, m_listSprite2D[currentMap]->Get2DPosition().y);
+
 }
 
 void GSMap::Update(float deltaTime)
@@ -128,7 +134,6 @@ void GSMap::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			switch (button->m_type)
 			{
 			case BUTTON_PLAY:
-				SceneManager::GetInstance()->SetCurrentMap(m_typeMap);
 				GameStateMachine::GetInstance()->PopState();
 				GameStateMachine::GetInstance()->PushState(StateType::STATE_PLAY);
 				return;
@@ -146,7 +151,7 @@ void GSMap::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 		if (m_listSprite2D[it]->HasTouchMouse(x, y, pressed))
 		{
 			//GameStateMachine::GetInstance()->PopState();
-			m_typeMap = it;
+			currentMap = (PlanetType)(it);
 			m_circleChosen->Set2DPosition(m_listSprite2D[it]->Get2DPosition().x, m_listSprite2D[it]->Get2DPosition().y);
 			return;
 		}

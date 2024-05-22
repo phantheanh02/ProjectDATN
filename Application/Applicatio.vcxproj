@@ -118,6 +118,7 @@
     <ClCompile Include="GSPlay.cpp" />
     <ClCompile Include="GSSetting.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="MapClass.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Sprite2D.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="GSPlay.h" />
     <ClInclude Include="GSSetting.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="MapClass.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Sprite2D.h" />

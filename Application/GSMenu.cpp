@@ -4,10 +4,11 @@
 #include "ResourcesManager.h"
 #include "SceneManager.h"
 #include "GameStateMachine.h"
+#include "MapClass.h"
 
 int tileSizeByPixel = 44;
 CharacterType currentCharacter = C_BLACK;
-
+PlanetType	currentMap = PlanetType::MT_BAREN;
 
 GSMenu::~GSMenu()
 {

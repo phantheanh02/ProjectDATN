@@ -87,6 +87,9 @@
     <ClCompile Include="GSChooseCharacter.cpp">
       <Filter>Source File\GameState</Filter>
     </ClCompile>
+    <ClCompile Include="MapClass.cpp">
+      <Filter>Source File\GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigClass.h" />
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="GSChooseCharacter.h">
       <Filter>Source File\GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="MapClass.h">
+      <Filter>Source File\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

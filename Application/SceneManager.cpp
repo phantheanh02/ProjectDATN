@@ -136,46 +136,17 @@ BoxBullet SceneManager::GetBoxBullet(GLint bullet_id)
 	return BoxBullet();
 }
 
-MapInfo SceneManager::GetMapInfo(GLint map_id)
+std::shared_ptr<MapClass> SceneManager::GetMap(PlanetType type)
 {
 	for (auto it : m_mapList)
 	{
-		if (it.id == map_id)
+		if (it->GetType() == type)
 		{
 			return it;
 		}
 	}
-	std::cerr << "ERR: Map with id " << map_id << " not found!\n";
-	return MapInfo();
-}
-
-MapInfo SceneManager::GetCurrentMapInfo()
-{
-	return m_currentMap;
-}
-
-void SceneManager::SetCurrentMap(int maptype)
-{
-	switch (maptype)
-	{
-	case 0: // MT_BAREN
-		m_currentMap = GetMapInfo(1);
-		break;
-	case 1: // MT_ICE
-		m_currentMap = GetMapInfo(2);
-		break;
-	case 2: // MT_LAVA
-		m_currentMap = GetMapInfo(3);
-		break;
-	case 3: // MT_BLACK_HOLE
-		m_currentMap = GetMapInfo(4);
-		break;
-	case 4: // MT_TERRAN
-		m_currentMap = GetMapInfo(4);
-		break;
-	default:
-		break;
-	}
+	std::cerr << "ERR: Map with type " << type << " not found!\n";
+	return nullptr;
 }
 
 void SceneManager::LoadObject(std::ifstream& file)
@@ -260,6 +231,7 @@ void SceneManager::LoadMap(std::ifstream& file)
 	while (skipStr != "$")
 	{
 		id = std::stoi(skipStr);
+		std::shared_ptr<MapClass> map = std::make_shared<MapClass>((PlanetType)id);
 		file >> filemap >> skipStr;
 		std::string path = Globals::scenePath + filemap;
 		std::ifstream fFile(path);
@@ -268,17 +240,19 @@ void SceneManager::LoadMap(std::ifstream& file)
 			std::cerr << "Error opening file " << path << "\n";
 			return;
 		}
-		MapInfo map = LoadElementsMap(fFile);
-		map.id = id;
+		LoadElementsMap(fFile, map);
 		m_mapList.push_back(map);
 	}
 }
 
-MapInfo SceneManager::LoadElementsMap(std::ifstream& file)
+std::shared_ptr<MapClass> SceneManager::LoadElementsMap(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
-	MapInfo map;
+	GLint idTexture, minTileSize, maxTileSize;
+	Vector2 sizeByTile;
+
 	std::string skipStr;
-	file >> skipStr >> map.idTexture >> skipStr >> map.sizeByTile.x >> map.sizeByTile.y >> map.minTileSize >> map.maxTileSize;
+	file >> skipStr >> idTexture >> skipStr >> sizeByTile.x >> sizeByTile.y >> minTileSize >> maxTileSize;
+	map->Init(idTexture, minTileSize, maxTileSize, sizeByTile);
 	std::string typeStr;
 	GLint type;
 	do
@@ -309,43 +283,49 @@ MapInfo SceneManager::LoadElementsMap(std::ifstream& file)
 	return map;
 }
 
-void SceneManager::LoadPlanesMap(std::ifstream& file, MapInfo& map)
+void SceneManager::LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
 	std::string skipStr;
 	float x, y, z, w;
+	std::vector<Vector4> planeList;
 	file >> skipStr;
 	while (skipStr != "$")
 	{
 		x = std::stoi(skipStr);
 		file >> y >> z >> w >> skipStr;
-		map.plane.push_back(Vector4(x, y, z, w));
+		planeList.push_back(Vector4(x, y, z, w));
 	}
+	map->SetPlaneList(planeList);
 }
 
-void SceneManager::LoadEnemiesMap(std::ifstream& file, MapInfo& map)
+void SceneManager::LoadEnemiesMap(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
 	std::string skipStr;
 	int x, y, z;
+	std::vector<Vector3> enemiesList;
 	file >> skipStr;
 	while (skipStr != "$")
 	{
 		x = std::stoi(skipStr);
 		file >> y >> z >> skipStr;
-		map.enemies.push_back(Vector3(x, y, z));
+		enemiesList.push_back(Vector3(x, y, z));
 	}
+	map->SetEnemiesList(enemiesList);
 }
 
-void SceneManager::LoadItemsMap(std::ifstream& file, MapInfo& map)
+void SceneManager::LoadItemsMap(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
 	std::string skipStr;
 	int x, y, z;
+	std::vector<Vector3> itemList;
 	file >> skipStr >> skipStr >> skipStr >> skipStr;
 	while (skipStr != "$")
 	{
 		x = std::stoi(skipStr);
 		file >> y >> z >> skipStr;
-		map.items.push_back(Vector3(x, y, z));
+		itemList.push_back(Vector3(x, y, z));
 	}
+	map->SetItemList(itemList);
 }
 
 int ParseElementType(const std::string& type)

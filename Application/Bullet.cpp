@@ -91,7 +91,7 @@ void Bullet::CreateNewBullet(TypeBullet type, b2Vec2 speed, Vector2 position)
 	case PLAYER_BULLET:
 		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
 		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
-		m_bulletAnimation = ResourcesManager::GetInstance()->GetAnimation(59);
+		m_bulletAnimation = std::make_shared<SpriteAnimation>(59, 4, 0.1);
 		m_bulletAnimation->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
 		m_bulletAnimation->Set2DPositionByTile(position.x, position.y);
 		m_bulletAnimation->Set2DSizeByTile(0.5, 0.5);
@@ -117,14 +117,6 @@ void Bullet::CreateNewBullet(TypeBullet type, b2Vec2 speed, Vector2 position)
 	m_bulletBody->SetEnabled(true);
 }
 
-
-void Bullet::Set2DSizeScroll()
-{
-}
-
-void Bullet::SetTileSize(GLint tileSize)
-{
-}
 
 void Bullet::SetDamage(GLint damage)
 {

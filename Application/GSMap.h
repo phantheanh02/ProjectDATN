@@ -4,7 +4,7 @@
 #include "SpriteAnimation.h"
 #include "Button.h"
 #include <memory>
-
+#include "MapClass.h"
 
 
 class GSMap final : public GameStateBase
@@ -28,7 +28,6 @@ public:
 private:
 	unsigned int	m_key;
 	unsigned int	m_mouse;
-	int				m_typeMap;
 
 	std::vector<std::shared_ptr<Button>>	m_listButton;
 	std::vector<std::shared_ptr<Sprite2D>>	m_listSprite2D;

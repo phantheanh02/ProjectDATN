@@ -6,24 +6,6 @@
 #include "Sprite2D.h"
 
 
-
-enum TypeEnemyAction
-{
-	FIND_PLAYER			= 1,
-	RUN					= 17,
-	FIRE_DOWN,
-	FIRE_UP,
-	DIE,
-	ARMOD_FIRE,
-	RPGMOD_FIRE,
-	SNIPERMOD_FIRE,
-	ENEMY_01			= 38,
-	ENEMY_02			= 39,
-	ENEMY_03			= 40,
-	ENEMY_EXPLOSION		= 41,
-	ACTION_INVALID		= -1
-};
-
 enum TypeBossAction
 {
 	DASH_BOSS = 31,
@@ -65,15 +47,5 @@ struct BoxBullet
 	Vector2 imgSize;
 };
 
-struct MapInfo
-{
-	GLint id;
-	GLint idTexture;
-	GLint minTileSize;
-	GLint maxTileSize;
-	Vector2 sizeByTile;
-	std::vector<Vector4>	plane;		// x, y: position; z, w : size
-	std::vector<Vector3>	enemies;	// x: id texture; y, z: position
-	std::vector<Vector3>	items;		// x" id texture; y, z: position
-};
+
 

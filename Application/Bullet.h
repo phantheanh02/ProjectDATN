@@ -33,8 +33,6 @@ public:
 	void Set2DPosition(float x, float y);
 	void Set2DPositionByTile(GLfloat x, GLfloat y);
 	void Set2DSize(int x, int y);
-	void Set2DSizeScroll();
-	void SetTileSize(GLint tileSize);
 	void SetDamage(GLint damage);
 	void SetActiveStatus(bool status);
 

@@ -5,6 +5,7 @@
 #include "Sprite2D.h"
 #include "Enemies.h"
 #include "ConfigClass.h"
+#include "MapClass.h"
 
 enum ElementType
 {
@@ -35,12 +36,9 @@ public:
 
 	std::shared_ptr<Camera>		GetCamera(CameraType camera);
 	std::shared_ptr<Sprite2D>	GetObject(GLint object_id);
+	std::shared_ptr<MapClass>	GetMap(PlanetType type);
 	BoxEnemy					GetBoxEnemy(GLint enemy_id);
 	BoxBullet					GetBoxBullet(GLint bullet_id);
-	MapInfo						GetMapInfo(GLint map_id);
-	MapInfo						GetCurrentMapInfo();
-
-	void						SetCurrentMap(int maptype);
 
 	bool m_init;
 	GLint m_soundVolume;
@@ -51,8 +49,7 @@ private:
 	std::unordered_map<GLint, std::shared_ptr<Sprite2D>>	m_objectList;
 	std::unordered_map<GLint, BoxEnemy>						m_enemiesList;
 	std::unordered_map<GLint, BoxBullet>					m_bulletList;
-	std::vector<MapInfo>									m_mapList;
-	MapInfo													m_currentMap;
+	std::vector<std::shared_ptr<MapClass>>					m_mapList;
 
 	// Utilities
 	void LoadObject(std::ifstream& file);
@@ -61,11 +58,11 @@ private:
 	void LoadBullet(std::ifstream& file);
 
 	// Load map
-	void LoadMap(std::ifstream& file);
-	MapInfo LoadElementsMap(std::ifstream& file);
-	void LoadPlanesMap(std::ifstream& file, MapInfo& map);
-	void LoadEnemiesMap(std::ifstream& file, MapInfo& map);
-	void LoadItemsMap(std::ifstream& file, MapInfo &map);
+	void					LoadMap(std::ifstream& file);
+	std::shared_ptr<MapClass>	LoadElementsMap(std::ifstream& file, std::shared_ptr<MapClass> map);
+	void					LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> map);
+	void					LoadEnemiesMap(std::ifstream& file, std::shared_ptr<MapClass> map);
+	void					LoadItemsMap(std::ifstream& file, std::shared_ptr<MapClass> map);
 
 
 };

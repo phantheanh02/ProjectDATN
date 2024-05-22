@@ -12,7 +12,6 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "SDL_ttf.h"
-#include "SpriteAnimation.h"
 
 enum ResourceType
 {
@@ -21,7 +20,6 @@ enum ResourceType
 	RT_TEXTURE,
 	RT_SOUND,
 	RT_TTF_FONT,
-	RT_DEFANIMATION,
 	RT_INVALID = -1
 };
 
@@ -39,7 +37,6 @@ public:
 	std::shared_ptr<Texture>	GetTexture(GLint id);
 	std::shared_ptr<Sound>		GetSound(GLint id);
 	TTF_Font*					GetFont(GLint id);
-	std::shared_ptr<SpriteAnimation> GetAnimation(GLint id, bool character = false);
 
 	std::shared_ptr<Shaders>	GetShader(const char* name);
 	std::shared_ptr<Texture>	GetTexture(const char* name);
@@ -55,7 +52,6 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Texture>>	m_textureList;
 	std::unordered_map<GLint, std::shared_ptr<Sound>>			m_soundList;
 	std::unordered_map<GLint, TTF_Font*>						m_fontList;
-	std::unordered_map<GLint, DefAnimation>						m_animationList;
 
 	// Utilities
 	void LoadModel(std::ifstream& filePtr);
@@ -63,5 +59,4 @@ private:
 	void LoadTexture(std::ifstream& filePtr);
 	void LoadSound(std::ifstream& filePtr);
 	void LoadFont(std::ifstream& filePtr);
-	void LoadDefAnimation(std::ifstream& filePtr);
 };

@@ -2,6 +2,7 @@
 #include "GSPlay.h"
 
 extern int tileSizeByPixel;
+extern PlanetType currentMap;
 
 GSPlay::~GSPlay()
 {
@@ -39,14 +40,15 @@ void GSPlay::Init()
 	m_staticCamera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
 
 	// Map Info
-	m_map = SceneManager::GetInstance()->GetCurrentMapInfo();
+	m_map = SceneManager::GetInstance()->GetMap(currentMap);
 	LoadMap();
 
 	// init camera boundaries
+	auto size = m_map->GetSizeByTile();
 	m_cameraPositionBoudaries.x = 0;
 	m_cameraPositionBoudaries.y = 0;
-	m_cameraPositionBoudaries.z = m_map.sizeByTile.x * tileSizeByPixel - (GLfloat)Globals::screenWidth;
-	m_cameraPositionBoudaries.w = m_map.sizeByTile.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
+	m_cameraPositionBoudaries.z = size.x * tileSizeByPixel - (GLfloat)Globals::screenWidth;
+	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
 	// button play
 	auto button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
@@ -109,17 +111,17 @@ void GSPlay::HandleEvent()
 	auto currentVelocity = m_player->GetPlayerBody()->GetLinearVelocity();
 	float desiredVel = 0, velChange, impulse;
 
-	if (m_key & (1 << 1))
+	if (m_key & (1 << 1) && m_keyStack.back() == "A")
 	{
 		// move left
 		desiredVel = b2Max(currentVelocity.x - 0.25f, -MOVEMENT_SPEED);
-		m_player->SetDirection(PlayerDirection::LEFT);
+		m_player->SetDirection(DirectionType::LEFT);
 	}
-	if (m_key & (1 << 3))
+	if (m_key & (1 << 3) && m_keyStack.back() == "D")
 	{
 		// move right
 		desiredVel = b2Min(currentVelocity.x + 0.25f, MOVEMENT_SPEED);
-		m_player->SetDirection(PlayerDirection::RIGHT);
+		m_player->SetDirection(DirectionType::RIGHT);
 	}
 	if (desiredVel != 0 && !m_player->IsJumping())
 	{
@@ -134,7 +136,7 @@ void GSPlay::HandleEvent()
 	{
 		// key w
 		m_player->SetAction(PlayerAction::FIRE_TOP);
-		m_player->SetDirection(PlayerDirection::TOP);
+		m_player->SetDirection(DirectionType::TOP);
 	}
 	else
 	{
@@ -176,13 +178,13 @@ void GSPlay::HandleEvent()
 
 		switch (m_player->GetDirection())
 		{
-		case PlayerDirection::TOP:
+		case DirectionType::TOP:
 			speed = b2Vec2(0.0f, -20.0f);
 			break;
-		case PlayerDirection::LEFT:
+		case DirectionType::LEFT:
 			speed = b2Vec2(-20.0f, 0.0f);
 			break;
-		case PlayerDirection::RIGHT:
+		case DirectionType::RIGHT:
 			speed = b2Vec2(20.0f, 0.0f);
 			break;
 		}
@@ -201,12 +203,16 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 			break;
 		case KEY_A:
 			m_key |= 1 << 1;
+			if (std::find(m_keyStack.begin(), m_keyStack.end(), "A") == m_keyStack.end())
+				m_keyStack.push_back("A");
 			break;
 		case KEY_S:
 			m_key |= 1 << 2;
 			break;
 		case KEY_D:
 			m_key |= 1 << 3;
+			if (std::find(m_keyStack.begin(), m_keyStack.end(), "D") == m_keyStack.end())
+				m_keyStack.push_back("D");
 			break;
 		case KEY_SPACE:
 			m_key |= 1 << 4;
@@ -228,12 +234,20 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 			break;
 		case KEY_A:
 			m_key ^= 1 << 1;
+			if (std::find(m_keyStack.begin(), m_keyStack.end(), "A") != m_keyStack.end())
+			{
+				m_keyStack.erase(std::find(m_keyStack.begin(), m_keyStack.end(), "A"));
+			}
 			break;
 		case KEY_S:
 			m_key ^= 1 << 2;
 			break;
 		case KEY_D:
 			m_key ^= 1 << 3;
+			if (std::find(m_keyStack.begin(), m_keyStack.end(), "D") != m_keyStack.end())
+			{
+				m_keyStack.erase(std::find(m_keyStack.begin(), m_keyStack.end(), "D"));
+			}
 			break;
 		case KEY_SPACE:
 			m_key ^= 1 << 4;
@@ -276,20 +290,24 @@ void GSPlay::OnMouseMove(int x, int y)
 void GSPlay::OnMouseScroll(int x, int y, short delta)
 {
 	// Calculate tile size
+	auto min = m_map->GetMinTileSize();
+	auto max = m_map->GetMaxTileSize();
 	tileSizeByPixel = delta > 0 ? tileSizeByPixel + 2 : tileSizeByPixel - 2;
-	tileSizeByPixel = tileSizeByPixel < m_map.minTileSize ? m_map.minTileSize : tileSizeByPixel;
-	tileSizeByPixel = tileSizeByPixel > m_map.maxTileSize ? m_map.maxTileSize : tileSizeByPixel;
+	tileSizeByPixel = tileSizeByPixel < min ? min : tileSizeByPixel;
+	tileSizeByPixel = tileSizeByPixel > max ? max : tileSizeByPixel;
 
 	// Calculate size
-	m_background->Set2DSizeByTile(m_map.sizeByTile.x, m_map.sizeByTile.y);
-	m_player->Set2DSizeByTile(3, 3);
+	auto size = m_map->GetSizeByTile();
+	m_background->Set2DSizeByTile(size.x, size.y);
+	m_player->ReCalculateWhenScroll();
 }
 
 void GSPlay::Update2DDrawPosition()
 {
 	// recalculate camera boundary
-	m_cameraPositionBoudaries.z = m_map.sizeByTile.x * tileSizeByPixel - (GLfloat)Globals::screenWidth;
-	m_cameraPositionBoudaries.w = m_map.sizeByTile.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
+	auto size = m_map->GetSizeByTile();
+	m_cameraPositionBoudaries.z = size.x * tileSizeByPixel - (GLfloat)Globals::screenWidth;
+	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
 	// set camera position to follows player
 	auto player_position = m_player->GetPlayerBody()->GetPosition();
@@ -313,8 +331,9 @@ void GSPlay::Update2DDrawPosition()
 void GSPlay::LoadMap()
 {
 	// background
-	m_background = std::make_shared<Sprite2D>(m_map.idTexture);
-	m_background->Set2DSizeByTile(m_map.sizeByTile.x, m_map.sizeByTile.y);
+	auto size = m_map->GetSizeByTile();
+	m_background = std::make_shared<Sprite2D>(m_map->GetIdTexture());
+	m_background->Set2DSizeByTile(size.x, size.y);
 	m_background->Set2DPosition(0, 0);
 
 	// Load obs
@@ -322,7 +341,8 @@ void GSPlay::LoadMap()
 	b2BodyDef obsBodyDef;
 	b2PolygonShape obsShape;
 	b2FixtureDef obsFixDef;
-	for (auto it : m_map.plane)
+	auto listPlane = m_map->GetPlaneList();
+	for (auto it : listPlane)
 	{
 		obsBody = nullptr;
 		obsBodyDef.position.Set(it.x, it.y);
