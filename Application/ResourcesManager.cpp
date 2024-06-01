@@ -117,6 +117,10 @@ std::shared_ptr<Model> ResourcesManager::GetModel(ModelType type)
 		return m_modelList[2];
 	case L_RETANGLE_CENTER:
 		return m_modelList[3];
+	case TOP_RETANGLE_CENTER:
+		return m_modelList[4];
+	case BOTTOM_RETANGLE_CENTER:
+		return m_modelList[5];
 	default:
 		break;
 	}

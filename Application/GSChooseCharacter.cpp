@@ -38,25 +38,66 @@ void GSChooseCharacter::Init()
 	button->Set2DSize(90, 70);
 	button->Set2DPosition(500, 350);
 	m_buttonList.push_back(button);
+
 	// bg
-	m_background = std::make_shared<Sprite2D>("state_background.png");
-	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
-	m_background->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	auto sprite2D = std::make_shared<Sprite2D>("state_background.png");
+	sprite2D->Set2DSize(Globals::screenWidth, Globals::screenHeight);
+	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_sprite2DList.push_back(sprite2D);
+
+	// info table
+	sprite2D = std::make_shared<Sprite2D>("BorderAttribute.png");
+	sprite2D->Set2DSize(146 * 2.5, 183 * 2.5);
+	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	sprite2D->Set2DPosition(550, 150);
+	m_sprite2DList.push_back(sprite2D);
+
+	// stats
+	auto stats = SceneManager::GetInstance()->GetCharacterStats(currentCharacter);
+	sprite2D = std::make_shared<Sprite2D>(stats.hp + 83);
+	sprite2D->Set2DSize(168, 20);
+	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	sprite2D->Set2DPosition(710, 270);
+	m_sprite2DList.push_back(sprite2D);
+
+	sprite2D = std::make_shared<Sprite2D>(stats.spd + 89);
+	sprite2D->Set2DSize(168, 20);
+	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	sprite2D->Set2DPosition(710, 270 + 65);
+	m_sprite2DList.push_back(sprite2D);
+
+	sprite2D = std::make_shared<Sprite2D>(stats.atk + 95);
+	sprite2D->Set2DSize(168, 20);
+	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	sprite2D->Set2DPosition(710, 270 + 130);
+	m_sprite2DList.push_back(sprite2D);
+
+	// Bullet type
+	auto id = (currentCharacter - 29) / 6;
+	m_bulletAnimation = std::make_shared<SpriteAnimation>(72 + id, 4, 0.1);
+	m_bulletAnimation->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_bulletAnimation->Set2DPosition(730, 530);
+	m_bulletAnimation->Set2DSize(96, 96);
 }
 
 void GSChooseCharacter::Update(float deltaTime)
 {
-	m_background->Update(deltaTime);
+	m_bulletAnimation->Update(deltaTime);
 	m_currentCharacter->Update(deltaTime);
 }
 
 void GSChooseCharacter::Draw()
 {
-	m_background->Draw();
+	for (auto it : m_sprite2DList)
+	{
+		it->Draw();
+	}
+
 	for (auto button : m_buttonList)
 	{
 		button->Draw();
 	}
+	m_bulletAnimation->Draw();
 	m_currentCharacter->Draw();
 }
 
@@ -88,7 +129,7 @@ void GSChooseCharacter::OnMouseClick(int x, int y, unsigned char key, bool press
 		if (button->HandleTouchMouse(x, y, pressed))
 		{
 			ResourcesManager::GetInstance()->GetSound(1)->Play();
-			GLint id;
+			GLint id = 0;
 			switch (button->m_type)
 			{
 			case BUTTON_BACK:
@@ -109,6 +150,14 @@ void GSChooseCharacter::OnMouseClick(int x, int y, unsigned char key, bool press
 				break;
 			default:
 				break;
+			}
+			auto stats = SceneManager::GetInstance()->GetCharacterStats((CharacterType)id);
+			if (stats.type)
+			{
+				m_sprite2DList[2]->SetTexture(ResourcesManager::GetInstance()->GetTexture(stats.hp + 83));
+				m_sprite2DList[3]->SetTexture(ResourcesManager::GetInstance()->GetTexture(stats.spd + 89));
+				m_sprite2DList[4]->SetTexture(ResourcesManager::GetInstance()->GetTexture(stats.atk + 95));
+				m_bulletAnimation->SetTexture(ResourcesManager::GetInstance()->GetTexture(72 + (id - 29) / 6));
 			}
 		};
 	}

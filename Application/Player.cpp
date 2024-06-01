@@ -7,38 +7,35 @@
 
 extern int tileSizeByPixel;
 extern CharacterType currentCharacter;
-
-constexpr auto ANIMATION_SIZE = 3.0f;
+extern std::shared_ptr<b2World> world;
 
 Player::Player()
-{
-
-}
-
-Player::Player(b2World* world)
 	: m_currentDirection(DirectionType::RIGHT)
 	, m_sprinningDirection(DirectionType::RIGHT)
 	, m_currentAction(PlayerAction::IDLE)
 	, m_isJumping(false)
 	, m_bulletCooldown(0)
+	, m_isDie(false)
+	, m_resetAfterDieTime(5)
+	, m_health(100)
 {
 	// create player body
 	b2BodyDef playerBodyDef;
 	playerBodyDef.type = b2_dynamicBody;
-	playerBodyDef.position.Set(3.0f, 5.0f);
+	playerBodyDef.position.Set(2.0f, 15.0f);
 	playerBodyDef.userData.pointer = (uintptr_t)this;
-	m_playerBody = world->CreateBody(&playerBodyDef);
+	m_body = world->CreateBody(&playerBodyDef);
 
 	// set player body properties
 	b2PolygonShape playerShape;
-	playerShape.SetAsBox(0.5 * 3 / 2, 0.625 * 3 / 2); // size box = size img / 2
+	playerShape.SetAsBox(0.5 * SCALE_SIZE / 2, 2 / 3.0f * SCALE_SIZE / 2); // size box = size img / 2
 	b2FixtureDef playerFixtureDef;
 	playerFixtureDef.shape = &playerShape;
-	playerFixtureDef.density = 1.0f;
+	playerFixtureDef.density = 1.0f; 
 	playerFixtureDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER;
-	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_ENEMY_BULLET | FixtureTypes::FIXTURE_BOSS_BULLET | FixtureTypes::FIXTURE_ITEM;
-	m_playerBodyFixture = m_playerBody->CreateFixture(&playerFixtureDef);
-	m_playerBody->SetFixedRotation(true);
+	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_ENEMY_BULLET | FixtureTypes::FIXTURE_ENEMY | FixtureTypes::FIXTURE_ITEM;
+	m_body->CreateFixture(&playerFixtureDef);
+	m_body->SetFixedRotation(true); 
 	// Create sensor foot to check in ground
 	b2PolygonShape sensorBox;
 	b2FixtureUserData userData;
@@ -49,12 +46,33 @@ Player::Player(b2World* world)
 	sensorDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER_FOOT;
 	sensorDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND;
 	sensorDef.userData.pointer = (uintptr_t)this;
-	m_playerFootSensorFixture = m_playerBody->CreateFixture(&sensorDef);
+	m_body->CreateFixture(&sensorDef);
 
 	// animation
 	m_actionAnimation = std::make_shared<SpriteAnimation>(currentCharacter, 5, 0.1);
 	m_actionAnimation->Set2DPositionByTile(3, 5);
-	m_actionAnimation->Set2DSizeByTile(ANIMATION_SIZE, ANIMATION_SIZE);
+	m_actionAnimation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
+
+	switch (currentCharacter)
+	{
+	case C_BLACK:
+		m_playerbulletType = 1;
+		break;
+	case C_BLUE:
+		m_playerbulletType = 2;
+		break;
+	case C_GREEN:
+		m_playerbulletType = 3;
+		break;
+	case C_RED:
+		m_playerbulletType = 4;
+		break;
+	case C_YELLOW:
+		m_playerbulletType = 5;
+		break;
+	default:
+		break;
+	}
 }
 
 Player::~Player()
@@ -63,11 +81,23 @@ Player::~Player()
 
 void Player::Update(float deltaTime)
 {
+	if (m_isDie)
+	{
+		m_resetAfterDieTime -= deltaTime;
+		SetAction(PlayerAction::DEAD);
+		//m_body->SetEnabled(false);
+		if (m_actionAnimation->GetCurrentFrame() != m_actionAnimation->GetNumFrames() - 1)
+		{
+			m_actionAnimation->Set2DPositionByTile(m_body->GetPosition().x, m_body->GetPosition().y);
+			m_actionAnimation->Update(deltaTime);
+		}
+		return;
+	}
 	if (!m_isJumping)
 	{
 		m_actionAnimation->Update(deltaTime);
 	}
-	m_actionAnimation->Set2DPositionByTile(m_playerBody->GetPosition().x, m_playerBody->GetPosition().y);
+	m_actionAnimation->Set2DPositionByTile(m_body->GetPosition().x, m_body->GetPosition().y);
 	if (m_bulletCooldown > 0)
 	{
 		m_bulletCooldown -= deltaTime;
@@ -127,7 +157,7 @@ void Player::SetDirection(DirectionType direction)
 
 void Player::SetAction(PlayerAction action)
 {
-	if (m_currentAction != action)
+	if (m_currentAction != action && m_currentAction != DEAD)
 	{
 		auto pos = m_actionAnimation->GetPosition();
 		auto size = m_actionAnimation->GetSize();
@@ -148,6 +178,7 @@ void Player::SetAction(PlayerAction action)
 			break;
 		case DEAD:
 			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 8, 0.1f);
+			m_actionAnimation->SetCurrentFrame(0);
 			break;
 		case FIRE_TOP:
 			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 1, 0.1f);
@@ -186,13 +217,17 @@ DirectionType Player::GetDirection()
 
 void Player::TakeDamage(GLint damage)
 {
-
+	m_health -= damage;
+	if (m_health <= 0)
+	{
+		m_isDie = true;
+	}
 }
 
 void Player::ReCalculateWhenScroll()
 {
-	Set2DSizeByTile(ANIMATION_SIZE, ANIMATION_SIZE);
-	m_actionAnimation->Set2DSizeByTile(ANIMATION_SIZE, ANIMATION_SIZE);
+	Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
+	m_actionAnimation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 }
 
 void Player::HandlePlayerDie(GLfloat deltaTime)

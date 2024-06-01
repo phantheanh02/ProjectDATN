@@ -38,8 +38,9 @@ public:
 	void OnMouseScroll(int x, int y, short delta) override;
 private:
 	float m_time;
-	std::shared_ptr<Sprite2D>			m_intro;
-	std::shared_ptr<Sprite2D>			m_background;
-	std::vector<std::shared_ptr<Button>>m_buttonList;
-	std::shared_ptr<SpriteAnimation>	m_currentCharacter;
+
+	std::vector<std::shared_ptr<Sprite2D>>	m_sprite2DList;
+	std::vector<std::shared_ptr<Button>>	m_buttonList;
+	std::shared_ptr<SpriteAnimation>		m_currentCharacter;
+	std::shared_ptr<SpriteAnimation>		m_bulletAnimation;
 };

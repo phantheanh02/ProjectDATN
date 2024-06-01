@@ -93,8 +93,16 @@ void BaseObject::SetTexture(std::shared_ptr<Texture> texture)
 	m_texture = texture;
 }
 
-void BaseObject::FlipHorizontal()
+void BaseObject::FlipHorizontal(bool isTop)
 {
+	if (isTop)
+	{
+		m_model = ResourcesManager::GetInstance()->GetModel(ModelType::TOP_RETANGLE_CENTER);
+	}
+	else
+	{
+		m_model = ResourcesManager::GetInstance()->GetModel(ModelType::BOTTOM_RETANGLE_CENTER);
+	}
 }
 
 void BaseObject::FlipVertical()

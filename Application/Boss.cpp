@@ -80,11 +80,11 @@ void Boss::Update(float deltaTime, std::shared_ptr<Player> player)
 	}
 	else
 	{
-		AttackUpdate(player->GetPlayerBody(), deltaTime);
+		AttackUpdate(player->GetBody(), deltaTime);
 
 		if (m_isNewTexture)
 		{
-			CreateBossBox(player->GetPlayerBody()->GetWorld());
+			CreateBossBox(player->GetBody()->GetWorld());
 			m_isNewTexture = false;
 		}
 		m_animation->Update(deltaTime);
@@ -131,9 +131,9 @@ void Boss::Set2DSize(GLint width, GLint height)
 	m_animation->Set2DSize(width, height);
 }
 
-void Boss::Set2DSizeScroll()
+void Boss::Set2DSizeByTile()
 {
-	this->Set2DSize(m_sizeImg.x * m_tileSizeByPixel, m_sizeImg.y * m_tileSizeByPixel);
+	this->Set2DSize(m_imgSize.x * m_tileSizeByPixel, m_imgSize.y * m_tileSizeByPixel);
 }
 
 Vector2 Boss::Get2DSize()
@@ -195,22 +195,21 @@ void Boss::SetTexture(GLint typeAction)
 void Boss::Set2DPositionFromBox2D(GLfloat x, GLfloat y)
 {
 	float posX = x * m_tileSizeByPixel - Get2DSize().x / 2.0f;
-	float posY = y * m_tileSizeByPixel - (Get2DSize().y - m_sizeBox.y * m_tileSizeByPixel);
+	float posY = y * m_tileSizeByPixel - (Get2DSize().y - m_boxSize.y * m_tileSizeByPixel);
 	m_animation->Set2DPosition(posX, posY);
 }
 
 void Boss::SetTileSizeScroll(GLint tileSize)
 {
 	m_tileSizeByPixel = tileSize;
-	Set2DSizeScroll();
+	Set2DSizeByTile();
 }
 
 void Boss::CreateBossBox(b2World* world)
 {
 	this->DestroyFixture(m_bossFixture);
 	b2PolygonShape bossShape;
-	m_sizeBox = Vector2(m_boxInfo.boxSize.x / HEIGHT_ENEMY * ENEMY_SIZE, m_boxInfo.boxSize.y / HEIGHT_ENEMY * ENEMY_SIZE);
-	bossShape.SetAsBox(m_sizeBox.x, m_sizeBox.y);
+	bossShape.SetAsBox(m_boxSize.x, m_boxSize.y);
 
 	b2FixtureDef bossFixtureDef;
 	bossFixtureDef.shape = &bossShape;
@@ -220,17 +219,13 @@ void Boss::CreateBossBox(b2World* world)
 	bossFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_PLAYER_BULLET ;
 	m_bossFixture = m_bossBody->CreateFixture(&bossFixtureDef);
 
-	m_sizeImg.x = 2 * m_sizeBox.x * m_boxInfo.imgSize.x / m_boxInfo.boxSize.x;
-	m_sizeImg.y = 2 * m_sizeBox.y * m_boxInfo.imgSize.y / m_boxInfo.boxSize.y;
 
-	this->Set2DSize(m_sizeImg.x * m_tileSizeByPixel, m_sizeImg.y * m_tileSizeByPixel);
+	this->Set2DSize(m_imgSize.x * m_tileSizeByPixel, m_imgSize.y * m_tileSizeByPixel);
 }
 
 
 void Boss::SetBoxInfo(Vector2 imgSize, Vector2 boxSize)
 {
-	m_boxInfo.imgSize = imgSize;
-	m_boxInfo.boxSize = boxSize;
 }
 
 void Boss::AttackUpdate(b2Body* playerBody, GLfloat deltaTime)
@@ -341,8 +336,7 @@ void Boss::CreateSkillFixture(Vector2 sizeSkillBox)
 		m_skillBossBody->DestroyFixture(m_skillBossFixture);
 	}
 
-	Vector2 sizeBox = Vector2(m_sizeBox.x * sizeSkillBox.x / m_boxInfo.boxSize.x, 
-		m_sizeBox.y * sizeSkillBox.y / m_boxInfo.boxSize.y);
+	Vector2 sizeBox = Vector2();
 
 	b2PolygonShape sensorShape;
 	b2FixtureDef sensorFixtureDef;

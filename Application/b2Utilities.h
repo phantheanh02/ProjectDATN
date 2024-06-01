@@ -57,6 +57,6 @@ public:
 	b2Fixture*	m_fixture;
 	b2Vec2		m_point;
 	b2Vec2		m_normal;
-	bool		m_playerHit = false; 
+	bool		m_isDetectObject = false; 
 	float		m_fraction = 1.0f;
 };

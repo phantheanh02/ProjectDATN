@@ -17,7 +17,7 @@ public:
 	virtual void Update(GLfloat deltaTime) = 0;
 
 	bool HasTouchMouse(GLfloat x, GLfloat y, bool bIsPressed);
-	void FlipHorizontal();
+	void FlipHorizontal(bool isTop = true);
 	void FlipVertical();
 	void CalculateWVPMatrix();
 	inline void AttachCamera(std::shared_ptr<Camera> camera) { m_camera = camera; };

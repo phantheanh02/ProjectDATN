@@ -40,7 +40,6 @@ private:
 	std::vector<std::string> m_keyStack;
 
 	// background
-	std::shared_ptr<Sprite2D>				m_background;
 	std::vector<std::shared_ptr<Button>>	m_listButton;
 
 	// camera
@@ -49,26 +48,24 @@ private:
 	Vector4									m_cameraPositionBoudaries;
 
 	// map
-	std::shared_ptr<MapClass> 					m_map;
+	std::shared_ptr<MapClass> 				m_map;
 
 	// box2d
-	std::shared_ptr<b2World>				m_world;
 	std::vector<b2Body*>					m_BodyList;
 	ContactListener*						m_contactListener;
-	b2Vec2									m_gravity;
 	GLfloat									m_timeStep;
 
-	// Player
+	// player
 	std::shared_ptr<Player>					m_player;
 
 	// Bullet
 	std::vector<std::shared_ptr<Bullet>>	m_bulletList;
 
-	// Enemies
+	// Enemy
 	std::vector<std::shared_ptr<Enemies>>	m_enemiesList;
 
 private:
-	void ActiveABullet(TypeBullet type, b2Vec2 speed, Vector2 position);
-
+	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);
+	void RandomEnemies();
 };
 	

@@ -26,13 +26,13 @@ public:
 
 	void Set2DPosition(GLint x, GLint y);
 	void Set2DSize(GLint width, GLint height);
-	void Set2DSizeScroll();
+	void Set2DSizeByTile();
 	void SetTexture(GLint typeAction);
 	void Set2DPositionFromBox2D(GLfloat x, GLfloat y);
 	void SetTileSizeScroll(GLint tileSize);
 
 	Vector2				Get2DSize();
-	inline b2Body*		GetEnemyBody() { return m_bossBody; };
+	inline b2Body*		GetBody() { return m_bossBody; };
 	inline b2Fixture*	GetEnemyFixture() { return m_bossFixture; };
 	inline std::shared_ptr<SpriteAnimation> GetAnimation() { return m_animation; };
 	inline GLint GetDamage() { return m_damage; };
@@ -44,7 +44,6 @@ private:
 	GLint		m_health;
 	GLint		m_damage;
 	GLint		m_tileSizeByPixel;
-	BoxEnemy	m_boxInfo;
 	std::shared_ptr<SpriteAnimation> m_animation;
 	bool		m_isNewTexture;
 	bool		m_isActive;
@@ -58,8 +57,8 @@ private:
 	b2Body*		m_skillBossBody;
 	b2Fixture*	m_bossFixture;
 	b2Fixture*	m_skillBossFixture;
-	Vector2		m_sizeImg;
-	Vector2		m_sizeBox;
+	Vector2		m_imgSize;
+	Vector2		m_boxSize;
 
 	// Skill
 	GLfloat		m_coolDownSkill1, m_coolDownSkill2, m_coolDownIDLE, m_coolDownJump;

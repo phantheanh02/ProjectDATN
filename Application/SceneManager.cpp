@@ -74,6 +74,9 @@ void SceneManager::LoadElements(const std::string& filename)
 		case ET_MAP:
 			LoadMap(fscene);
 			break;
+		case ET_CHARACTER:
+			LoadCharacter(fscene);
+			break;
 		default:
 			std::cerr << "Scene file format error, abort loading elements";
 			valid = false;
@@ -110,19 +113,6 @@ std::shared_ptr<Sprite2D> SceneManager::GetObject(GLint object_id)
 	return nullptr;
 }
 
-BoxEnemy SceneManager::GetBoxEnemy(GLint enemy_id)
-{
-	for (auto it : m_enemiesList)
-	{
-		if (it.first == enemy_id)
-		{
-			return it.second;
-		}
-	}
-	std::cerr << "ERR: Enemy with id " << enemy_id << " not found!\n";
-	return BoxEnemy();
-}
-
 BoxBullet SceneManager::GetBoxBullet(GLint bullet_id)
 {
 	for (auto it : m_bulletList)
@@ -147,6 +137,30 @@ std::shared_ptr<MapClass> SceneManager::GetMap(PlanetType type)
 	}
 	std::cerr << "ERR: Map with type " << type << " not found!\n";
 	return nullptr;
+}
+
+std::shared_ptr<Enemies> SceneManager::GetEnemy(EnemyType type)
+{
+	for (auto enemy : m_enemiesList)
+	{
+		if (enemy->GetType() == type)
+		{
+			return enemy->Clone();
+		}
+	}
+	return nullptr;
+}
+
+CharacterStats SceneManager::GetCharacterStats(CharacterType type)
+{
+	for (auto character : m_characterList)
+	{
+		if (character.type == type)
+		{
+			return character;
+		}
+	}
+	return CharacterStats();
 }
 
 void SceneManager::LoadObject(std::ifstream& file)
@@ -199,12 +213,14 @@ void SceneManager::LoadEnemies(std::ifstream& file)
 	std::string skipStr;
 	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
 	file >> skipStr;
+	GLint id;
+	Vector2 imgSize, boxSize;
 	while (skipStr != "$")
 	{
-		BoxEnemy box;
-		box.id = std::stoi(skipStr);
-		file >> box.imgSize.x >> box.imgSize.y >> box.boxSize.x >> box.boxSize.y >> skipStr;
-		m_enemiesList.insert(std::make_pair(box.id, box));
+		id = std::stoi(skipStr);
+		file >> imgSize.x >> imgSize.y >> boxSize.x >> boxSize.y >> skipStr;
+		auto enemy = std::make_shared<Enemies>((EnemyType)id, imgSize, boxSize);
+		m_enemiesList.push_back(enemy);
 	}
 }
 
@@ -220,6 +236,21 @@ void SceneManager::LoadBullet(std::ifstream& file)
 		box.id = std::stoi(skipStr);
 		file >> box.imgSize.x >> box.imgSize.y >> skipStr;
 		m_bulletList.insert(std::make_pair(box.id, box));
+	}
+}
+
+void SceneManager::LoadCharacter(std::ifstream& file)
+{
+	std::string skipStr;
+	BoxBullet box;
+	file >> skipStr >> skipStr >> skipStr >> skipStr;
+	file >> skipStr;
+	while (skipStr != "$")
+	{
+		CharacterStats character;
+		character.type = (CharacterType)std::stoi(skipStr);
+		file >> character.hp >> character.spd >> character.atk >> skipStr;
+		m_characterList.push_back(character);
 	}
 }
 
@@ -268,13 +299,13 @@ std::shared_ptr<MapClass> SceneManager::LoadElementsMap(std::ifstream& file, std
 			LoadPlanesMap(file, map);
 			break;
 		case MT_ENEMIES:
-			LoadEnemiesMap(file, map);
+			LoadSpawnEnemies(file, map);
 			break;
 		case MT_ITEMS:
 			LoadItemsMap(file, map);
 			break;
 		default:
-			std::cerr << "Map file format error, abort loading elements";
+			std::cerr << "Map file format error, abort loading elements\n";
 			file.close();
 			return map;
 		}
@@ -298,19 +329,32 @@ void SceneManager::LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> 
 	map->SetPlaneList(planeList);
 }
 
-void SceneManager::LoadEnemiesMap(std::ifstream& file, std::shared_ptr<MapClass> map)
+void SceneManager::LoadSpawnEnemies(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
 	std::string skipStr;
-	int x, y, z;
-	std::vector<Vector3> enemiesList;
-	file >> skipStr;
+	int type, x, y;
+	GLfloat ratio;
+	std::unordered_map<EnemyType, GLfloat>	enemiesTypeRatio;
+	std::vector<Vector2>					spawnPosition;
+	file >> skipStr >> skipStr >> skipStr;
+
+	while (skipStr != "POSX")
+	{
+		type = std::stoi(skipStr);
+		file >> ratio >> skipStr;
+		enemiesTypeRatio.insert(std::make_pair((EnemyType)type, ratio));
+	}
+
+	file >> skipStr >> skipStr;
 	while (skipStr != "$")
 	{
 		x = std::stoi(skipStr);
-		file >> y >> z >> skipStr;
-		enemiesList.push_back(Vector3(x, y, z));
+		file >> y >> skipStr;
+		spawnPosition.push_back(Vector2(x, y));
 	}
-	map->SetEnemiesList(enemiesList);
+	
+	map->SetEnemiesTypeRatio(enemiesTypeRatio);
+	map->SetSpawnPosition(spawnPosition);
 }
 
 void SceneManager::LoadItemsMap(std::ifstream& file, std::shared_ptr<MapClass> map)
@@ -342,9 +386,11 @@ int ParseElementType(const std::string& type)
 		return ET_MAP;
 	if (type == "#PlanesMap")
 		return MT_PLANES;
-	if (type == "#EnemiesMap")
+	if (type == "#SpawnEnemies")
 		return MT_ENEMIES;
 	if (type == "#ItemsMap")
 		return MT_ITEMS;
+	if (type == "#CharacterStats")
+		return ET_CHARACTER;
 	return ET_INVALID;
 }

@@ -35,11 +35,6 @@ struct ObsDynamic
 	bool* isLock;
 };
 
-struct BoxEnemy
-{
-	GLint id;
-	Vector2 boxSize, imgSize;
-};
 
 struct BoxBullet
 {

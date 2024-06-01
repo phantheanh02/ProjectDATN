@@ -1,37 +1,32 @@
 #pragma once
+
+#ifndef __ENEMY__
+#define __ENEMY__
+#endif
+
 #include <GLES2/gl2.h>
 #include "../Utilities/Math.h"
 #include <memory>
 #include "SpriteAnimation.h"
 #include <unordered_map>
 #include "box2d.h"
-#include "Player.h"
 #include "b2Utilities.h"
 #include "Sprite2D.h"
-#include "SceneManager.h"
-#include "ConfigClass.h"
-#include "Globals.h"
+#include "Player.h"
+#include "Bullet.h"
 
 enum EnemyAction
 {
-	FIND_PLAYER = 1,
-	RUN = 17,
-	FIRE_DOWN,
-	FIRE_UP,
-	DIE,
-	ARMOD_FIRE,
-	RPGMOD_FIRE,
-	SNIPERMOD_FIRE,
-	ENEMY_01 = 38,
-	ENEMY_02 = 39,
-	ENEMY_03 = 40,
-	ENEMY_EXPLOSION = 41,
-	ACTION_INVALID = -1
+	E_IDLE = 0,
+	E_RUN,
+	E_ATTACK,
+	E_DIE,
+	E_NONE = -1
 };
 
 enum EnemyType
 {
-	AR_MOD,
+	AR_MOD = 0,
 	RPG_MOD,
 	Sniper_MOD,
 	PATREON,
@@ -42,35 +37,40 @@ enum EnemyType
 class Enemies
 {
 public:
-	Enemies(EnemyType type);
-	Enemies(GLint id, GLint idTexture);
+	Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox);
 	~Enemies();
 
-	void Update(float deltaTime, std::shared_ptr<Player> player);
+	void Update(float deltaTime, b2Vec2 positionPlayer);
 	void Draw();
 	void Move();
-	void Init();
+	void Init(GLfloat posX, GLfloat posY);
+	void OnMouseScroll();
 
 	void CreateEnemyBox(std::shared_ptr<b2World> world, float x, float y);
 	void CalculateSize();
 	void TakeDamage(GLint damage);
-	void Kill();
+	std::shared_ptr<Enemies> Clone();
 
 	void Set2DPosition(GLint x, GLint y);
+	void Set2DPositionByTile(GLfloat x, GLfloat y);
 	void Set2DSize(GLint width, GLint height);
-	void Set2DSizeScroll();
+	void Set2DSizeByTile(GLfloat x, GLfloat y);
 	void SetTexture(GLint typeAction);
-	void Set2DPositionFromBox2D(GLfloat x, GLfloat y);
-	void SetBoundaryMove(GLfloat x, GLfloat y);
+	void SetActive(bool isActive);
+	void SetAction(EnemyAction action);
+	void SetAttack(bool isAttack);
 
 	Vector2								Get2DSize();
 	std::shared_ptr<SpriteAnimation>	GetAnimation() { return m_animation; };
-	b2Body*								GetEnemyBody();
-	b2Fixture*							GetEnemyFixture();
+	b2Body*								GetBody();
 	inline DirectionType				GetCurrentDirection() { return m_currentDirection; }
+	inline DirectionType				GetSprinningDirection() { return m_sprinningDirection; }
+	inline EnemyType					GetType() { return m_type; };
+	inline BulletType					GetEnemyBulletType() { return m_enemyBulletType; };
+
 	inline bool							IsActive() { return m_isActive; };
 	inline bool							IsDie() { return m_isDie; };
-
+	inline bool							IsReadyAttack() { return m_isReadyAttack; };
 
 private:
 	// Attribute
@@ -81,6 +81,12 @@ private:
 	GLfloat			m_speed;
 	GLfloat			m_coolDown;
 	DirectionType	m_currentDirection;
+	Vector2			m_imgSize;
+	Vector2			m_boxSize;
+	Vector2			m_sizeByTile;
+
+	DirectionType	m_sprinningDirection;
+	BulletType		m_enemyBulletType;
 
 	// Sprite
 	std::shared_ptr<SpriteAnimation> m_animation;
@@ -92,15 +98,15 @@ private:
 	bool		m_isDie;
 	bool		m_isChange;
 	bool		m_isFire;
+	bool		m_isReadyAttack;
 
 	// box2d
 	b2Body*		m_body;
-	b2Fixture*	m_fixture;
 	MyRayCastCallback m_rayCallback;
 
 	
 private:
-	void		PerformRayCasting();
+	void		PerformRayCasting(b2Vec2 positionPlayer);
 	void		RunModUpdate(std::shared_ptr<Player> player);
 	void		FindPlayerUpdate(std::shared_ptr<Player> player);
 	void		AttackUpdate(std::shared_ptr<Player> player);

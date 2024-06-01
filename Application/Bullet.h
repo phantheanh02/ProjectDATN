@@ -1,22 +1,31 @@
 #pragma once
+
+#ifndef __BULLET__
+#define __BULLET__
+#endif
+
+#include <cstdint>
 #include <memory>
 #include "../Utilities/Math.h"
 #include <box2d.h>
-#include "Sprite2D.h"
 #include "b2Utilities.h"
-#include "ConfigClass.h"
-#include "SceneManager.h"
-#include "Globals.h"
 
-enum TypeBullet
+enum BulletType
 {
-	PLAYER_BULLET,
+	PLAYER_BULLET = 0 ,
+	BLACK_BULLET,
+	BLUE_BULLET,
+	GREEN_BULLET,
+	RED_BULLET,
+	YELLOW_BULLET,
 	AR_BULLET,
 	RPG_BULLET,
 	SNIPER_BULLET,
-	ENEMY_FLY_BULLET
+	PATREON_BULLET,
+	MEGAMAN_BULLET,
+	YUME_BULLET,
+	NONE_BULLET = -1
 };
-
 
 class Bullet
 {
@@ -27,7 +36,7 @@ public:
 	void Update(float deltaTime);
 	void Draw();
 
-	void CreateNewBullet(TypeBullet type, b2Vec2 speed, Vector2 position);
+	void CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage = 1);
 
 	void SetBulletLinearVelocity(b2Vec2 speed);
 	void Set2DPosition(float x, float y);
@@ -44,7 +53,7 @@ private:
 	GLint		m_damage;
 	GLint		m_currentDirection;
 	Vector2		m_size2D;
-	TypeBullet	m_typeBullet;
+	BulletType	m_typeBullet;
 	std::shared_ptr<SpriteAnimation> m_bulletAnimation;
 
 	b2Body*		m_bulletBody;

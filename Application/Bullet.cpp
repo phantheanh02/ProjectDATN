@@ -80,37 +80,108 @@ void Bullet::Draw()
 	}
 }
 
-void Bullet::CreateNewBullet(TypeBullet type, b2Vec2 speed, Vector2 position)
+void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage)
 {
 	m_isActive = true;
+	m_damage = damage;
+
 	// First create fixture
 	b2FixtureDef bulletFixtureDef;
 	b2PolygonShape bulletShape;
+
+	bulletFixtureDef.isSensor = true;
+
 	switch (type)
 	{
 	case PLAYER_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/BlackBullet.png", 4, 0.1);
 		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
 		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
-		m_bulletAnimation = std::make_shared<SpriteAnimation>(59, 4, 0.1);
-		m_bulletAnimation->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
-		m_bulletAnimation->Set2DPositionByTile(position.x, position.y);
-		m_bulletAnimation->Set2DSizeByTile(0.5, 0.5);
 		break;
-	case FIXTURE_ENEMY_BULLET:
+	case BLACK_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/BlackBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
+		break;
+	case BLUE_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/BlueBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
+		break;
+	case GREEN_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/GreenBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
+		break;
+	case RED_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/RedBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
+		break;
+	case YELLOW_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/YellowBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
+		break;
+	case AR_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/ARMBullet.png", 4, 0.1);
 		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
 		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
 		break;
+	case RPG_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/RPGBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
+		break;
+	case SNIPER_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/SniperBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
+		break;
+	case PATREON_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/PatreonBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
+		break;
+	case MEGAMAN_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/MegamanBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
+		break;
+	case YUME_BULLET:
+		m_bulletAnimation = std::make_shared<SpriteAnimation>("Bullet/YumeBullet.png", 4, 0.1);
+		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
+		break;
+	case NONE_BULLET:
+		return;
 	default:
 		std::cout << "Invalid bullet fixture type: " << type << "\n";
 		break;
 	}
+
+	m_bulletAnimation->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
+	m_bulletAnimation->Set2DPositionByTile(position.x, position.y);
+	m_bulletAnimation->Set2DSizeByTile(1, 1);
+	if (speed.x < 0)
+	{
+		m_bulletAnimation->FlipVertical();
+	}
+	if (speed.y < 0)
+	{
+		m_bulletAnimation->FlipHorizontal(false);
+	}
+	else if (speed.y > 0)
+	{
+		m_bulletAnimation->FlipHorizontal(true);
+	}
+
 	bulletShape.SetAsBox(0.5, 0.5);
 	bulletFixtureDef.shape = &bulletShape;
 	if (m_bulletFixture)
 	{
 		m_bulletBody->DestroyFixture(m_bulletFixture);
 	}
-
 	m_bulletBody->SetTransform(b2Vec2(position.x, position.y), 0);
 	m_bulletFixture = m_bulletBody->CreateFixture(&bulletFixtureDef);
 	m_bulletBody->SetLinearVelocity(speed);

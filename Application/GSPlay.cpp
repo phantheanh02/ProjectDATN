@@ -1,18 +1,20 @@
 ﻿#include "stdafx.h"
 #include "GSPlay.h"
+#include <cstdlib>  // Thư viện cần cho srand và rand
+#include <ctime>    
 
 extern int tileSizeByPixel;
 extern PlanetType currentMap;
+std::shared_ptr<b2World> world;
 
 GSPlay::~GSPlay()
 {
 	for (auto& it : m_BodyList)
 	{
-		m_world->DestroyBody(it);
+		world->DestroyBody(it);
 	}
-	m_world.reset();
+	world.reset();
 	delete m_contactListener;
-
 }
 
 void GSPlay::Init()
@@ -26,14 +28,13 @@ void GSPlay::Init()
 	m_timeStep = 1.0f / devMode.dmDisplayFrequency;
 
 	// Box2d
-	m_gravity = { 0.0f, 30.0f };
 	// create world with gravity
-	m_world = std::make_shared<b2World>(m_gravity);
+	world = std::make_shared<b2World>(b2Vec2(0, 30));
 	m_contactListener = new ContactListener();
-	m_world->SetContactListener(m_contactListener);
+	world->SetContactListener(m_contactListener);
 
 	// Player
-	m_player = std::make_shared<Player>(m_world.get());
+	m_player = std::make_shared<Player>();
 
 	// Get camera
 	m_dynamicCamera = SceneManager::GetInstance()->GetCamera(CameraType::DYNAMIC_CAMERA);
@@ -42,6 +43,9 @@ void GSPlay::Init()
 	// Map Info
 	m_map = SceneManager::GetInstance()->GetMap(currentMap);
 	LoadMap();
+
+	// Enemies
+	RandomEnemies();
 
 	// init camera boundaries
 	auto size = m_map->GetSizeByTile();
@@ -60,37 +64,85 @@ void GSPlay::Init()
 	// Create bullet pooling
 	for (int i = 0; i < 100; i++)
 	{
-		m_bulletList.push_back(std::make_shared<Bullet>(m_world.get()));
+		m_bulletList.push_back(std::make_shared<Bullet>(world.get()));
 	}
 }
 
 void GSPlay::Update(float deltaTime)
 {
-	HandleEvent();
-	m_world->Step(m_timeStep, VELOCITY_ITERATION, POSITION_ITERATION);
+	if (!m_player->IsDie())
+	{
+		HandleEvent();
+	}
+	world->Step(m_timeStep, VELOCITY_ITERATION, POSITION_ITERATION);
 	Update2DDrawPosition();
-
 	
 	for (auto it : m_bulletList)
 	{
 		it->Update(deltaTime);
 	}
 
+	for (auto enemy : m_enemiesList)
+	{
+		if (enemy->IsActive())
+		{
+			enemy->Update(deltaTime, m_player->GetBody()->GetPosition());
+			if (enemy->IsReadyAttack())
+			{
+				auto type = enemy->GetType();
+				b2Vec2 speed = b2Vec2_zero;
+
+				switch (type)
+				{
+				case AR_MOD:
+				case RPG_MOD:
+				case Sniper_MOD:
+					speed = enemy->GetSprinningDirection() == DirectionType::RIGHT ? b2Vec2(-10, 0) : b2Vec2(10, 0);
+					break;
+				case PATREON:
+				case MEGAMAN:
+				case YUME:
+					speed = m_player->GetBody()->GetPosition() - enemy->GetBody()->GetPosition();
+					speed.Normalize();
+					speed *= 10;
+					break;
+				default:
+					break;
+				}
+				Vector2 pos = Vector2(enemy->GetBody()->GetPosition().x, enemy->GetBody()->GetPosition().y);
+				CreateBullet(enemy->GetEnemyBulletType(), speed, pos);
+				enemy->SetAttack(false);
+			}
+		}
+	}
+
+	m_map->Update(deltaTime, m_player->GetBody()->GetPosition());
 	m_player->Update(deltaTime);
+	if (m_player->IsReadyToReset())
+	{
+		GameStateMachine::GetInstance()->PopState();
+	}
 }
 
 void GSPlay::Draw()
 {
-	m_background->Draw();
+	m_map->Draw();
+
 	for (auto& button : m_listButton)
 	{
 		button->Draw();
 	}
+
 	for (auto it : m_bulletList)
 	{
 		it->Draw();
 	}
 	
+	for (auto enemy : m_enemiesList)
+	{
+		enemy->Draw();
+	}
+
 	m_player->Draw();
 }
 
@@ -108,7 +160,7 @@ void GSPlay::Exit()
 
 void GSPlay::HandleEvent()
 {
-	auto currentVelocity = m_player->GetPlayerBody()->GetLinearVelocity();
+	auto currentVelocity = m_player->GetBody()->GetLinearVelocity();
 	float desiredVel = 0, velChange, impulse;
 
 	if (m_key & (1 << 1) && m_keyStack.back() == "A")
@@ -129,8 +181,8 @@ void GSPlay::HandleEvent()
 	}
 	// apply force to move
 	velChange = desiredVel - currentVelocity.x;
-	impulse = m_player->GetPlayerBody()->GetMass() * velChange; //disregard time factor
-	m_player->GetPlayerBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_player->GetPlayerBody()->GetWorldCenter(), true);
+	impulse = m_player->GetBody()->GetMass() * velChange; //disregard time factor
+	m_player->GetBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_player->GetBody()->GetWorldCenter(), true);
 
 	if (m_key & (1 << 0) && velChange == 0 && !m_player->IsJumping())
 	{
@@ -155,8 +207,8 @@ void GSPlay::HandleEvent()
 		m_player->SetAction(PlayerAction::JUMPING);
 		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
 		float jumpHeight = 5.0f;
-		auto impulse = m_player->GetPlayerBody()->GetMass() * sqrt(2 * m_gravity.y * jumpHeight);
-		m_player->GetPlayerBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
+		auto impulse = m_player->GetBody()->GetMass() * sqrt(2 * world->GetGravity().y * jumpHeight);
+		m_player->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
 	}
 
 	if (!(m_key & 0xF))
@@ -173,7 +225,7 @@ void GSPlay::HandleEvent()
 	if (m_key & (1 << 5) && m_player->IsReadyAttack())
 	{
 		m_player->ResetCooldown();
-		b2Vec2 pos = m_player->GetPlayerBody()->GetPosition();
+		b2Vec2 pos = m_player->GetBody()->GetPosition();
 		b2Vec2 speed;
 
 		switch (m_player->GetDirection())
@@ -188,7 +240,7 @@ void GSPlay::HandleEvent()
 			speed = b2Vec2(20.0f, 0.0f);
 			break;
 		}
-		ActiveABullet(TypeBullet::PLAYER_BULLET, speed, Vector2(m_player->GetPlayerBody()->GetPosition().x, m_player->GetPlayerBody()->GetPosition().y));
+		CreateBullet((BulletType)m_player->GetPlayerBulletType(), speed, Vector2(m_player->GetBody()->GetPosition().x, m_player->GetBody()->GetPosition().y));
 	}
 }
 
@@ -297,9 +349,12 @@ void GSPlay::OnMouseScroll(int x, int y, short delta)
 	tileSizeByPixel = tileSizeByPixel > max ? max : tileSizeByPixel;
 
 	// Calculate size
-	auto size = m_map->GetSizeByTile();
-	m_background->Set2DSizeByTile(size.x, size.y);
+	m_map->OnMouseScroll();
 	m_player->ReCalculateWhenScroll();
+	for (auto enemy : m_enemiesList)
+	{
+		enemy->OnMouseScroll();
+	}
 }
 
 void GSPlay::Update2DDrawPosition()
@@ -309,9 +364,9 @@ void GSPlay::Update2DDrawPosition()
 	m_cameraPositionBoudaries.z = size.x * tileSizeByPixel - (GLfloat)Globals::screenWidth;
 	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
-	// set camera position to follows player
-	auto player_position = m_player->GetPlayerBody()->GetPosition();
-	auto newCameraPos = Vector3(player_position.x * tileSizeByPixel - (GLfloat)Globals::screenWidth / 2, player_position.y * tileSizeByPixel - (GLfloat)Globals::screenHeight / 2, 0.0f);
+	// set camera position to follows m_player
+	auto m_player_position = m_player->GetBody()->GetPosition();
+	auto newCameraPos = Vector3(m_player_position.x * tileSizeByPixel - (GLfloat)Globals::screenWidth / 2, m_player_position.y * tileSizeByPixel - (GLfloat)Globals::screenHeight / 2, 0.0f);
 	newCameraPos.x = newCameraPos.x <= m_cameraPositionBoudaries.x ? m_cameraPositionBoudaries.x : newCameraPos.x;
 	newCameraPos.x = newCameraPos.x >= m_cameraPositionBoudaries.z ? m_cameraPositionBoudaries.z : newCameraPos.x;
 	newCameraPos.y = newCameraPos.y <= m_cameraPositionBoudaries.y ? m_cameraPositionBoudaries.y : newCameraPos.y;
@@ -320,22 +375,16 @@ void GSPlay::Update2DDrawPosition()
 	m_dynamicCamera->SetPosition(newCameraPos);
 	m_dynamicCamera->SetTarget(Vector3(newCameraPos.x, newCameraPos.y, -1.0f));
 
-	// set player draw position
-	player_position.x -= 9.0f / 8;
-	player_position.y -= 1.5f;
-	m_player->Set2DPositionByTile(player_position.x, player_position.y );
+	// set m_player draw position
+	m_player_position.x -= 9.0f / 8;
+	m_player_position.y -= 1.5f;
+	m_player->Set2DPositionByTile(m_player_position.x, m_player_position.y );
 
 
 }
 
 void GSPlay::LoadMap()
 {
-	// background
-	auto size = m_map->GetSizeByTile();
-	m_background = std::make_shared<Sprite2D>(m_map->GetIdTexture());
-	m_background->Set2DSizeByTile(size.x, size.y);
-	m_background->Set2DPosition(0, 0);
-
 	// Load obs
 	b2Body* obsBody;
 	b2BodyDef obsBodyDef;
@@ -347,7 +396,7 @@ void GSPlay::LoadMap()
 		obsBody = nullptr;
 		obsBodyDef.position.Set(it.x, it.y);
 		obsShape.SetAsBox(it.z, it.w);
-		obsBody = m_world->CreateBody(&obsBodyDef);
+		obsBody = world->CreateBody(&obsBodyDef);
 		obsFixDef.shape = &obsShape;
 		obsFixDef.filter.categoryBits = FixtureTypes::FIXTURE_GROUND;
 		obsFixDef.filter.maskBits = 0xFFFF;
@@ -356,7 +405,7 @@ void GSPlay::LoadMap()
 	}
 }
 
-void GSPlay::ActiveABullet(TypeBullet type, b2Vec2 speed, Vector2 position)
+void GSPlay::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)
 {
 	for (auto bullet : m_bulletList)
 	{
@@ -366,4 +415,38 @@ void GSPlay::ActiveABullet(TypeBullet type, b2Vec2 speed, Vector2 position)
 			break;
 		}
 	}
+}
+
+void GSPlay::RandomEnemies()
+{
+	auto spawnPosition = m_map->GetSpawnPosition();
+	auto enemiesRatio = m_map->GetEnemiesTypeRatio();
+
+	srand(static_cast<unsigned int>(time(0)));
+
+	// Tạo mảng kết quả với n phần tử dựa trên tỷ lệ y
+	for (int i = 0; i < spawnPosition.size(); ++i) 
+	{
+		double randValue = static_cast<double>(rand()) / RAND_MAX;
+		double cumulativeProbability = 0.0;
+
+		for (const auto& type : enemiesRatio) 
+		{
+			cumulativeProbability += type.second;
+			if (randValue <= cumulativeProbability) 
+			{
+				auto enemy = SceneManager::GetInstance()->GetEnemy(type.first);
+				enemy->Init(spawnPosition[i].x, spawnPosition[i].y);
+				m_enemiesList.push_back(enemy);
+				break;
+			}
+		}
+	}
+
+	//for (int i = 0; i < spawnPosition.size(); i++)
+	//{
+	//	auto enemy = SceneManager::GetInstance()->GetEnemy(EnemyType::YUME);
+	//	enemy->Init(spawnPosition[i].x, spawnPosition[i].y);
+	//	m_enemiesList.push_back(enemy);
+	//}
 }
