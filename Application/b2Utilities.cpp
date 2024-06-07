@@ -86,6 +86,10 @@ GLfloat MyRayCastCallback::ReportFixture(b2Fixture* fixture, const b2Vec2& point
 	m_normal = normal;
 	m_fraction = fraction;
 
+	if (fixture->IsSensor()) 
+	{
+		return -1.0f;
+	}
 	// Check if collision with player
 	if (fixture->GetFilterData().categoryBits == FIXTURE_PLAYER)
 	{

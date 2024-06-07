@@ -16,6 +16,7 @@ Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox)
 	, m_sprinningDirection(LEFT)
 	, m_coolDown(0)
 	, m_isReadyAttack(false)
+	, m_timeFinding(TIME_FINDING)
 {
 }
 
@@ -142,6 +143,16 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 		{
 			m_coolDown -= deltaTime;
 		}
+
+		if (m_currentAction == EnemyAction::E_RUN)
+		{
+			m_body->SetLinearVelocity(m_speed);
+			m_timeFinding -= deltaTime;
+			if (m_timeFinding <= 0)
+			{
+				SetAction(EnemyAction::E_IDLE);
+			}
+		}
 	}
 }
 
@@ -188,6 +199,11 @@ void Enemies::SetAction(EnemyAction action)
 {
 	if (action != EnemyAction::E_NONE && m_currentAction != action)
 	{
+		if (action == EnemyAction::E_IDLE)
+		{
+			m_body->SetLinearVelocity(b2Vec2_zero);
+		}
+
 		m_currentAction = action;
 		int check = m_type * 10 + m_currentAction;
 		auto pos = m_animation->GetPosition();
@@ -279,50 +295,20 @@ void Enemies::CreateEnemyBox(std::shared_ptr<b2World> world, float x, float y)
 
 void Enemies::PerformRayCasting(b2Vec2 positionPlayer)
 {
-	b2RayCastInput rayInput;
-	rayInput.p1 = m_body->GetPosition();
-	rayInput.p2 = positionPlayer;
-	float distance = b2Distance(rayInput.p1, rayInput.p2);
-	world->RayCast(&m_rayCallback, rayInput.p1, rayInput.p2);
 	EnemyAction action = EnemyAction::E_NONE;
-	
+	b2RayCastInput rayInput;
+
+	rayInput.p1 = m_body->GetPosition();
+	b2Vec2 p2 = positionPlayer - rayInput.p1;
+	p2.Normalize();
+	p2.x *= MAX_DISTANCE;
+	p2.y *= MAX_DISTANCE;
+	rayInput.p2 = rayInput.p1 + p2;
+	world->RayCast(&m_rayCallback, rayInput.p1, rayInput.p2);
 
 	if (m_rayCallback.m_isDetectObject)
 	{
-		switch (m_currentAction)
-		{
-		case E_IDLE:
-			if (distance <= MAX_DISTANCE)
-			{
-				if (m_rayCallback.m_isDetectObject)
-				{
-					action = EnemyAction::E_RUN;
-				}
-			}
-			break;
-		case E_RUN:
-			if (distance > MAX_DISTANCE - 3)
-			{
-				b2Vec2 speed = rayInput.p2 - rayInput.p1;
-				speed.Normalize();
-				speed *= 3;
-				m_body->SetLinearVelocity(speed);
-			}
-			else
-			{
-				action = EnemyAction::E_ATTACK;
-				m_body->SetLinearVelocity(b2Vec2_zero);
-			}
-			break;
-		case E_ATTACK:
-			if (distance > MAX_DISTANCE - 3)
-			{
-				action = EnemyAction::E_RUN;
-			}
-			break;
-		default:
-			break;
-		}
+		action = EnemyAction::E_ATTACK;
 
 		if (rayInput.p1.x < rayInput.p2.x && m_sprinningDirection == DirectionType::RIGHT ||
 			(rayInput.p1.x > rayInput.p2.x && m_sprinningDirection == DirectionType::LEFT))
@@ -331,10 +317,25 @@ void Enemies::PerformRayCasting(b2Vec2 positionPlayer)
 			m_sprinningDirection = m_sprinningDirection == DirectionType::RIGHT ? LEFT : RIGHT;
 		}
 	}
-	else if (m_currentAction != E_ATTACK)
+	else 
 	{
-		action = E_IDLE;
-		m_body->SetLinearVelocity(b2Vec2(0, 0));
+		if (m_currentAction == E_ATTACK)
+		{
+			action = E_RUN;
+			b2Vec2 speed = rayInput.p2 - rayInput.p1;
+			if (m_type == EnemyType::AR_MOD || m_type == EnemyType::RPG_MOD || m_type == EnemyType::Sniper_MOD)
+			{
+				speed.x = speed.x > 0 ? 3 : -3;
+				speed.y = 0;
+			}
+			else
+			{
+				speed.Normalize();
+				speed *= 3;
+			}
+			m_speed = speed;
+			m_timeFinding = TIME_FINDING;
+		}
 	}
 
 	SetAction(action);

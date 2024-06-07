@@ -78,8 +78,10 @@ private:
 	EnemyType		m_type;
 	EnemyAction		m_currentAction;
 	GLint			m_health;
-	GLfloat			m_speed;
+	b2Vec2			m_speed;
 	GLfloat			m_coolDown;
+	GLfloat			m_timeFinding;
+
 	DirectionType	m_currentDirection;
 	Vector2			m_imgSize;
 	Vector2			m_boxSize;
