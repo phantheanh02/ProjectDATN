@@ -10,7 +10,7 @@ enum PlanetType
 	MT_BAREN = 0,
 	MT_LAVA,
 	MT_ICE,
-	MT_BLACK_HOLE,
+	//MT_BLACK_HOLE,
 	MT_TERRAN
 };
 

@@ -52,7 +52,7 @@ void GSSetting::Init()
 	m_textVolumeLevel = std::make_shared<Text>(0);
 	m_textVolumeLevel->AttachCamera(staticCamera);
 	m_textVolumeLevel->Init(font, std::to_string(m_currentVolume));
-	m_textVolumeLevel->Set2DPosition(549, 345);
+	m_textVolumeLevel->Set2DPosition(590, 350);
 	m_textVolumeLevel->Set2DScale(0.75f, 0.75f);
 	m_textVolumeLevel->SetTextColor(255, 255, 0);
 
@@ -64,22 +64,22 @@ void GSSetting::Init()
 
 	// init buttons
 	auto button = std::make_shared<Button>("btn_save.png", BUTTON_SAVE);
-	button->Set2DPosition(244, 584);
+	button->Set2DPosition(200, 530);
 	button->Set2DSize(220, 70);
 	m_listButton.push_back(button);
 
 	button = std::make_shared<Button>("btn_cancel.png", BUTTON_CANCEL);
-	button->Set2DPosition(548, 584);
+	button->Set2DPosition(540, 530);
 	button->Set2DSize(220, 70);
 	m_listButton.push_back(button);
 
 	button = std::make_shared<Button>("Icons/icon_back.png", BUTTON_BACK);
-	button->Set2DPosition(470, 348);
+	button->Set2DPosition(480, 350);
 	button->Set2DSize(60, 60);
 	m_listButton.push_back(button);
 
 	button = std::make_shared<Button>("Icons/icon_next.png", BUTTON_NEXT);
-	button->Set2DPosition(667, 348);
+	button->Set2DPosition(730, 350);
 	button->Set2DSize(60, 60);
 	m_listButton.push_back(button);
 
