@@ -19,7 +19,7 @@ void GSMenu::Init()
 	m_key = 0;
 	m_mouse = 0;
 
-	Vector2 posButton = Vector2(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 230);
+	Vector2 posButton = Vector2(Globals::screenWidth / 2.0 - 110, Globals::screenHeight / 2.0f - 230);
 
 	// button play
 	std::shared_ptr<Button> button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);

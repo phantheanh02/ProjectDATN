@@ -98,7 +98,7 @@ void Enemies::Init(GLfloat posX, GLfloat posY)
 		break;
 	}
 	m_animation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
-
+	m_sizeByTile = Vector2(SCALE_SIZE, SCALE_SIZE);
 }
 
 void Enemies::OnMouseScroll()
