@@ -37,5 +37,5 @@ private:
 	std::shared_ptr<Text> m_textVolumeLevel;
 	std::shared_ptr<Button> m_buttonSoundToggle;
 	std::vector<std::shared_ptr<Text>> m_listText;
-	std::vector<std::shared_ptr<Button>> m_listButton;
+	std::vector<std::shared_ptr<Button>> m_buttonList;
 };

@@ -37,7 +37,7 @@ public:
 	void Draw();
 
 	void CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage = 1);
-
+	void OnMouseScroll();
 	void SetBulletLinearVelocity(b2Vec2 speed);
 	void Set2DPosition(float x, float y);
 	void Set2DPositionByTile(GLfloat x, GLfloat y);
@@ -45,18 +45,18 @@ public:
 	void SetDamage(GLint damage);
 	void SetActiveStatus(bool status);
 
-	inline std::shared_ptr<SpriteAnimation>	GetAnimation() { return m_bulletAnimation; };
+	inline std::shared_ptr<SpriteAnimation>	GetAnimation() { return m_animation; };
 	inline GLint							GetDamage() { return m_damage; };
-	inline b2Body*							GetBody() { return m_bulletBody; };
+	inline b2Body*							GetBody() { return m_body; };
 	inline bool								IsActive() { return m_isActive; };
 private:
 	GLint		m_damage;
 	GLint		m_currentDirection;
 	Vector2		m_size2D;
 	BulletType	m_typeBullet;
-	std::shared_ptr<SpriteAnimation> m_bulletAnimation;
+	std::shared_ptr<SpriteAnimation> m_animation;
 
-	b2Body*		m_bulletBody;
+	b2Body*		m_body;
 	b2Fixture*	m_bulletFixture;
 
 	bool		m_isActive;

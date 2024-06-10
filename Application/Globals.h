@@ -44,7 +44,7 @@ public:
 #define MOVEMENT_SPEED				7.0f
 #define BULLET_COOLDOWN				0.3f
 
-#define	SCALE_SIZE					3.0f
+#define	SCALE_SIZE					2.8f
 #define	HEIGHT_BOX					0.666667f
 #define HEIGHT_IMG					(30 / 48) // để chuẩn hóa, 1 ô = 48 pixel, 30 là chiều cao chung
 

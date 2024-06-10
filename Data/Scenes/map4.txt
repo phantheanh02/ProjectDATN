@@ -1,7 +1,7 @@
 #TextureID: 28
 
 #TileSize 
-180 40 18 60
+106 40 18 60
 
 #PlanesMap
 -0.5 20 0.5 20

@@ -40,7 +40,7 @@ private:
 	std::vector<std::string> m_keyStack;
 
 	// background
-	std::vector<std::shared_ptr<Button>>	m_listButton;
+	std::vector<std::shared_ptr<Button>>	m_buttonList;
 
 	// camera
 	std::shared_ptr<Camera>					m_dynamicCamera;

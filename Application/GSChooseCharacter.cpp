@@ -166,6 +166,10 @@ void GSChooseCharacter::OnMouseClick(int x, int y, unsigned char key, bool press
 
 void GSChooseCharacter::OnMouseMove(int x, int y)
 {
+	for (auto button : m_buttonList)
+	{
+		button->HandleMoveMouse(x, y);
+	}
 }
 
 void GSChooseCharacter::OnMouseScroll(int x, int y, short delta)

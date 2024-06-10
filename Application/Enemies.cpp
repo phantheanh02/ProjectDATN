@@ -199,7 +199,7 @@ void Enemies::SetAction(EnemyAction action)
 {
 	if (action != EnemyAction::E_NONE && m_currentAction != action)
 	{
-		if (action == EnemyAction::E_IDLE)
+		if (action == EnemyAction::E_IDLE || action == EnemyAction::E_ATTACK)
 		{
 			m_body->SetLinearVelocity(b2Vec2_zero);
 		}

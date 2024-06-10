@@ -45,7 +45,7 @@ void GSPlay::Init()
 	LoadMap();
 
 	// Enemies
-	RandomEnemies();
+	//RandomEnemies();
 
 	// init camera boundaries
 	auto size = m_map->GetSizeByTile();
@@ -59,7 +59,7 @@ void GSPlay::Init()
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
 	button->AttachCamera(m_staticCamera);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// Create bullet pooling
 	for (int i = 0; i < 100; i++)
@@ -128,7 +128,7 @@ void GSPlay::Draw()
 {
 	m_map->Draw();
 
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		button->Draw();
 	}
@@ -315,7 +315,7 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 
 void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 {
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))
 		{
@@ -337,6 +337,10 @@ void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 
 void GSPlay::OnMouseMove(int x, int y)
 {
+	for (auto button : m_buttonList)
+	{
+		button->HandleMoveMouse(x, y);
+	}
 }
 
 void GSPlay::OnMouseScroll(int x, int y, short delta)
@@ -353,7 +357,18 @@ void GSPlay::OnMouseScroll(int x, int y, short delta)
 	m_player->ReCalculateWhenScroll();
 	for (auto enemy : m_enemiesList)
 	{
-		enemy->OnMouseScroll();
+		if (enemy->IsActive())
+		{
+			enemy->OnMouseScroll();
+		}
+	}
+
+	for (auto bullet : m_bulletList)
+	{
+		if (bullet->IsActive())
+		{
+			bullet->OnMouseScroll();
+		}
 	}
 }
 

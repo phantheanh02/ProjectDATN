@@ -22,13 +22,13 @@ void GSMap::Init()
 	auto button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(460, 30);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// button back
 	button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(710, 30);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// background
 	auto staticCamera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
@@ -92,7 +92,7 @@ void GSMap::Update(float deltaTime)
 void GSMap::Draw()
 {
 	m_background->Draw();
-	for (auto it : m_listButton)
+	for (auto it : m_buttonList)
 	{
 		it->Draw();
 	}
@@ -126,7 +126,7 @@ void GSMap::OnKey(unsigned char key, bool pressed)
 
 void GSMap::OnMouseClick(int x, int y, unsigned char key, bool pressed)	
 {
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))
 		{
@@ -160,6 +160,10 @@ void GSMap::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 
 void GSMap::OnMouseMove(int x, int y)
 {
+	for (auto button : m_buttonList)
+	{
+		button->HandleMoveMouse(x, y);
+	}
 }
 
 void GSMap::OnMouseScroll(int x, int y, short delta)

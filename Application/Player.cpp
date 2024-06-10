@@ -22,7 +22,7 @@ Player::Player()
 	// create player body
 	b2BodyDef playerBodyDef;
 	playerBodyDef.type = b2_dynamicBody;
-	playerBodyDef.position.Set(2.0f, 15.0f);
+	playerBodyDef.position.Set(9.0f, 18.0f);
 	playerBodyDef.userData.pointer = (uintptr_t)this;
 	m_body = world->CreateBody(&playerBodyDef);
 
@@ -34,13 +34,14 @@ Player::Player()
 	playerFixtureDef.density = 1.0f; 
 	playerFixtureDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER;
 	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_ENEMY_BULLET | FixtureTypes::FIXTURE_ENEMY | FixtureTypes::FIXTURE_ITEM;
+	playerFixtureDef.userData.pointer = (uintptr_t)this;
 	m_body->CreateFixture(&playerFixtureDef);
 	m_body->SetFixedRotation(true); 
+
 	// Create sensor foot to check in ground
 	b2PolygonShape sensorBox;
-	b2FixtureUserData userData;
 	b2FixtureDef sensorDef;
-	sensorBox.SetAsBox(0.1f, 0.1f, b2Vec2(0, 1), 0); // sensor dưới chân
+	sensorBox.SetAsBox(0.5 * SCALE_SIZE / 2, 0.1f, b2Vec2(0, 1), 0); // sensor foot
 	sensorDef.shape = &sensorBox;
 	sensorDef.isSensor = true;
 	sensorDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER_FOOT;

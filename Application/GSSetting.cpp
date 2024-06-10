@@ -66,22 +66,22 @@ void GSSetting::Init()
 	auto button = std::make_shared<Button>("btn_save.png", BUTTON_SAVE);
 	button->Set2DPosition(200, 530);
 	button->Set2DSize(220, 70);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	button = std::make_shared<Button>("btn_cancel.png", BUTTON_CANCEL);
 	button->Set2DPosition(540, 530);
 	button->Set2DSize(220, 70);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	button = std::make_shared<Button>("Icons/icon_back.png", BUTTON_BACK);
 	button->Set2DPosition(480, 350);
 	button->Set2DSize(60, 60);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	button = std::make_shared<Button>("Icons/icon_next.png", BUTTON_NEXT);
 	button->Set2DPosition(730, 350);
 	button->Set2DSize(60, 60);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	if (m_currentVolume <= 0)
 	{
@@ -124,7 +124,7 @@ void GSSetting::Draw()
 		text->Draw();
 	}
 
-	for (auto& btn : m_listButton)
+	for (auto& btn : m_buttonList)
 	{
 		btn->Draw();
 	}
@@ -152,7 +152,7 @@ void GSSetting::OnKey(unsigned char key, bool pressed)
 
 void GSSetting::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 {
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))
 		{
@@ -202,7 +202,7 @@ void GSSetting::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 
 void GSSetting::OnMouseMove(int x, int y)
 {
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		button->HandleMoveMouse(x, y);
 	}

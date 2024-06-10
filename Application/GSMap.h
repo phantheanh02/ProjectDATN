@@ -29,7 +29,7 @@ private:
 	unsigned int	m_key;
 	unsigned int	m_mouse;
 
-	std::vector<std::shared_ptr<Button>>	m_listButton;
+	std::vector<std::shared_ptr<Button>>	m_buttonList;
 	std::vector<std::shared_ptr<Sprite2D>>	m_listSprite2D;
 	std::shared_ptr<SpriteAnimation>		m_background;
 	std::shared_ptr<Sprite2D>				m_circleChosen;

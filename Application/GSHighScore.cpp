@@ -64,6 +64,7 @@ void GSHighScore::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 
 void GSHighScore::OnMouseMove(int x, int y)
 {
+	m_button->HandleMoveMouse(x, y);
 }
 
 void GSHighScore::OnMouseScroll(int x, int y, short delta)

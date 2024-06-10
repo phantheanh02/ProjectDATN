@@ -62,6 +62,9 @@ void GSCredit::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 
 void GSCredit::OnMouseMove(int x, int y)
 {
+
+	m_button->HandleMoveMouse(x, y);
+	
 }
 
 void GSCredit::OnMouseScroll(int x, int y, short delta)

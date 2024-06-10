@@ -6,7 +6,7 @@
 #include "GameStateMachine.h"
 #include "MapClass.h"
 
-int tileSizeByPixel = 44;
+int tileSizeByPixel = 30;
 CharacterType currentCharacter = C_BLACK;
 PlanetType	currentMap = PlanetType::MT_BAREN;
 
@@ -19,52 +19,48 @@ void GSMenu::Init()
 	m_key = 0;
 	m_mouse = 0;
 
-<<<<<<< HEAD
-	Vector2 posButton = Vector2(Globals::screenWidth / 2.0 - 110, Globals::screenHeight / 2.0f - 230);
-=======
 	Vector2 posButton = Vector2(370, 100);
->>>>>>> origin/enemyRefacter
 
 	// button play
 	std::shared_ptr<Button> button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// button character
 	posButton.y += 85;
 	button = std::make_shared<Button>("btn_character.png", BUTTON_CHOOSE_CHARACTER);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// button setting
 	posButton.y += 85;
 	button = std::make_shared<Button>("btn_setting.png", BUTTON_SETTING);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// button highscore
 	posButton.y += 85;
 	button = std::make_shared<Button>("btn_highscore.png", BUTTON_HIGHSCORE);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// button credit
 	posButton.y += 85;
 	button = std::make_shared<Button>("btn_credit.png", BUTTON_CREDIT);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// button quit
 	posButton.y += 85;
 	button = std::make_shared<Button>("btn_quit.png", BUTTON_EXIT);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
-	m_listButton.push_back(button);
+	m_buttonList.push_back(button);
 
 	// background
 	m_background = std::make_shared<Sprite2D>("bg_menu.png");
@@ -75,7 +71,7 @@ void GSMenu::Init()
 
 void GSMenu::Update(float deltaTime)
 {
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		button->Update(deltaTime);
 	}
@@ -84,7 +80,7 @@ void GSMenu::Update(float deltaTime)
 void GSMenu::Draw()
 {
 	m_background->Draw();
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		button->Draw();
 	}
@@ -136,7 +132,7 @@ void GSMenu::OnKey(unsigned char key, bool pressed)
 
 void GSMenu::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 {
-	for (auto& button : m_listButton)
+	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))
 		{
@@ -170,7 +166,7 @@ void GSMenu::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 
 void GSMenu::OnMouseMove(int x, int y)
 {
-	for (auto button : m_listButton)
+	for (auto button : m_buttonList)
 	{
 		button->HandleMoveMouse(x, y);
 	}
