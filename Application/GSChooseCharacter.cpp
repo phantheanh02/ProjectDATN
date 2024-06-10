@@ -21,8 +21,8 @@ void GSChooseCharacter::Init()
 
 	// back button
 	auto button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
-	button->Set2DSize(175, 55);
-	button->Set2DPosition(750, 30);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(710, 30);
 	m_buttonList.push_back(button);
 
 	// Left arrow
@@ -47,36 +47,37 @@ void GSChooseCharacter::Init()
 
 	// info table
 	sprite2D = std::make_shared<Sprite2D>("BorderAttribute.png");
-	sprite2D->Set2DSize(146 * 2.5, 183 * 2.5);
+	sprite2D->Set2DSize(360, 450);
 	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
-	sprite2D->Set2DPosition(550, 150);
+	sprite2D->Set2DPosition(570, 150);
 	m_sprite2DList.push_back(sprite2D);
 
 	// stats
+	auto pos = Vector2(730, 260);
 	auto stats = SceneManager::GetInstance()->GetCharacterStats(currentCharacter);
 	sprite2D = std::make_shared<Sprite2D>(stats.hp + 83);
 	sprite2D->Set2DSize(168, 20);
 	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
-	sprite2D->Set2DPosition(710, 270);
+	sprite2D->Set2DPosition(pos.x, pos.y);
 	m_sprite2DList.push_back(sprite2D);
 
 	sprite2D = std::make_shared<Sprite2D>(stats.spd + 89);
 	sprite2D->Set2DSize(168, 20);
 	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
-	sprite2D->Set2DPosition(710, 270 + 65);
+	sprite2D->Set2DPosition(pos.x, pos.y + 67);
 	m_sprite2DList.push_back(sprite2D);
 
 	sprite2D = std::make_shared<Sprite2D>(stats.atk + 95);
 	sprite2D->Set2DSize(168, 20);
 	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
-	sprite2D->Set2DPosition(710, 270 + 130);
+	sprite2D->Set2DPosition(pos.x, pos.y + 134);
 	m_sprite2DList.push_back(sprite2D);
 
 	// Bullet type
 	auto id = (currentCharacter - 29) / 6;
 	m_bulletAnimation = std::make_shared<SpriteAnimation>(72 + id, 4, 0.1);
 	m_bulletAnimation->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
-	m_bulletAnimation->Set2DPosition(730, 530);
+	m_bulletAnimation->Set2DPosition(750, 520);
 	m_bulletAnimation->Set2DSize(96, 96);
 }
 

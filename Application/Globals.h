@@ -50,3 +50,4 @@ public:
 
 #define	MAX_DISTANCE				15
 #define COOLDOWN_ENEMY_BULLET		1.2f
+#define TIME_FINDING				3.0f

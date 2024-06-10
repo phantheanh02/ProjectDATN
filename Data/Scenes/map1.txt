@@ -78,14 +78,9 @@ $
 
 #SpawnEnemies
 TYPE RATIO
-2 0.4
-3 0.6
+0 1
 POSX POSY 
-24 13
-27 27
-33 25
-46 25
-55 21
+17 17
 $
 
 #ItemsMap

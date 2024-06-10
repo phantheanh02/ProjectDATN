@@ -20,14 +20,14 @@ void GSMap::Init()
 
 	// button play
 	auto button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
-	button->Set2DSize(110, 35);
-	button->Set2DPosition(650, 40);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(460, 30);
 	m_listButton.push_back(button);
 
 	// button back
 	button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
-	button->Set2DSize(110, 35);
-	button->Set2DPosition(800, 40);
+	button->Set2DSize(220, 70);
+	button->Set2DPosition(710, 30);
 	m_listButton.push_back(button);
 
 	// background
@@ -43,42 +43,42 @@ void GSMap::Init()
 	}
 	// Planet baren
 	auto planet = std::make_shared<Sprite2D>("GSMap/Baren.png");
-	planet->Set2DSize(96, 96);
+	planet->Set2DSize(100, 100);
 	planet->AttachCamera(staticCamera);
-	planet->Set2DPosition(180, 540);
+	planet->Set2DPosition(200, 500);
 	m_listSprite2D.push_back(planet);
 
 	// Planet lava
 	planet = std::make_shared<Sprite2D>("GSMap/Lava.png");
-	planet->Set2DSize(96, 96);
+	planet->Set2DSize(100, 100);
 	planet->AttachCamera(staticCamera);
-	planet->Set2DPosition(310, 130);
+	planet->Set2DPosition(350, 120);
 	m_listSprite2D.push_back(planet);
 
 	// Planet ice
 	planet = std::make_shared<Sprite2D>("GSMap/Ice.png");
-	planet->Set2DSize(96, 96);
+	planet->Set2DSize(100, 100);
 	planet->AttachCamera(staticCamera);
-	planet->Set2DPosition(450, 420);
+	planet->Set2DPosition(500, 450);
 	m_listSprite2D.push_back(planet);
 
 	// Black hole
-	planet = std::make_shared<Sprite2D>("GSMap/Black_hole.png");
-	planet->Set2DSize(96, 96);
-	planet->AttachCamera(staticCamera);
-	planet->Set2DPosition(670, 170);
-	m_listSprite2D.push_back(planet);
+	//planet = std::make_shared<Sprite2D>("GSMap/Black_hole.png");
+	//planet->Set2DSize(96, 96);
+	//planet->AttachCamera(staticCamera);
+	//planet->Set2DPosition(670, 170);
+	//m_listSprite2D.push_back(planet);
 
 	// Planet terran
 	planet = std::make_shared<Sprite2D>("GSMap/Terran.png");
-	planet->Set2DSize(96, 96);
+	planet->Set2DSize(100, 100);
 	planet->AttachCamera(staticCamera);
-	planet->Set2DPosition(730, 460);
+	planet->Set2DPosition(700, 250);
 	m_listSprite2D.push_back(planet);
 
 	// Circle
 	m_circleChosen = std::make_shared<Sprite2D>("GSMap/Circle.png");
-	m_circleChosen->Set2DSize(96, 96);
+	m_circleChosen->Set2DSize(100, 100);
 	m_circleChosen->AttachCamera(staticCamera);
 	m_circleChosen->Set2DPosition(m_listSprite2D[currentMap]->Get2DPosition().x, m_listSprite2D[currentMap]->Get2DPosition().y);
 

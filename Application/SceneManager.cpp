@@ -305,7 +305,7 @@ std::shared_ptr<MapClass> SceneManager::LoadElementsMap(std::ifstream& file, std
 			LoadItemsMap(file, map);
 			break;
 		default:
-			std::cerr << "Map file format error, abort loading elements\n";
+			//std::cerr << "Map file format error, abort loading elements\n";
 			file.close();
 			return map;
 		}
