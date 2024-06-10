@@ -37,11 +37,8 @@ GLint Model::LoadModel(const std::string& filename)
 	// get vertices
 	for (int i = 0; i < numVertices; i++)
 	{
-		fscanf_s(fmodel, "%*d. pos:[%f, %f, %f]; norm:[%f, %f, %f]; binorm:[%f, %f, %f]; tgt:[%f, %f, %f]; uv:[%f, %f];",
+		fscanf_s(fmodel, "%*d. pos:[%f, %f, %f]; uv:[%f, %f];",
 			&tempVertex.pos.x, &tempVertex.pos.y, &tempVertex.pos.z,
-			&tempVertex.norm.x, &tempVertex.norm.y, &tempVertex.norm.z,
-			&tempVertex.binorm.x, &tempVertex.binorm.y, &tempVertex.binorm.z,
-			&tempVertex.tgt.x, &tempVertex.tgt.y, &tempVertex.tgt.z,
 			&tempVertex.uv.x, &tempVertex.uv.y);
 		tempPivot.x += tempVertex.pos.x;
 		tempPivot.y += tempVertex.pos.y;
