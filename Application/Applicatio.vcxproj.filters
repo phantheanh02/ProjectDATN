@@ -24,7 +24,7 @@
     <ClCompile Include="GSIntro.cpp">
       <Filter>Source File\GameState</Filter>
     </ClCompile>
-    <ClCompile Include="GSHighScore.cpp">
+    <ClCompile Include="GSLocalWifi.cpp">
       <Filter>Source File\GameState</Filter>
     </ClCompile>
     <ClCompile Include="GSMenu.cpp">
@@ -93,6 +93,9 @@
     <ClCompile Include="SocketManager.cpp">
       <Filter>Source File\GameManager</Filter>
     </ClCompile>
+    <ClCompile Include="GSSolo.cpp">
+      <Filter>Source File\GameState</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigClass.h" />
@@ -119,7 +122,7 @@
     <ClInclude Include="GSCredit.h">
       <Filter>Source File\GameState</Filter>
     </ClInclude>
-    <ClInclude Include="GSHighScore.h">
+    <ClInclude Include="GSLocalWifi.h">
       <Filter>Source File\GameState</Filter>
     </ClInclude>
     <ClInclude Include="GSIntro.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="SocketManager.h">
       <Filter>Source File\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GSSolo.h">
+      <Filter>Source File\GameState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 #include <Winsock2.h>
 #include <ws2tcpip.h>
 #include <string>
+#include <thread>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -11,6 +12,21 @@
 #define CLIENT_PORT 9001
 #define IP_ADDRESS "127.0.0.1"
 
+enum RequestType
+{
+	CONNECT			= 00,
+	READY_STATE		= 10,
+
+	CHARACTER_BLACK = 20,
+	CHARACTER_BLUE	= 21,
+	CHARACTER_GREEN	= 22,
+	CHARACTER_RED	= 23,
+	CHARACTER_YELLOW = 24,
+
+	START_PLAY		= 30,
+	REJOIN			= 40,
+	EXIT_ROOM		= 50			
+};
 class SocketManager : public SingletonDclp<SocketManager>
 {
 public:
@@ -18,13 +34,17 @@ public:
 	void CleanUp();
 
 	bool CreateSocket(bool host, unsigned int port);
-	void BindSocket();
-	void SendMessage(const char* message);
+	void CloseSocket();
+
+	void SendNewMessage(const char* message);
 	void* ReceiveMessage();
 
 	bool HasNewMsg();
 	void SetStatusMsg(bool isReceives);
 	std::string  GetDataMsg();
+
+	bool IsHost();
+	void SetHost(bool host);
 private:
 	bool	m_host;
 	int		m_port;
@@ -36,6 +56,6 @@ private:
 	sockaddr_in m_serverAddr, m_clientAddr;
 
 	bool		m_hasNewMsg;
-
+	HANDLE		m_threadHandle;
 	static void ThreadProc(void* lpParameter);
 };

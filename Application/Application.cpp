@@ -96,10 +96,15 @@ void CleanUp()
 {
 	SceneManager::GetInstance()->CleanUp();
 	SceneManager::GetInstance()->DestroyInstance();
+
 	ResourcesManager::GetInstance()->CleanUp();
 	ResourcesManager::DestroyInstance();
+
 	GameStateMachine::GetInstance()->CleanUp();
 	GameStateMachine::DestroyInstance();
+
+	SocketManager::GetInstance()->CleanUp();
+	SocketManager::DestroyInstance();
 }
 
 int _tmain(int argc, _TCHAR* argv[])

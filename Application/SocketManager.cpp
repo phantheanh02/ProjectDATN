@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include <iostream>
 #include "SocketManager.h"
-#include <thread>
 
 bool SocketManager::Init()
 {
@@ -18,20 +17,31 @@ bool SocketManager::Init()
 void SocketManager::CleanUp()
 {
     //freeaddrinfo(m_addrInfo);
-    closesocket(m_socket);
-    WSACleanup();
+    if (m_socket)
+    {
+        closesocket(m_socket);
+        WSACleanup();
+    }
 }
 
 bool SocketManager::CreateSocket(bool host, unsigned int port)
 {
+    Init();
     m_host = host;
     m_port = port;
     m_hasNewMsg = false;
 
     m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (!m_host)
+    {
+        // Set time-out for receiving
+        int tv = 1000; //Time-out interval: 1000ms
+        //setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)(&tv), sizeof(int));
+    }
+
     if (m_socket == INVALID_SOCKET) 
     {
-        std::cerr << "socket failed: " << WSAGetLastError() << std::endl;
+        std::cerr << "socket failed\n";
         WSACleanup();
         return 0;
     }
@@ -45,70 +55,73 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
         if (bind(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
         {
             printf("Error! Cannot bind this address.\n");
-            return 0;
+            CloseSocket();
+            return false;
         }
         printf("Server started!\n");
     }
     else
     {
-        SendMessage("Client has connected\n");
+        // Ping to server
+        SendNewMessage("00");
+        int serverAddrSize = sizeof(m_serverAddr);
+        int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
+
+        if (ret == SOCKET_ERROR) 
+        {
+            if (WSAGetLastError() == WSAETIMEDOUT)
+            {
+                printf("Time-out!\n");
+            }
+            else
+            {
+                printf("Error! Cannot receive message from server\n");
+            }
+            CloseSocket();
+            return false;
+        }
+        else 
+        {
+            m_buf[ret] = 0;
+            printf("Receive from server : % s\n", m_buf);
+        }
         printf("Client started!\n");
     }
-    HANDLE  threadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, &m_socket, 0, NULL);
-    //if (threadHandle == NULL) 
-    //{
-    //    perror("Error creating thread");
-    //    return 0;
-    //}
+    m_threadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, &m_socket, 0, NULL);
+    if (m_threadHandle == NULL)
+    {
+        perror("Error creating thread\n");
+        return 0;
+    }
 }
 
-void SocketManager::BindSocket()
+void SocketManager::CloseSocket()
 {
-   /*ZeroMemory(&m_hints, sizeof(m_hints));
-    m_hints.ai_family = AF_INET;
-    m_hints.ai_socktype = SOCK_DGRAM;
-    m_hints.ai_protocol = IPPROTO_UDP;
-    m_hints.ai_flags = AI_PASSIVE;
-
-    char port[16];
-    memset(port, 0, 16);
-    sprintf(port, "%d", m_port);
-
-    int result = getaddrinfo(IP_ADDRESS, port, &m_hints, &m_addrInfo);
-    if (result != 0) 
-    {
-        std::cerr << "getaddrinfo failed: " << result << std::endl;
-        closesocket(m_socket);
-        WSACleanup();
-        return;
-    }
-
-    result = bind(m_socket, m_addrInfo->ai_addr, (int)m_addrInfo->ai_addrlen);
+    // Shutdown the socket
+    int result = shutdown(m_socket, SD_BOTH);
     if (result == SOCKET_ERROR) 
     {
-        std::cerr << "bind failed: " << WSAGetLastError() << std::endl;
-        freeaddrinfo(m_addrInfo);
-        closesocket(m_socket);
-        WSACleanup();
-        return;
-    }*/
+        std::cerr << "shutdown failed\n";
+    }
+
+    // Close the thread
+    if (m_threadHandle)
+    {
+        CloseHandle(m_threadHandle);
+    }
+    WSACleanup();
+
+    std::cout << "Closed socket\n";
 }
 
-void SocketManager::SendMessage(const char* message)
+
+void SocketManager::SendNewMessage(const char* message)
 {
     if (!message)
     {
         return;
     }
-    //int result = send(m_socket, message, (int)strlen(message), 0);
-    //if (result == SOCKET_ERROR) 
-    //{
-    //    std::cerr << "sendto failed: " << WSAGetLastError() << std::endl;
-    //    freeaddrinfo(m_addrInfo);
-    //    closesocket(m_socket);
-    //    WSACleanup();
-    //    return;
-    //}
+
     int ret = SOCKET_ERROR;
     if (m_host)
     {
@@ -121,28 +134,32 @@ void SocketManager::SendMessage(const char* message)
 
     if (ret == SOCKET_ERROR)
     {
-        printf("Error when send: %\n", WSAGetLastError());
+        printf("Error when send\n");
+    }
+    else
+    {
+        printf("Send a message: %s\n", message);
     }
 }
 
 void* SocketManager::ReceiveMessage()
 {
+    memset(m_buf, 0, BUFLEN);
+
     while (true)
     {
-        memset(m_buf, 0, BUFLEN);
-
         if (m_host)
         {
             int clientAddrSize = sizeof(m_clientAddr);
             int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_clientAddr, &clientAddrSize);
             if (ret == SOCKET_ERROR)
             {
-                printf("Error receive from server : %\n", WSAGetLastError());
+                printf("Error receive at server\n");
                 return 0;
             }
 
             m_buf[ret] = 0;
-            printf("Receive from client : % s\n", m_buf);
+            printf("Receive from client %s\n", m_buf);
         }
         else
         {
@@ -150,11 +167,11 @@ void* SocketManager::ReceiveMessage()
             int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
             if (ret == SOCKET_ERROR)
             {
-                printf("Error receive from client : %\n", WSAGetLastError());
+                printf("Error receive at client\n");
                 continue;
             }
             m_buf[ret] = 0;
-            printf("Receive from server : % s\n", m_buf);
+            printf("Receive from server: %s\n", m_buf);
         }
         m_hasNewMsg = true;
     }
@@ -173,6 +190,16 @@ void SocketManager::SetStatusMsg(bool isReceives)
 std::string SocketManager::GetDataMsg()
 {
     return std::string(m_buf);
+}
+
+bool SocketManager::IsHost()
+{
+    return m_host;
+}
+
+void SocketManager::SetHost(bool host)
+{
+    m_host = host;
 }
 
 void SocketManager::ThreadProc(void* lpParameter)

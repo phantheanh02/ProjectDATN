@@ -4,10 +4,11 @@
 #include "GSMenu.h"
 #include "GSPlay.h"
 #include "GSSetting.h"
-#include "GSHighScore.h"
+#include "GSLocalWifi.h"
 #include "GSCredit.h"
 #include "GSMap.h"
 #include "GSChooseCharacter.h"
+#include "GSSolo.h"
 
 std::shared_ptr<GameStateBase> CreateState(StateType stateType);
 
@@ -111,7 +112,7 @@ std::shared_ptr<GameStateBase> CreateState(StateType stateType)
 		state = std::make_shared<GSSetting>(stateType);
 		break;
 	case StateType::STATE_HIGHSCORE:
-		state = std::make_shared<GSHighScore>(stateType);
+		state = std::make_shared<GSLocalWifi>(stateType);
 		break;
 	case StateType::STATE_CREDIT:
 		state = std::make_shared<GSCredit>(stateType);
@@ -121,6 +122,10 @@ std::shared_ptr<GameStateBase> CreateState(StateType stateType)
 		break;
 	case StateType::STATE_CHOOSECHARACTER:
 		state = std::make_shared<GSChooseCharacter>(stateType);
+		break;
+	case StateType::STATE_SOLO:
+		state = std::make_shared<GSSolo>(stateType);
+		break;
 	case StateType::STATE_INVALID:
 		break;
 	default:

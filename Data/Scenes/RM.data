@@ -225,6 +225,12 @@ ID 100
 FILE "Character/Stats/Atk5.png"
 ID 101
 FILE "Character/Stats/Atk6.png"
+ID 102
+FILE "btn_ok.png"
+ID 103
+FILE "btn_create.png"
+ID 104
+FILE "btn_join.png"
 $
 
 #Sounds

@@ -1,0 +1,75 @@
+#include "stdafx.h"
+#include "GSSolo.h"
+#include "ResourcesManager.h"
+#include "SceneManager.h"
+#include "GameStateMachine.h"
+#include "Globals.h"
+
+GSSolo::~GSSolo()
+{
+}
+
+void GSSolo::Init()
+{
+	m_time = 2.0f;
+
+	m_intro = std::make_shared<Sprite2D>("intro.png");
+	m_intro->Set2DSize(864, 42);
+	m_intro->Set2DPosition(Globals::screenWidth / 2 - 864 / 2.0f, Globals::screenHeight / 2 - 21);
+
+	m_bgIntro = std::make_shared<Sprite2D>("bg_intro.png");
+	m_bgIntro->Set2DSize(Globals::screenWidth , Globals::screenHeight);
+	m_bgIntro->Set2DPosition(0, 0);
+}
+
+void GSSolo::Update(float deltaTime)
+{
+	m_time -= deltaTime;
+	if (m_time< 0) // space pressed
+	{
+		GameStateMachine::GetInstance()->PushState(StateType::STATE_MENU);
+	}
+	m_intro->Update(deltaTime);
+
+
+}
+
+void GSSolo::Draw()
+{
+	m_bgIntro->Draw();
+	m_intro->Draw();
+}
+
+void GSSolo::Pause()
+{
+}
+
+void GSSolo::Resume()
+{
+}
+
+void GSSolo::Exit()
+{
+	m_intro.reset();
+}
+
+void GSSolo::HandleEvent()
+{
+}
+
+void GSSolo::OnKey(unsigned char key, bool pressed)
+{
+	
+}
+
+void GSSolo::OnMouseClick(int x, int y, unsigned char key, bool pressed)
+{
+}
+
+void GSSolo::OnMouseMove(int x, int y)
+{
+}
+
+void GSSolo::OnMouseScroll(int x, int y, short delta)
+{
+}
