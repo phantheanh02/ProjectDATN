@@ -90,6 +90,9 @@
     <ClCompile Include="MapClass.cpp">
       <Filter>Source File\GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="SocketManager.cpp">
+      <Filter>Source File\GameManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigClass.h" />
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="MapClass.h">
       <Filter>Source File\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketManager.h">
+      <Filter>Source File\GameManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

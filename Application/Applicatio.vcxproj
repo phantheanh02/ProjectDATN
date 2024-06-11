@@ -121,6 +121,7 @@
     <ClCompile Include="MapClass.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SocketManager.cpp" />
     <ClCompile Include="Sprite2D.cpp" />
     <ClCompile Include="ResourcesManager.cpp" />
     <ClCompile Include="SceneManager.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="MapClass.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SocketManager.h" />
     <ClInclude Include="Sprite2D.h" />
     <ClInclude Include="ResourcesManager.h" />
     <ClInclude Include="SceneManager.h" />

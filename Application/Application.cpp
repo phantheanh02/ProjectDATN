@@ -11,6 +11,7 @@
 #include "ResourcesManager.h"
 #include "SceneManager.h"
 #include "GameStateMachine.h"
+#include "SocketManager.h"
 
 bool running;
 
@@ -31,6 +32,9 @@ int Init ( ESContext *esContext )
 	GameStateMachine::Construct();
 	GameStateMachine::GetInstance()->Init();
 	GameStateMachine::GetInstance()->PushState(StateType::STATE_INTRO);
+
+	//Net
+	SocketManager::Construct();
 	return 0;
 
 }

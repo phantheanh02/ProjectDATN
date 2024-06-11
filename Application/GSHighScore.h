@@ -32,5 +32,9 @@ private:
 	float m_time;
 	std::shared_ptr<Sprite2D>	m_intro;
 	std::shared_ptr<Sprite2D>	m_background;
-	std::shared_ptr<Button>  m_button;
+	std::shared_ptr<Button>		m_button;
+	std::vector<std::shared_ptr<Button>> m_buttonList;
+	
+	void CreateThread();
+	void CallFunc();
 };
