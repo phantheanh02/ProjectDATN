@@ -22,48 +22,48 @@ void GSMenu::Init()
 	Vector2 posButton = Vector2(370, 100);
 
 	// button play
-	std::shared_ptr<Button> button = std::make_shared<Button>("btn_play.png", BUTTON_PLAY);
+	std::shared_ptr<Button> button = std::make_shared<Button>("Button/btn_play.png", BUTTON_PLAY);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
 	m_buttonList.push_back(button);
 
 	// button character
 	posButton.y += 85;
-	button = std::make_shared<Button>("btn_character.png", BUTTON_CHOOSE_CHARACTER);
+	button = std::make_shared<Button>("Button/btn_character.png", BUTTON_CHOOSE_CHARACTER);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
 	m_buttonList.push_back(button);
 
 	// button setting
 	posButton.y += 85;
-	button = std::make_shared<Button>("btn_setting.png", BUTTON_SETTING);
+	button = std::make_shared<Button>("Button/btn_setting.png", BUTTON_SETTING);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
 	m_buttonList.push_back(button);
 
 	// button highscore
 	posButton.y += 85;
-	button = std::make_shared<Button>("btn_highscore.png", BUTTON_HIGHSCORE);
+	button = std::make_shared<Button>("Button/btn_highscore.png", BUTTON_HIGHSCORE);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
 	m_buttonList.push_back(button);
 
 	// button credit
 	posButton.y += 85;
-	button = std::make_shared<Button>("btn_credit.png", BUTTON_CREDIT);
+	button = std::make_shared<Button>("Button/btn_credit.png", BUTTON_CREDIT);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
 	m_buttonList.push_back(button);
 
 	// button quit
 	posButton.y += 85;
-	button = std::make_shared<Button>("btn_quit.png", BUTTON_EXIT);
+	button = std::make_shared<Button>("Button/btn_quit.png", BUTTON_EXIT);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(posButton.x, posButton.y);
 	m_buttonList.push_back(button);
 
 	// background
-	m_background = std::make_shared<Sprite2D>("bg_menu.png");
+	m_background = std::make_shared<Sprite2D>("Background/bg_menu.png");
 	m_background->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->Set2DPosition(0, 0);

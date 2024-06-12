@@ -13,11 +13,11 @@ void GSIntro::Init()
 {
 	m_time = 2.0f;
 
-	m_intro = std::make_shared<Sprite2D>("intro.png");
+	m_intro = std::make_shared<Sprite2D>("Background/bg_text_intro.png");
 	m_intro->Set2DSize(864, 42);
 	m_intro->Set2DPosition(Globals::screenWidth / 2 - 864 / 2.0f, Globals::screenHeight / 2 - 21);
 
-	m_bgIntro = std::make_shared<Sprite2D>("bg_intro.png");
+	m_bgIntro = std::make_shared<Sprite2D>("Background/bg_intro.png");
 	m_bgIntro->Set2DSize(Globals::screenWidth , Globals::screenHeight);
 	m_bgIntro->Set2DPosition(0, 0);
 }

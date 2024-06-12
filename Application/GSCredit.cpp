@@ -10,12 +10,12 @@ GSCredit::~GSCredit()
 void GSCredit::Init()
 {
 	// button
-	m_button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
+	m_button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
 	m_button->Set2DSize(110 * 960 / 608.0f, 35 * 960 / 608.0f);
 	m_button->Set2DPosition(479 * 960 / 608.0f, 18 * 960 / 608.0f);
 
 	// bg
-	m_background = std::make_shared<Sprite2D>("bg_help.png");
+	m_background = std::make_shared<Sprite2D>("Background/bg_help.png");
 	m_background->Set2DPosition(0, 0);
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));

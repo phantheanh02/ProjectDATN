@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "GSLocalWifi.h"
 
-#define CHEAT 0
-
 extern CharacterType currentCharacter;
 CharacterType currentOpponentCharacter = C_BLACK;
 
@@ -29,34 +27,34 @@ void GSLocalWifi::Init()
 	m_clientCharacter->Set2DSize(300, 300);
 
 	// button
-	auto button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
+	auto button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(710, 30);
 	m_buttonList.push_back(button);
 
-	button = std::make_shared<Button>("btn_character.png", BUTTON_CHOOSE_CHARACTER);
+	button = std::make_shared<Button>("Button/btn_character.png", BUTTON_CHOOSE_CHARACTER);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(460, 30);
 	m_buttonList.push_back(button);
 
-	button = std::make_shared<Button>("btn_create.png", BUTTON_CREAT);
+	button = std::make_shared<Button>("Button/btn_create.png", BUTTON_CREAT);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(605, 250);
 	m_buttonList.push_back(button);
 
-	button = std::make_shared<Button>("btn_join.png", BUTTON_JOIN);
+	button = std::make_shared<Button>("Button/btn_join.png", BUTTON_JOIN);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(605, 350);
 	m_buttonList.push_back(button);
 
 #if CHEAT
-	button = std::make_shared<Button>("btn_cancel.png", BUTTON_CANCEL);
+	button = std::make_shared<Button>("Button/btn_cancel.png", BUTTON_CANCEL);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(100, 30);
 	m_buttonList.push_back(button);
 #endif
 	// bg
-	m_background = std::make_shared<Sprite2D>("state_background.png");
+	m_background = std::make_shared<Sprite2D>("Background/bg_state_background.png");
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 
@@ -317,14 +315,14 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 		PopButton(BUTTON_JOIN);
 		if (SocketManager::GetInstance()->IsHost())
 		{
-			auto button = std::make_shared<Button>("btn_start.png", BUTTON_START);
+			auto button = std::make_shared<Button>("Button/btn_start.png", BUTTON_START);
 			button->Set2DSize(220, 70);
 			button->Set2DPosition(710, 620);
 			m_buttonList.push_back(button);
 		}
 		else
 		{
-			auto button = std::make_shared<Button>("btn_ready.png", BUTTON_READY);
+			auto button = std::make_shared<Button>("Button/btn_ready.png", BUTTON_READY);
 			button->Set2DSize(220, 70);
 			button->Set2DPosition(710, 620);
 			m_buttonList.push_back(button);

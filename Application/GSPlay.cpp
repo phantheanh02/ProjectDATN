@@ -55,7 +55,7 @@ void GSPlay::Init()
 	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
 	// button play
-	auto button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
+	auto button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
 	button->AttachCamera(m_staticCamera);

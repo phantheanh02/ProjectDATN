@@ -20,7 +20,7 @@ void GSChooseCharacter::Init()
 	m_currentCharacter->Set2DSize(300, 300);
 
 	// back button
-	auto button = std::make_shared<Button>("btn_back.png", BUTTON_BACK);
+	auto button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(710, 30);
 	m_buttonList.push_back(button);
@@ -40,13 +40,13 @@ void GSChooseCharacter::Init()
 	m_buttonList.push_back(button);
 
 	// bg
-	auto sprite2D = std::make_shared<Sprite2D>("state_background.png");
+	auto sprite2D = std::make_shared<Sprite2D>("Background/bg_state_background.png");
 	sprite2D->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 	m_sprite2DList.push_back(sprite2D);
 
 	// info table
-	sprite2D = std::make_shared<Sprite2D>("BorderAttribute.png");
+	sprite2D = std::make_shared<Sprite2D>("Background/bg_borderAttribute.png");
 	sprite2D->Set2DSize(360, 450);
 	sprite2D->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 	sprite2D->Set2DPosition(570, 150);

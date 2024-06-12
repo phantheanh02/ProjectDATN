@@ -7,6 +7,8 @@
 #include "Model.h"
 #include "Sprite2D.h"
 #include "Text.h"
+#include "Player.h"
+#include "MapClass.h"
 
 class GSSolo final : public GameStateBase
 {
@@ -26,8 +28,14 @@ public:
 	void OnMouseClick(int x, int y, unsigned char key, bool pressed) override;
 	void OnMouseMove(int x, int y) override;
 	void OnMouseScroll(int x, int y, short delta) override;
+
 private:
 	float m_time;
 	std::shared_ptr<Sprite2D>	m_intro;
-	std::shared_ptr<Sprite2D> m_bgIntro;
+	std::shared_ptr<Sprite2D>	m_bgIntro;
+
+	std::shared_ptr<Player>		m_player1;
+	std::shared_ptr<Player>		m_player2;
+
+	std::shared_ptr<MapClass> 	m_map;
 };

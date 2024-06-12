@@ -19,7 +19,7 @@ void GSSetting::Init()
 
 	auto staticCamera = SM->GetCamera(CameraType::STATIC_CAMERA);
 
-	m_background = std::make_shared<Sprite2D>("state_background.png");
+	m_background = std::make_shared<Sprite2D>("Background/bg_state_background.png");
 	m_background->Set2DPosition(-10, -10);
 	m_background->Set2DSize(1200, 900);
 	m_background->AttachCamera(staticCamera);
@@ -63,12 +63,12 @@ void GSSetting::Init()
 	m_listText.push_back(m_textVolumeLevel);
 
 	// init buttons
-	auto button = std::make_shared<Button>("btn_save.png", BUTTON_SAVE);
+	auto button = std::make_shared<Button>("Button/btn_save.png", BUTTON_SAVE);
 	button->Set2DPosition(200, 530);
 	button->Set2DSize(220, 70);
 	m_buttonList.push_back(button);
 
-	button = std::make_shared<Button>("btn_cancel.png", BUTTON_CANCEL);
+	button = std::make_shared<Button>("Button/btn_cancel.png", BUTTON_CANCEL);
 	button->Set2DPosition(540, 530);
 	button->Set2DSize(220, 70);
 	m_buttonList.push_back(button);

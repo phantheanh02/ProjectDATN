@@ -16,6 +16,9 @@ public:
 	
 };
 
+// flags
+#define CHEAT 0
+
 // key define
 #define KEY_LEFT		VK_LEFT
 #define KEY_RIGHT		VK_RIGHT
