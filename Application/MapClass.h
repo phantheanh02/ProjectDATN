@@ -11,7 +11,8 @@ enum PlanetType
 	MT_LAVA,
 	MT_ICE,
 	//MT_BLACK_HOLE,
-	MT_TERRAN
+	MT_TERRAN,
+	MAP_SOLO
 };
 
 class MapClass

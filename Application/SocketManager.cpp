@@ -115,12 +115,12 @@ void SocketManager::CloseSocket()
 }
 
 
-void SocketManager::SendNewMessage(const char* message)
+bool SocketManager::SendNewMessage(const char* message)
 {
-    if (!message)
-    {
-        return;
-    }
+    //if (!message)
+    //{
+    //    return;
+    //}
 
     int ret = SOCKET_ERROR;
     if (m_host)
@@ -135,11 +135,13 @@ void SocketManager::SendNewMessage(const char* message)
     if (ret == SOCKET_ERROR)
     {
         printf("Error when send\n");
+        return false;
     }
     else
     {
         printf("Send a message: %s\n", message);
     }
+    return true;
 }
 
 void* SocketManager::ReceiveMessage()

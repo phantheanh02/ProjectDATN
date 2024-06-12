@@ -19,8 +19,13 @@ GSPlay::~GSPlay()
 
 void GSPlay::Init()
 {
+	if (world)
+	{
+		world.reset();
+	}
+
 	m_key = 0;
-	unsigned int	m_mouse;
+	tileSizeByPixel = 30;
 
 	// get refresh rate and set time step
 	DEVMODE devMode;
@@ -54,7 +59,7 @@ void GSPlay::Init()
 	m_cameraPositionBoudaries.z = size.x * tileSizeByPixel - (GLfloat)Globals::screenWidth;
 	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
-	// button play
+	// button back
 	auto button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
 	button->Set2DSize(220, 70);
 	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);

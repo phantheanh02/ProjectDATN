@@ -31,7 +31,6 @@ public:
 	void OnMouseScroll(int x, int y, short delta) override;
 
 	void Update2DDrawPosition();
-	void LoadMap();
 
 private:
 	// Kry/mouse event
@@ -67,5 +66,7 @@ private:
 private:
 	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);
 	void RandomEnemies();
+	void LoadMap();
+
 };
 	

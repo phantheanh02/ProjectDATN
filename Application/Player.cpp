@@ -19,6 +19,8 @@ Player::Player()
 	, m_resetAfterDieTime(5)
 	, m_health(100)
 {
+	SetCharacter(currentCharacter);
+
 	// create player body
 	b2BodyDef playerBodyDef;
 	playerBodyDef.type = b2_dynamicBody;
@@ -50,30 +52,11 @@ Player::Player()
 	m_body->CreateFixture(&sensorDef);
 
 	// animation
-	m_actionAnimation = std::make_shared<SpriteAnimation>(currentCharacter, 5, 0.1);
+	m_actionAnimation = std::make_shared<SpriteAnimation>(m_currentCharacter, 5, 0.1);
 	m_actionAnimation->Set2DPositionByTile(3, 5);
 	m_actionAnimation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 
-	switch (currentCharacter)
-	{
-	case C_BLACK:
-		m_playerbulletType = 1;
-		break;
-	case C_BLUE:
-		m_playerbulletType = 2;
-		break;
-	case C_GREEN:
-		m_playerbulletType = 3;
-		break;
-	case C_RED:
-		m_playerbulletType = 4;
-		break;
-	case C_YELLOW:
-		m_playerbulletType = 5;
-		break;
-	default:
-		break;
-	}
+
 }
 
 Player::~Player()
@@ -166,23 +149,23 @@ void Player::SetAction(PlayerAction action)
 		switch (action)
 		{
 		case IDLE:
-			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 5, 0.1f);
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + m_currentCharacter, 5, 0.1f);
 			break;
 		case RUNNING:
-			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 6, 0.1f);
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + m_currentCharacter, 6, 0.1f);
 			break;
 		case JUMPING:
-			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 2, 0.1f);
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + m_currentCharacter, 2, 0.1f);
 			break;
 		case CROUCH:
-			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 3, 0.1f);
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + m_currentCharacter, 3, 0.1f);
 			break;
 		case DEAD:
-			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 8, 0.1f);
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + m_currentCharacter, 8, 0.1f);
 			m_actionAnimation->SetCurrentFrame(0);
 			break;
 		case FIRE_TOP:
-			m_actionAnimation = std::make_shared<SpriteAnimation>(action + currentCharacter, 1, 0.1f);
+			m_actionAnimation = std::make_shared<SpriteAnimation>(action + m_currentCharacter, 1, 0.1f);
 			break;
 		case NONE_ACTION:
 			break;
@@ -204,6 +187,39 @@ void Player::SetAction(PlayerAction action)
 void Player::SetJumpingStatus(bool status)
 {
 	m_isJumping = status;
+	if (m_isJumping)
+	{
+		SetAction(PlayerAction::JUMPING);
+	}
+	else
+	{
+		SetAction(PlayerAction::IDLE);
+	}
+}
+
+void Player::SetCharacter(CharacterType type)
+{
+	m_currentCharacter = type;
+	switch (m_currentCharacter)
+	{
+	case C_BLACK:
+		m_playerbulletType = 1;
+		break;
+	case C_BLUE:
+		m_playerbulletType = 2;
+		break;
+	case C_GREEN:
+		m_playerbulletType = 3;
+		break;
+	case C_RED:
+		m_playerbulletType = 4;
+		break;
+	case C_YELLOW:
+		m_playerbulletType = 5;
+		break;
+	default:
+		break;
+	}
 }
 
 void Player::GetItem(GLint typeItem)

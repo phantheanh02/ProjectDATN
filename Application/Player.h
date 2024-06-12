@@ -55,6 +55,7 @@ public:
 	void SetDirection(DirectionType direction);
 	void SetAction(PlayerAction action);
 	void SetJumpingStatus(bool status);
+	void SetCharacter(CharacterType type);
 
 	DirectionType			GetDirection();
 	void					GetItem(GLint typeItem);
@@ -81,7 +82,7 @@ private:
 	bool								m_isJumping;
 	bool								m_isDie;
 	GLfloat								m_resetAfterDieTime;
-
+	CharacterType						m_currentCharacter;
 	// box2d
 	b2Body*								m_body;
 	GLfloat								m_bulletCooldown;

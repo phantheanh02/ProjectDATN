@@ -30,12 +30,31 @@ public:
 	void OnMouseScroll(int x, int y, short delta) override;
 
 private:
-	float m_time;
-	std::shared_ptr<Sprite2D>	m_intro;
-	std::shared_ptr<Sprite2D>	m_bgIntro;
+	std::shared_ptr<Sprite2D>	m_background;
 
-	std::shared_ptr<Player>		m_player1;
-	std::shared_ptr<Player>		m_player2;
+	std::shared_ptr<Player>		m_ownerPlayer;
+	std::shared_ptr<Player>		m_opponentPlayer;
 
 	std::shared_ptr<MapClass> 	m_map;
+
+	// Kry/mouse event
+	unsigned int	m_key;
+	std::vector<std::string> m_keyStack;
+
+	// button
+	std::vector<std::shared_ptr<Button>>	m_buttonList;
+
+	// camera
+	std::shared_ptr<Camera>					m_dynamicCamera;
+	std::shared_ptr<Camera>					m_staticCamera;
+	Vector4									m_cameraPositionBoudaries;
+
+	// box2d
+	std::vector<b2Body*>					m_BodyList;
+	ContactListener*						m_contactListener;
+	GLfloat									m_timeStep;
+
+private:
+	void LoadMap();
+	void HandleRequest();
 };

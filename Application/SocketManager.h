@@ -40,7 +40,7 @@ public:
 	bool CreateSocket(bool host, unsigned int port);
 	void CloseSocket();
 
-	void SendNewMessage(const char* message);
+	bool SendNewMessage(const char* message);
 	void* ReceiveMessage();
 
 	bool HasNewMsg();
