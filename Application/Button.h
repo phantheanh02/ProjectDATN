@@ -30,7 +30,9 @@ enum ButtonType
 	BUTTON_NEXT_LEFT,
 	BUTTON_NEXT_RIGHT,
 	BUTTON_CREAT,
-	BUTTON_JOIN
+	BUTTON_JOIN,
+	BUTTON_READY,
+	BUTTON_START
 };
 class Button : public Sprite2D
 {

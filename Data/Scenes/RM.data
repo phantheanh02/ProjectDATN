@@ -231,6 +231,10 @@ ID 103
 FILE "btn_create.png"
 ID 104
 FILE "btn_join.png"
+ID 105
+FILE "btn_start.png"
+ID 106
+FILE "btn_ready.png"
 $
 
 #Sounds

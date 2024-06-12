@@ -43,6 +43,7 @@ private:
 	std::shared_ptr<SpriteAnimation>	m_clientCharacter;
 	bool								m_hasClient;
 	bool								m_isJoinRoom;
+	bool								m_isClientReady;
 
 private:
 	void CreateThread();

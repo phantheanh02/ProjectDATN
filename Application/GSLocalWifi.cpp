@@ -4,6 +4,7 @@
 #define CHEAT 0
 
 extern CharacterType currentCharacter;
+CharacterType currentOpponentCharacter = C_BLACK;
 
 GSLocalWifi::~GSLocalWifi()
 {
@@ -13,6 +14,8 @@ void GSLocalWifi::Init()
 {
 	m_hasClient = false;
 	m_isJoinRoom = false;
+	m_isClientReady = false;
+
 	// chacracter
 	m_hostCharacter = std::make_shared<SpriteAnimation>(currentCharacter, 5, 0.1);
 	m_hostCharacter->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
@@ -74,7 +77,7 @@ void GSLocalWifi::Update(float deltaTime)
 		switch (request)
 		{
 		case CONNECT:
-			SocketManager::GetInstance()->SendNewMessage("Connected!!");
+			SocketManager::GetInstance()->SendNewMessage("Accept connection!!");
 			break;
 		case READY_STATE:
 			break;
@@ -87,6 +90,7 @@ void GSLocalWifi::Update(float deltaTime)
 			{
 				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(29));
 			}
+			currentOpponentCharacter = C_BLACK;
 			break;
 		case CHARACTER_BLUE:
 			if (SocketManager::GetInstance()->IsHost())
@@ -97,6 +101,7 @@ void GSLocalWifi::Update(float deltaTime)
 			{
 				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(35));
 			}
+			currentOpponentCharacter = C_BLUE;
 			break;
 		case CHARACTER_GREEN:
 			if (SocketManager::GetInstance()->IsHost())
@@ -107,6 +112,7 @@ void GSLocalWifi::Update(float deltaTime)
 			{
 				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(41));
 			}
+			currentOpponentCharacter = C_GREEN;
 			break;
 		case CHARACTER_RED:
 			if (SocketManager::GetInstance()->IsHost())
@@ -117,6 +123,7 @@ void GSLocalWifi::Update(float deltaTime)
 			{
 				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(47));
 			}
+			currentOpponentCharacter = C_RED;
 			break;
 		case CHARACTER_YELLOW:
 			if (SocketManager::GetInstance()->IsHost())
@@ -127,6 +134,7 @@ void GSLocalWifi::Update(float deltaTime)
 			{
 				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(53));
 			}
+			currentOpponentCharacter = C_YELLOW;
 			break;
 		case START_PLAY:
 			GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
@@ -142,6 +150,12 @@ void GSLocalWifi::Update(float deltaTime)
 			{
 				GameStateMachine::GetInstance()->PopState();
 			}
+			break;
+		case READY:
+			m_isClientReady = true;
+			break;
+		case NO_READY:
+			m_isClientReady = false;
 			break;
 		default:
 			break;
@@ -246,6 +260,7 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				else
 				{
 					// noti error
+					printf("Create room fail!!\n");
 				}
 				break;
 			case BUTTON_JOIN:
@@ -257,6 +272,7 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				else
 				{
 					// noti error
+					printf("Join room fail!!\n");
 				}
 				break;
 			case BUTTON_CANCEL:
@@ -264,6 +280,31 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				break;
 			case BUTTON_CHOOSE_CHARACTER:
 				GameStateMachine::GetInstance()->PushState(StateType::STATE_CHOOSECHARACTER);
+				break;
+			case BUTTON_READY:
+				if (m_isClientReady)
+				{
+					m_isClientReady = false;
+					SocketManager::GetInstance()->SendNewMessage("13");
+				}
+				else
+				{
+					m_isClientReady = true;
+					SocketManager::GetInstance()->SendNewMessage("12");
+				}
+				break;
+			case BUTTON_START:
+				if (m_isClientReady)
+				{
+					SocketManager::GetInstance()->SendNewMessage("11");
+					GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
+				}
+				else
+				{
+					// noti client not ready
+					printf("Client hasn't ready\n");
+
+				}
 				break;
 			default:
 				break;
@@ -274,6 +315,21 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 	{
 		PopButton(BUTTON_CREAT);
 		PopButton(BUTTON_JOIN);
+		if (SocketManager::GetInstance()->IsHost())
+		{
+			auto button = std::make_shared<Button>("btn_start.png", BUTTON_START);
+			button->Set2DSize(220, 70);
+			button->Set2DPosition(710, 620);
+			m_buttonList.push_back(button);
+		}
+		else
+		{
+			auto button = std::make_shared<Button>("btn_ready.png", BUTTON_READY);
+			button->Set2DSize(220, 70);
+			button->Set2DPosition(710, 620);
+			m_buttonList.push_back(button);
+		}
+
 	}
 }
 

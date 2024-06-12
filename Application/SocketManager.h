@@ -15,17 +15,21 @@
 enum RequestType
 {
 	CONNECT			= 00,
+
 	READY_STATE		= 10,
+	START_PLAY		= 11,
+	READY			= 12,
+	NO_READY		= 13,
+	REJOIN			= 14,
+	EXIT_ROOM		= 15,
 
 	CHARACTER_BLACK = 20,
 	CHARACTER_BLUE	= 21,
 	CHARACTER_GREEN	= 22,
 	CHARACTER_RED	= 23,
-	CHARACTER_YELLOW = 24,
+	CHARACTER_YELLOW = 24
 
-	START_PLAY		= 30,
-	REJOIN			= 40,
-	EXIT_ROOM		= 50			
+		
 };
 class SocketManager : public SingletonDclp<SocketManager>
 {
