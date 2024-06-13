@@ -28,9 +28,9 @@ enum RequestType
 	CHARACTER_BLUE	= 21,
 	CHARACTER_GREEN	= 22,
 	CHARACTER_RED	= 23,
-	CHARACTER_YELLOW = 24
+	CHARACTER_YELLOW = 24,
 
-		
+	DISCONNECT		= 99
 };
 class SocketManager : public SingletonDclp<SocketManager>
 {
@@ -39,10 +39,15 @@ public:
 	void CleanUp();
 
 	bool CreateSocket(bool host, unsigned int port);
+	void CreateReceiveThread();
+	void CreateNewThread(LPTHREAD_START_ROUTINE func);
+
 	void CloseSocket();
+	void CloseClientSocket();
+	void CloseReceiveThread();
 
 	bool SendNewMessage(const char* message);
-	void* ReceiveMessage();
+	bool ReceiveMessage();
 
 	bool HasNewMsg();
 	void SetStatusMsg(bool isReceives);

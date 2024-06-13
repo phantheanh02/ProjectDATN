@@ -26,6 +26,7 @@ GSSolo::~GSSolo()
 void GSSolo::Init()
 {
 	m_key = 0;
+	m_opponentKey = 0;
 	m_isReadyState = false;
 
 	if (world)
@@ -88,6 +89,10 @@ void GSSolo::Init()
 
 void GSSolo::Update(float deltaTime)
 {
+	if (!m_isReadyState)
+	{
+		SocketManager::GetInstance()->SendNewMessage("action11");
+	}
 	HandleRequest();
 	HandleEvent();
 
@@ -240,6 +245,7 @@ void GSSolo::HandleEvent()
 		std::string msg = std::to_string(keySend);
 		while (msg.size() < 2)
 		{
+			printf("%s\n", msg);
 			msg = "0" + msg;
 		}
 		msg = "events" + msg;
@@ -376,7 +382,7 @@ void GSSolo::HandleRequest()
 		std::string msg = SocketManager::GetInstance()->GetDataMsg();
 		std::string header = msg.substr(0, 6);
 		std::string body = msg.substr(6, 8);
-		int check = std::stoi(msg);
+		int check = std::stoi(body);
 
 		if (header == "action")
 		{
@@ -384,6 +390,7 @@ void GSSolo::HandleRequest()
 			{
 			case START_PLAY:
 				m_isReadyState = true;
+				SocketManager::GetInstance()->SendNewMessage("action11");
 				break;
 			case EXIT_BATTLE:
 				GameStateMachine::GetInstance()->PopState();
@@ -392,7 +399,7 @@ void GSSolo::HandleRequest()
 				break;
 			}
 		}
-		else if (header == "events")
+		else
 		{
 			m_opponentKey = check;
 		}

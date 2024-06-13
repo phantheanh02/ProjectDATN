@@ -6,13 +6,14 @@ CharacterType currentOpponentCharacter = C_BLACK;
 
 GSLocalWifi::~GSLocalWifi()
 {
+	SocketManager::GetInstance()->CloseSocket();
 }
 
 void GSLocalWifi::Init()
 {
 	m_hasClient = false;
 	m_isClientReady = false;
-
+	m_preCharacter = currentCharacter;
 	// chacracter
 	m_hostCharacter = std::make_shared<SpriteAnimation>(currentCharacter, 5, 0.1);
 	m_hostCharacter->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
@@ -25,6 +26,10 @@ void GSLocalWifi::Init()
 	m_clientCharacter->Set2DPosition(715, 300);
 	m_clientCharacter->Set2DSize(300, 300);
 
+	if (m_buttonList.size() > 0)
+	{
+		m_buttonList.clear();
+	}
 	// button
 	auto button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
 	button->Set2DSize(220, 70);
@@ -92,6 +97,7 @@ void GSLocalWifi::Draw()
 
 void GSLocalWifi::Pause()
 {
+	m_preCharacter = currentCharacter;
 }
 
 void GSLocalWifi::Resume()
@@ -106,26 +112,31 @@ void GSLocalWifi::Resume()
 		m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(currentCharacter));
 	}
 
-	switch (currentCharacter)
+	if (m_preCharacter != currentCharacter)
 	{
-	case C_BLACK:
-		SocketManager::GetInstance()->SendNewMessage("action20");
-		break;
-	case C_BLUE:
-		SocketManager::GetInstance()->SendNewMessage("action21");
-		break;
-	case C_GREEN:
-		SocketManager::GetInstance()->SendNewMessage("action22");
-		break;
-	case C_RED:
-		SocketManager::GetInstance()->SendNewMessage("action23");
-		break;
-	case C_YELLOW:
-		SocketManager::GetInstance()->SendNewMessage("action24");
-		break;
-	default:
-		break;
+		m_preCharacter = currentCharacter;
+		switch (currentCharacter)
+		{
+		case C_BLACK:
+			SocketManager::GetInstance()->SendNewMessage("action20");
+			break;
+		case C_BLUE:
+			SocketManager::GetInstance()->SendNewMessage("action21");
+			break;
+		case C_GREEN:
+			SocketManager::GetInstance()->SendNewMessage("action22");
+			break;
+		case C_RED:
+			SocketManager::GetInstance()->SendNewMessage("action23");
+			break;
+		case C_YELLOW:
+			SocketManager::GetInstance()->SendNewMessage("action24");
+			break;
+		default:
+			break;
+		}
 	}
+	
 }
 
 void GSLocalWifi::Exit()
@@ -150,8 +161,7 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			switch (button->m_type)
 			{
 			case BUTTON_BACK:
-				SocketManager::GetInstance()->SendNewMessage("action50");
-				SocketManager::GetInstance()->CloseSocket();
+				SocketManager::GetInstance()->SendNewMessage("action15");
 
 				ResourcesManager::GetInstance()->GetSound(1)->Play();
 				GameStateMachine::GetInstance()->PopState();
@@ -201,7 +211,7 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			case BUTTON_START:
 				if (m_isClientReady)
 				{
-					SocketManager::GetInstance()->SendNewMessage("action11");
+					//SocketManager::GetInstance()->SendNewMessage("action11");
 					GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
 				}
 				else
@@ -267,100 +277,120 @@ void GSLocalWifi::HandleRequest()
 		std::string header = msg.substr(0, 6);
 		std::string body = msg.substr(6, 8);
 		RequestType request = (RequestType)std::stoi(body);
-		switch (request)
+		if (header == "action")
 		{
-		case CONNECT:
-			if (SocketManager::GetInstance()->IsHost())
+			switch (request)
 			{
+			case CONNECT:
+				if (SocketManager::GetInstance()->IsHost())
 				{
-					SocketManager::GetInstance()->SendNewMessage("action00");
+					{
+						SocketManager::GetInstance()->SendNewMessage("action00");
+					}
 				}
+				break;
+			case READY_STATE:
+				break;
+			case CHARACTER_BLACK:
+				if (SocketManager::GetInstance()->IsHost())
+				{
+					m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(29));
+				}
+				else
+				{
+					m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(29));
+				}
+				currentOpponentCharacter = C_BLACK;
+				break;
+			case CHARACTER_BLUE:
+				if (SocketManager::GetInstance()->IsHost())
+				{
+					m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(35));
+				}
+				else
+				{
+					m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(35));
+				}
+				currentOpponentCharacter = C_BLUE;
+				break;
+			case CHARACTER_GREEN:
+				if (SocketManager::GetInstance()->IsHost())
+				{
+					m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(41));
+				}
+				else
+				{
+					m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(41));
+				}
+				currentOpponentCharacter = C_GREEN;
+				break;
+			case CHARACTER_RED:
+				if (SocketManager::GetInstance()->IsHost())
+				{
+					m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(47));
+				}
+				else
+				{
+					m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(47));
+				}
+				currentOpponentCharacter = C_RED;
+				break;
+			case CHARACTER_YELLOW:
+				if (SocketManager::GetInstance()->IsHost())
+				{
+					m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(53));
+				}
+				else
+				{
+					m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(53));
+				}
+				currentOpponentCharacter = C_YELLOW;
+				break;
+			case START_PLAY:
+				//if (!SocketManager::GetInstance()->IsHost())
+				//{
+				//	SocketManager::GetInstance()->SendNewMessage("action11");
+				//}
+				GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
+				break;
+			case JOIN_BATTLE:
+				break;
+			case EXIT_ROOM:
+				if (SocketManager::GetInstance()->IsHost())
+				{
+					m_hasClient = false;
+					m_isClientReady = false;
+					//SocketManager::GetInstance()->CloseClientSocket();
+				}
+				/*else
+				{
+					m_hasClient = false;					
+					SocketManager::GetInstance()->CloseSocket();
+					GameStateMachine::GetInstance()->PopState();
+				}*/
+				break;
+			case READY:
+				m_isClientReady = true;
+				break;
+			case NO_READY:
+				m_isClientReady = false;
+				break;
+			case DISCONNECT:
+				if (!SocketManager::GetInstance()->IsHost())
+				{
+					m_isClientReady = false;
+					m_hasClient = false;
+					SocketManager::GetInstance()->CloseSocket();
+					Init();
+					//GameStateMachine::GetInstance()->PopState();
+					//GameStateMachine::GetInstance()->PushState(StateType::STATE_HIGHSCORE);
+
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case READY_STATE:
-			break;
-		case CHARACTER_BLACK:
-			if (SocketManager::GetInstance()->IsHost())
-			{
-				m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(29));
-			}
-			else
-			{
-				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(29));
-			}
-			currentOpponentCharacter = C_BLACK;
-			break;
-		case CHARACTER_BLUE:
-			if (SocketManager::GetInstance()->IsHost())
-			{
-				m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(35));
-			}
-			else
-			{
-				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(35));
-			}
-			currentOpponentCharacter = C_BLUE;
-			break;
-		case CHARACTER_GREEN:
-			if (SocketManager::GetInstance()->IsHost())
-			{
-				m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(41));
-			}
-			else
-			{
-				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(41));
-			}
-			currentOpponentCharacter = C_GREEN;
-			break;
-		case CHARACTER_RED:
-			if (SocketManager::GetInstance()->IsHost())
-			{
-				m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(47));
-			}
-			else
-			{
-				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(47));
-			}
-			currentOpponentCharacter = C_RED;
-			break;
-		case CHARACTER_YELLOW:
-			if (SocketManager::GetInstance()->IsHost())
-			{
-				m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(53));
-			}
-			else
-			{
-				m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(53));
-			}
-			currentOpponentCharacter = C_YELLOW;
-			break;
-		case START_PLAY:
-			if (!SocketManager::GetInstance()->IsHost())
-			{
-				SocketManager::GetInstance()->SendNewMessage("action11");
-			}
-			GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
-			break;
-		case JOIN_BATTLE:
-			break;
-		case EXIT_ROOM:
-			if (SocketManager::GetInstance()->IsHost())
-			{
-				m_hasClient = false;
-			}
-			else
-			{
-				GameStateMachine::GetInstance()->PopState();
-			}
-			break;
-		case READY:
-			m_isClientReady = true;
-			break;
-		case NO_READY:
-			m_isClientReady = false;
-			break;
-		default:
-			break;
+
 		}
 		SocketManager::GetInstance()->SetStatusMsg(false);
 	}

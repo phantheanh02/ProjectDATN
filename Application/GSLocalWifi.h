@@ -38,9 +38,11 @@ private:
 	std::shared_ptr<Sprite2D>				m_intro;
 	std::shared_ptr<Sprite2D>				m_background;
 	std::vector<std::shared_ptr<Button>>	m_buttonList;
+	CharacterType							m_preCharacter;
 
 	std::shared_ptr<SpriteAnimation>	m_hostCharacter;
 	std::shared_ptr<SpriteAnimation>	m_clientCharacter;
+
 	bool								m_hasClient;
 	bool								m_isClientReady;
 

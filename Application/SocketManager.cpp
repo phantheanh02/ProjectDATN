@@ -17,6 +17,7 @@ bool SocketManager::Init()
 void SocketManager::CleanUp()
 {
     //freeaddrinfo(m_addrInfo);
+    CloseSocket();
     if (m_socket)
     {
         closesocket(m_socket);
@@ -30,6 +31,7 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     m_host = host;
     m_port = port;
     m_hasNewMsg = false;
+    memset(m_buf, 0, BUFLEN);
 
     m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     //if (!m_host)
@@ -101,11 +103,32 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
         }
         printf("Client started!\n");
     }
+    CreateReceiveThread();
+}
+
+void SocketManager::CreateReceiveThread()
+{
     m_threadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, &m_socket, 0, NULL);
     if (m_threadHandle == NULL)
     {
         perror("Error creating thread\n");
-        return 0;
+        return;
+    }
+}
+
+void SocketManager::CreateNewThread(LPTHREAD_START_ROUTINE func)
+{
+    if (m_threadHandle)
+    {
+        CloseHandle(m_threadHandle);
+        m_threadHandle = nullptr;
+    }
+     
+    m_threadHandle = CreateThread(NULL, 0, func, &m_socket, 0, NULL);
+    if (m_threadHandle == NULL)
+    {
+        perror("Error creating thread\n");
+        return;
     }
 }
 
@@ -122,10 +145,35 @@ void SocketManager::CloseSocket()
     if (m_threadHandle)
     {
         CloseHandle(m_threadHandle);
+        m_threadHandle = nullptr;
     }
     WSACleanup();
 
     std::cout << "Closed socket\n";
+}
+
+void SocketManager::CloseClientSocket()
+{
+    if (m_threadHandle)
+    {
+        CloseHandle(m_threadHandle);
+        m_threadHandle = nullptr;
+    }
+    m_threadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, &m_socket, 0, NULL);
+    if (m_threadHandle == NULL)
+    {
+        perror("Error creating thread\n");
+        return;
+    }
+}
+
+void SocketManager::CloseReceiveThread()
+{
+    if (m_threadHandle)
+    {
+        CloseHandle(m_threadHandle);
+        m_threadHandle = nullptr;
+    }
 }
 
 
@@ -160,41 +208,46 @@ bool SocketManager::SendNewMessage(const char* message)
     return true;
 }
 
-void* SocketManager::ReceiveMessage()
+bool SocketManager::ReceiveMessage()
 {
-    memset(m_buf, 0, BUFLEN);
-
-    while (true)
+    if (m_host)
     {
-        if (m_host)
+        int clientAddrSize = sizeof(m_clientAddr);
+        //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_clientAddr, &clientAddrSize);
+        int ret = recv(m_clientSock, m_buf, 8, MSG_WAITALL);
+        if (ret == SOCKET_ERROR)
         {
-            int clientAddrSize = sizeof(m_clientAddr);
-            //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_clientAddr, &clientAddrSize);
-            int ret = recv(m_clientSock, m_buf, 8, MSG_WAITALL);
-            if (ret == SOCKET_ERROR)
-            {
-                printf("Error receive at server\n");
-                return 0;
-            }
-
-            m_buf[ret] = 0;
-            printf("Receive from client: %s\n", m_buf);
+            memset(m_buf, 0, BUFLEN);
+            strcpy(m_buf, "action99");
+            printf("Error receive at server\n");
+            return false;
         }
-        else
+        printf("%d\n", ret);
+        if (ret == 0)
         {
-            int serverAddrSize = sizeof(m_serverAddr);
-            //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
-            int ret = recv(m_socket, m_buf, 8, MSG_WAITALL);
-            if (ret == SOCKET_ERROR)
-            {
-                printf("Error receive at client\n");
-                continue;
-            }
-            m_buf[ret] = 0;
-            printf("Receive from server: %s\n", m_buf);
+            CloseClientSocket();
+            return 0;
         }
-        m_hasNewMsg = true;
+        m_buf[ret] = 0;
+        printf("Receive from client: %s\n", m_buf);
     }
+    else
+    {
+        int serverAddrSize = sizeof(m_serverAddr);
+        //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
+        int ret = recv(m_socket, m_buf, 8, MSG_WAITALL);
+        if (ret == SOCKET_ERROR)
+        {
+            memset(m_buf, 0, BUFLEN);
+            strcpy(m_buf, "action99");
+            printf("Error receive at client\n");
+            return false;
+        }
+        m_buf[ret] = 0;
+        printf("Receive from server: %s\n", m_buf);
+    }
+    m_hasNewMsg = true;
+    return true;
 }
 
 bool SocketManager::HasNewMsg()
@@ -230,8 +283,8 @@ void SocketManager::ThreadProc(void* lpParameter)
     {
         SocketManager::GetInstance()->AcceptClientConnect();
     }
-    
-    SocketManager::GetInstance()->ReceiveMessage();
+
+    while (SocketManager::GetInstance()->ReceiveMessage()){}
 }
 
 void SocketManager::AcceptClientConnect()

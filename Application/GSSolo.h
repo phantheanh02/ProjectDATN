@@ -30,6 +30,7 @@ public:
 	void OnMouseMove(int x, int y) override;
 	void OnMouseScroll(int x, int y, short delta) override;
 
+	void SendRequest();
 private:
 	std::shared_ptr<Sprite2D>	m_background;
 
