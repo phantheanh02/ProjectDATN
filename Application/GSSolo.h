@@ -9,6 +9,7 @@
 #include "Text.h"
 #include "Player.h"
 #include "MapClass.h"
+#include "Bullet.h"
 
 class GSSolo final : public GameStateBase
 {
@@ -37,9 +38,15 @@ private:
 
 	std::shared_ptr<MapClass> 	m_map;
 
-	// Kry/mouse event
+	// Bullet
+	std::vector<std::shared_ptr<Bullet>>	m_bulletList;
+
+	// Key event
 	unsigned int	m_key;
 	std::vector<std::string> m_keyStack;
+
+	unsigned int	m_opponentKey;
+	std::vector<std::string> m_opponentKeyStack;
 
 	// button
 	std::vector<std::shared_ptr<Button>>	m_buttonList;
@@ -57,4 +64,5 @@ private:
 private:
 	void LoadMap();
 	void HandleRequest();
+	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);
 };
