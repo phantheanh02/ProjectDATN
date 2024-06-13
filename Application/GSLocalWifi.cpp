@@ -11,7 +11,6 @@ GSLocalWifi::~GSLocalWifi()
 void GSLocalWifi::Init()
 {
 	m_hasClient = false;
-	m_isJoinRoom = false;
 	m_isClientReady = false;
 
 	// chacracter
@@ -66,16 +65,217 @@ void GSLocalWifi::Init()
 void GSLocalWifi::Update(float deltaTime)
 {
 	m_background->Update(deltaTime);
+	HandleRequest();
+	
+	m_hostCharacter->Update(deltaTime);	
+	if (m_hasClient)
+	{
+		m_clientCharacter->Update(deltaTime);
+	}
+}
+
+void GSLocalWifi::Draw()
+{
+	m_background->Draw();
+
+	for (auto button : m_buttonList)
+	{
+		button->Draw();
+	}
+
+	m_hostCharacter->Draw();
+	if (m_hasClient)
+	{
+		m_clientCharacter->Draw();
+	}
+}
+
+void GSLocalWifi::Pause()
+{
+}
+
+void GSLocalWifi::Resume()
+{
+	// chacracter
+	if (SocketManager::GetInstance()->IsHost())
+	{
+		m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(currentCharacter));
+	}
+	else
+	{
+		m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(currentCharacter));
+	}
+
+	switch (currentCharacter)
+	{
+	case C_BLACK:
+		SocketManager::GetInstance()->SendNewMessage("action20");
+		break;
+	case C_BLUE:
+		SocketManager::GetInstance()->SendNewMessage("action21");
+		break;
+	case C_GREEN:
+		SocketManager::GetInstance()->SendNewMessage("action22");
+		break;
+	case C_RED:
+		SocketManager::GetInstance()->SendNewMessage("action23");
+		break;
+	case C_YELLOW:
+		SocketManager::GetInstance()->SendNewMessage("action24");
+		break;
+	default:
+		break;
+	}
+}
+
+void GSLocalWifi::Exit()
+{
+}
+
+void GSLocalWifi::HandleEvent()
+{
+}
+
+void GSLocalWifi::OnKey(unsigned char key, bool pressed)
+{
+}
+
+void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
+{
+	bool isCreatedSocket = false;
+	for (auto button : m_buttonList)
+	{
+		if (button->HandleTouchMouse(x, y, pressed))
+		{
+			switch (button->m_type)
+			{
+			case BUTTON_BACK:
+				SocketManager::GetInstance()->SendNewMessage("action50");
+				SocketManager::GetInstance()->CloseSocket();
+
+				ResourcesManager::GetInstance()->GetSound(1)->Play();
+				GameStateMachine::GetInstance()->PopState();
+				break;
+			case BUTTON_CREAT:
+				if (SocketManager::GetInstance()->CreateSocket(true, SERVER_PORT))
+				{
+					m_hasClient = false;
+					isCreatedSocket = true;
+				}
+				else
+				{
+					// noti error
+					printf("Create room fail!!\n");
+				}
+				break;
+			case BUTTON_JOIN:
+				if (SocketManager::GetInstance()->CreateSocket(false, SERVER_PORT))
+				{
+					m_hasClient = true;
+					isCreatedSocket = true;
+				}
+				else
+				{
+					// noti error
+					printf("Join room fail!!\n");
+				}
+				break;
+			case BUTTON_CANCEL:
+				SocketManager::GetInstance()->SendNewMessage("actionok");
+				break;
+			case BUTTON_CHOOSE_CHARACTER:
+				GameStateMachine::GetInstance()->PushState(StateType::STATE_CHOOSECHARACTER);
+				break;
+			case BUTTON_READY:
+				if (m_isClientReady)
+				{
+					m_isClientReady = false;
+					SocketManager::GetInstance()->SendNewMessage("action13");
+				}
+				else
+				{
+					m_isClientReady = true;
+					SocketManager::GetInstance()->SendNewMessage("action12");
+				}
+				break;
+			case BUTTON_START:
+				if (m_isClientReady)
+				{
+					SocketManager::GetInstance()->SendNewMessage("action11");
+					GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
+				}
+				else
+				{
+					// noti client not ready
+					printf("Client hasn't ready\n");
+
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if (isCreatedSocket)
+	{
+		PopButton(BUTTON_CREAT);
+		PopButton(BUTTON_JOIN);
+		if (SocketManager::GetInstance()->IsHost())
+		{
+			auto button = std::make_shared<Button>("Button/btn_start.png", BUTTON_START);
+			button->Set2DSize(220, 70);
+			button->Set2DPosition(710, 620);
+			m_buttonList.push_back(button);
+		}
+		else
+		{
+			auto button = std::make_shared<Button>("Button/btn_ready.png", BUTTON_READY);
+			button->Set2DSize(220, 70);
+			button->Set2DPosition(710, 620);
+			m_buttonList.push_back(button);
+		}
+
+	}
+}
+
+void GSLocalWifi::OnMouseMove(int x, int y)
+{
+}
+
+void GSLocalWifi::OnMouseScroll(int x, int y, short delta)
+{
+}
+
+void GSLocalWifi::PopButton(ButtonType type)
+{
+	for (int button = 0; button < m_buttonList.size(); button++)
+	{
+		if (m_buttonList[button]->m_type == type)
+		{
+			m_buttonList.erase(m_buttonList.begin() + button);
+			break;
+		}
+	}
+}
+
+void GSLocalWifi::HandleRequest()
+{
 	if (SocketManager::GetInstance()->HasNewMsg())
 	{
 		m_hasClient = true;
 		std::string msg = SocketManager::GetInstance()->GetDataMsg();
-		std::cout << msg << "\n";
-		RequestType request = (RequestType)std::stoi(msg);
+		std::string header = msg.substr(0, 6);
+		std::string body = msg.substr(6, 8);
+		RequestType request = (RequestType)std::stoi(body);
 		switch (request)
 		{
 		case CONNECT:
-			SocketManager::GetInstance()->SendNewMessage("Accept connection!!");
+			if (SocketManager::GetInstance()->IsHost())
+			{
+				{
+					SocketManager::GetInstance()->SendNewMessage("action00");
+				}
+			}
 			break;
 		case READY_STATE:
 			break;
@@ -135,9 +335,13 @@ void GSLocalWifi::Update(float deltaTime)
 			currentOpponentCharacter = C_YELLOW;
 			break;
 		case START_PLAY:
+			if (!SocketManager::GetInstance()->IsHost())
+			{
+				SocketManager::GetInstance()->SendNewMessage("action11");
+			}
 			GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
 			break;
-		case REJOIN:
+		case JOIN_BATTLE:
 			break;
 		case EXIT_ROOM:
 			if (SocketManager::GetInstance()->IsHost())
@@ -161,192 +365,4 @@ void GSLocalWifi::Update(float deltaTime)
 		SocketManager::GetInstance()->SetStatusMsg(false);
 	}
 
-	m_hostCharacter->Update(deltaTime);	
-	if (m_hasClient)
-	{
-		m_clientCharacter->Update(deltaTime);
-	}
-}
-
-void GSLocalWifi::Draw()
-{
-	m_background->Draw();
-
-	for (auto button : m_buttonList)
-	{
-		button->Draw();
-	}
-
-	m_hostCharacter->Draw();
-	if (m_hasClient)
-	{
-		m_clientCharacter->Draw();
-	}
-}
-
-void GSLocalWifi::Pause()
-{
-}
-
-void GSLocalWifi::Resume()
-{
-	// chacracter
-	if (SocketManager::GetInstance()->IsHost())
-	{
-		m_hostCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(currentCharacter));
-	}
-	else
-	{
-		m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(currentCharacter));
-	}
-	switch (currentCharacter)
-	{
-	case C_BLACK:
-		SocketManager::GetInstance()->SendNewMessage("20");
-		break;
-	case C_BLUE:
-		SocketManager::GetInstance()->SendNewMessage("21");
-		break;
-	case C_GREEN:
-		SocketManager::GetInstance()->SendNewMessage("22");
-		break;
-	case C_RED:
-		SocketManager::GetInstance()->SendNewMessage("23");
-		break;
-	case C_YELLOW:
-		SocketManager::GetInstance()->SendNewMessage("24");
-		break;
-	default:
-		break;
-	}
-}
-
-void GSLocalWifi::Exit()
-{
-}
-
-void GSLocalWifi::HandleEvent()
-{
-}
-
-void GSLocalWifi::OnKey(unsigned char key, bool pressed)
-{
-}
-
-void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
-{
-	bool isCreatedSocket = false;
-	for (auto button : m_buttonList)
-	{
-		if (button->HandleTouchMouse(x, y, pressed))
-		{
-			switch (button->m_type)
-			{
-			case BUTTON_BACK:
-				SocketManager::GetInstance()->SendNewMessage("50");
-				SocketManager::GetInstance()->CloseSocket();
-
-				ResourcesManager::GetInstance()->GetSound(1)->Play();
-				GameStateMachine::GetInstance()->PopState();
-				break;
-			case BUTTON_CREAT:
-				if (SocketManager::GetInstance()->CreateSocket(true, SERVER_PORT))
-				{
-					m_hasClient = false;
-					isCreatedSocket = true;
-				}
-				else
-				{
-					// noti error
-					printf("Create room fail!!\n");
-				}
-				break;
-			case BUTTON_JOIN:
-				if (SocketManager::GetInstance()->CreateSocket(false, SERVER_PORT))
-				{
-					m_hasClient = true;
-					isCreatedSocket = true;
-				}
-				else
-				{
-					// noti error
-					printf("Join room fail!!\n");
-				}
-				break;
-			case BUTTON_CANCEL:
-				SocketManager::GetInstance()->SendNewMessage("ok");
-				break;
-			case BUTTON_CHOOSE_CHARACTER:
-				GameStateMachine::GetInstance()->PushState(StateType::STATE_CHOOSECHARACTER);
-				break;
-			case BUTTON_READY:
-				if (m_isClientReady)
-				{
-					m_isClientReady = false;
-					SocketManager::GetInstance()->SendNewMessage("13");
-				}
-				else
-				{
-					m_isClientReady = true;
-					SocketManager::GetInstance()->SendNewMessage("12");
-				}
-				break;
-			case BUTTON_START:
-				if (m_isClientReady)
-				{
-					SocketManager::GetInstance()->SendNewMessage("11");
-					GameStateMachine::GetInstance()->PushState(StateType::STATE_SOLO);
-				}
-				else
-				{
-					// noti client not ready
-					printf("Client hasn't ready\n");
-
-				}
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	if (isCreatedSocket)
-	{
-		PopButton(BUTTON_CREAT);
-		PopButton(BUTTON_JOIN);
-		if (SocketManager::GetInstance()->IsHost())
-		{
-			auto button = std::make_shared<Button>("Button/btn_start.png", BUTTON_START);
-			button->Set2DSize(220, 70);
-			button->Set2DPosition(710, 620);
-			m_buttonList.push_back(button);
-		}
-		else
-		{
-			auto button = std::make_shared<Button>("Button/btn_ready.png", BUTTON_READY);
-			button->Set2DSize(220, 70);
-			button->Set2DPosition(710, 620);
-			m_buttonList.push_back(button);
-		}
-
-	}
-}
-
-void GSLocalWifi::OnMouseMove(int x, int y)
-{
-}
-
-void GSLocalWifi::OnMouseScroll(int x, int y, short delta)
-{
-}
-
-void GSLocalWifi::PopButton(ButtonType type)
-{
-	for (int button = 0; button < m_buttonList.size(); button++)
-	{
-		if (m_buttonList[button]->m_type == type)
-		{
-			m_buttonList.erase(m_buttonList.begin() + button);
-			break;
-		}
-	}
 }

@@ -31,13 +31,13 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     m_port = port;
     m_hasNewMsg = false;
 
-    m_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (!m_host)
-    {
+    m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    //if (!m_host)
+    //{
         // Set time-out for receiving
-        int tv = 1000; //Time-out interval: 1000ms
+        //int tv = 1000; //Time-out interval: 1000ms
         //setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)(&tv), sizeof(int));
-    }
+    //}
 
     if (m_socket == INVALID_SOCKET) 
     {
@@ -52,21 +52,35 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
 
     if (m_host)
     {
+        // Bind address to socket
         if (bind(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
         {
             printf("Error! Cannot bind this address.\n");
             CloseSocket();
             return false;
         }
+
+        // listen reqest from client
+        if (listen(m_socket, 1))
+        {
+            printf("Error listening\n");
+            return 0;
+        }
         printf("Server started!\n");
     }
     else
     {
+        //m_clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (connect(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
+        {
+            printf("Error! Cannot connect server.");
+            return false;
+        }
         // Ping to server
-        SendNewMessage("00");
-        int serverAddrSize = sizeof(m_serverAddr);
-        int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
-
+        SendNewMessage("action00"); // CONNECT
+        //int serverAddrSize = sizeof(m_serverAddr);
+        //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
+        int ret = recv(m_socket, m_buf, BUFLEN, 0);
         if (ret == SOCKET_ERROR) 
         {
             if (WSAGetLastError() == WSAETIMEDOUT)
@@ -125,11 +139,13 @@ bool SocketManager::SendNewMessage(const char* message)
     int ret = SOCKET_ERROR;
     if (m_host)
     {
-        ret = sendto(m_socket, message, (int)strlen(message), 0, (SOCKADDR*)&m_clientAddr, sizeof(m_clientAddr));
+        //ret = sendto(m_socket, message, (int)strlen(message), 0, (SOCKADDR*)&m_clientAddr, sizeof(m_clientAddr));
+        ret = send(m_clientSock, message, (int)strlen(message), 0);
     }
     else
     {
-        ret = sendto(m_socket, message, (int)strlen(message), 0, (SOCKADDR*)&m_serverAddr, sizeof(m_serverAddr));
+        //ret = sendto(m_socket, message, (int)strlen(message), 0, (SOCKADDR*)&m_serverAddr, sizeof(m_serverAddr));
+        ret = send(m_socket, message, (int)strlen(message), 0);
     }
 
     if (ret == SOCKET_ERROR)
@@ -153,7 +169,8 @@ void* SocketManager::ReceiveMessage()
         if (m_host)
         {
             int clientAddrSize = sizeof(m_clientAddr);
-            int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_clientAddr, &clientAddrSize);
+            //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_clientAddr, &clientAddrSize);
+            int ret = recv(m_clientSock, m_buf, 8, MSG_WAITALL);
             if (ret == SOCKET_ERROR)
             {
                 printf("Error receive at server\n");
@@ -161,12 +178,13 @@ void* SocketManager::ReceiveMessage()
             }
 
             m_buf[ret] = 0;
-            printf("Receive from client %s\n", m_buf);
+            printf("Receive from client: %s\n", m_buf);
         }
         else
         {
             int serverAddrSize = sizeof(m_serverAddr);
-            int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
+            //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
+            int ret = recv(m_socket, m_buf, 8, MSG_WAITALL);
             if (ret == SOCKET_ERROR)
             {
                 printf("Error receive at client\n");
@@ -207,7 +225,23 @@ void SocketManager::SetHost(bool host)
 void SocketManager::ThreadProc(void* lpParameter)
 {
     LPVOID* param = reinterpret_cast<LPVOID*>(lpParameter);
+
+    if (SocketManager::GetInstance()->IsHost())
+    {
+        SocketManager::GetInstance()->AcceptClientConnect();
+    }
+    
     SocketManager::GetInstance()->ReceiveMessage();
+}
+
+void SocketManager::AcceptClientConnect()
+{
+    int clientAddrLen = sizeof(m_clientAddr);
+    //accept connect
+    m_clientSock = accept(m_socket, (sockaddr*)&m_clientAddr, &clientAddrLen);
+    //inet_ntop(AF_INET, &m_clientAddr.sin_addr, IP_ADDRESS, sizeof(IP_ADDRESS));
+    //ntohs(m_clientAddr.sin_port);
+    printf("Connectd with client\n");
 }
 
 

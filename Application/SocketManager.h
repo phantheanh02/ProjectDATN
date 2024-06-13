@@ -20,8 +20,9 @@ enum RequestType
 	START_PLAY		= 11,
 	READY			= 12,
 	NO_READY		= 13,
-	REJOIN			= 14,
+	JOIN_BATTLE		= 14,
 	EXIT_ROOM		= 15,
+	EXIT_BATTLE		= 16,
 
 	CHARACTER_BLACK = 20,
 	CHARACTER_BLUE	= 21,
@@ -55,11 +56,17 @@ private:
 
 	WSADATA m_wsaData;
 	SOCKET	m_socket;
+	//SOCKET	m_listenSock;
+	SOCKET	m_clientSock;
+
 	char	m_buf[BUFLEN];
 	//struct addrinfo m_hints, * m_addrInfo;
 	sockaddr_in m_serverAddr, m_clientAddr;
 
 	bool		m_hasNewMsg;
 	HANDLE		m_threadHandle;
+
+private:
 	static void ThreadProc(void* lpParameter);
+	void AcceptClientConnect();
 };

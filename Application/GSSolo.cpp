@@ -26,6 +26,7 @@ GSSolo::~GSSolo()
 void GSSolo::Init()
 {
 	m_key = 0;
+	m_isReadyState = false;
 
 	if (world)
 	{
@@ -87,8 +88,8 @@ void GSSolo::Init()
 
 void GSSolo::Update(float deltaTime)
 {
-	HandleEvent();
 	HandleRequest();
+	HandleEvent();
 
 	world->Step(m_timeStep, VELOCITY_ITERATION, POSITION_ITERATION);
 
@@ -221,23 +222,31 @@ void GSSolo::HandleEvent()
 	}
 
 	// Send information to opponent
-	int keySend = m_key;
-	if (keySend & (1 << 1) && keySend & (1 << 3))
+	if (m_isReadyState)
 	{
-		if (processKeyAAndDPressed == 1)
+		int keySend = m_key;
+		if (keySend & (1 << 1) && keySend & (1 << 3))
 		{
-			keySend ^= 1 << 3; // pop key "D"
+			if (processKeyAAndDPressed == 1)
+			{
+				keySend ^= 1 << 3; // pop key "D"
+			}
+			else if (processKeyAAndDPressed == 3)
+			{
+				keySend ^= 1 << 1; // pop key "A"
+			}
 		}
-		else if (processKeyAAndDPressed == 3)
+
+		std::string msg = std::to_string(keySend);
+		while (msg.size() < 2)
 		{
-			keySend ^= 1 << 1; // pop key "A"
+			msg = "0" + msg;
 		}
-	}
-	
-	std::string msg = std::to_string(keySend);
-	if (!SocketManager::GetInstance()->SendNewMessage(msg.c_str()))
-	{
-		printf("Opponent disconnect!!\n");
+		msg = "events" + msg;
+		if (!SocketManager::GetInstance()->SendNewMessage(msg.c_str()))
+		{
+			printf("Opponent disconnect!!\n");
+		}
 	}
 }
 
@@ -320,7 +329,7 @@ void GSSolo::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			switch (button->m_type)
 			{
 			case BUTTON_BACK:
-				SocketManager::GetInstance()->SendNewMessage("exit");
+				SocketManager::GetInstance()->SendNewMessage("action16"); // exit battle
 				GameStateMachine::GetInstance()->PopState();
 				break;
 			default:
@@ -365,14 +374,29 @@ void GSSolo::HandleRequest()
 	if (SocketManager::GetInstance()->HasNewMsg())
 	{
 		std::string msg = SocketManager::GetInstance()->GetDataMsg();
-		if (msg == "exit")
+		std::string header = msg.substr(0, 6);
+		std::string body = msg.substr(6, 8);
+		int check = std::stoi(msg);
+
+		if (header == "action")
 		{
-			// TODO: opponent exit batlle
-			GameStateMachine::GetInstance()->PopState();
-			return;
+			switch (check)
+			{
+			case START_PLAY:
+				m_isReadyState = true;
+				break;
+			case EXIT_BATTLE:
+				GameStateMachine::GetInstance()->PopState();
+				return;
+			default:
+				break;
+			}
+		}
+		else if (header == "events")
+		{
+			m_opponentKey = check;
 		}
 
-		m_opponentKey = std::stoi(msg);
 		SocketManager::GetInstance()->SetStatusMsg(false);
 	}
 

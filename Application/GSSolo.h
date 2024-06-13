@@ -61,6 +61,8 @@ private:
 	ContactListener*						m_contactListener;
 	GLfloat									m_timeStep;
 
+	// other
+	bool									m_isReadyState;
 private:
 	void LoadMap();
 	void HandleRequest();
