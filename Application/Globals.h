@@ -18,7 +18,11 @@ public:
 
 // flags
 #define CHEAT 0
-#define MAX_CLIENTS 1
+#define DEBUG 1
+
+// func
+#define LOG(str) if (DEBUG) std::cout << str << "\n";
+
 // key define
 #define KEY_LEFT		VK_LEFT
 #define KEY_RIGHT		VK_RIGHT
@@ -54,3 +58,7 @@ public:
 #define	MAX_DISTANCE				15
 #define COOLDOWN_ENEMY_BULLET		1.2f
 #define TIME_FINDING				3.0f
+
+#define MAX_CLIENTS 1
+
+
