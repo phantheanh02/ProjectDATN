@@ -237,6 +237,7 @@ void WinLoop(ESContext* esContext)
 	lastTime = curTime = std::chrono::steady_clock::now();
 	std::chrono::duration<float> duration;
 	float deltaTime;
+	const std::chrono::microseconds tickTime(16000);
 
 	while (!done && esContext->running)
 	{
@@ -256,9 +257,18 @@ void WinLoop(ESContext* esContext)
 		{
 			curTime = std::chrono::steady_clock::now();
 			duration = curTime - lastTime;
+			if (duration <= tickTime)
+			{
+				std::this_thread::sleep_for(tickTime - duration);
+			}
+			curTime = std::chrono::steady_clock::now();
+			duration = curTime - lastTime;
 			deltaTime = duration.count();
 			lastTime = curTime;
-			esContext->updateFunc(esContext, deltaTime);
+			if (esContext->updateFunc != nullptr)
+			{
+				esContext->updateFunc(esContext, deltaTime);
+			}
 			SendMessage(esContext->hWnd, WM_PAINT, 0, 0);
 		}
 	}
