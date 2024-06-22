@@ -38,6 +38,13 @@ public:
 #define KEY_E			'E'
 #define KEY_J			'J'
 
+// Color
+#define	YELLOW			255, 255, 0
+#define RED				255, 0, 0
+#define BLUE			0, 0, 255
+#define GREEN			0, 255, 0
+#define BLACK			0, 0, 0
+#define WHITE			255, 255, 255
 // other
 #define HP_MAX						50
 #define ARMOR_MAX					100
@@ -48,16 +55,14 @@ public:
 #define BULLET_SIZE					0.1f
 #define VELOCITY_ITERATION			8
 #define POSITION_ITERATION			3
-#define MOVEMENT_SPEED				7.0f
+#define MOVEMENT_SPEED				10.0f
 #define BULLET_COOLDOWN				0.3f
-
+#define LOADING_BULLET_TIME			0.9f
 #define	SCALE_SIZE					2.8f
-#define	HEIGHT_BOX					0.666667f
-#define HEIGHT_IMG					(30 / 48) // để chuẩn hóa, 1 ô = 48 pixel, 30 là chiều cao chung
-
 #define	MAX_DISTANCE				15
 #define COOLDOWN_ENEMY_BULLET		1.2f
 #define TIME_FINDING				3.0f
+#define JUMP_COOLDOWN				0.3
 
 #define MAX_CLIENTS 1
 

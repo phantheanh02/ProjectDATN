@@ -3,9 +3,11 @@
 #include "Singleton.h"
 #include "Camera.h"
 #include "Sprite2D.h"
-#include "ConfigClass.h"
 #include "MapClass.h"
 #include "Enemies.h"
+
+class Player;
+class Bullet;
 
 enum ElementType
 {
@@ -25,16 +27,6 @@ enum CameraType
 {
 	STATIC_CAMERA,
 	DYNAMIC_CAMERA,
-};
-
-struct CharacterStats
-{
-	CharacterType type;
-	GLint hp, spd, atk;
-	CharacterStats() : hp(0), spd(0), atk(0) {};
-	CharacterStats(GLint _hp, GLint _spd, GLint _atk)
-		: hp(_hp), spd(_spd), atk(_atk) {};
-
 };
 
 class SceneManager final : public SingletonDclp<SceneManager>
@@ -63,7 +55,6 @@ private:
 	std::vector<std::shared_ptr<Enemies>>					m_enemiesList;
 	std::vector<std::shared_ptr<MapClass>>					m_mapList;
 	std::vector<CharacterStats>								m_characterList;
-
 	// Utilities
 	void LoadObject(std::ifstream& file);
 	void LoadCamera(std::ifstream& file);

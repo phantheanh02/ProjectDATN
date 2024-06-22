@@ -237,6 +237,16 @@ ID 106
 FILE "Button/btn_ready.png"
 ID 107
 FILE "Map/map_solo.png"
+ID 108
+FILE "Icons/hp_bar.png"
+ID 109
+FILE "Icons/hp_status.png"
+ID 110
+FILE "Icons/bullet_number.png"
+ID 111
+FILE "Effect/blood.png"
+ID 112
+FILE "Effect/loading.png"
 $
 
 #Sounds

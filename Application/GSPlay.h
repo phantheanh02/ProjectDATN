@@ -9,7 +9,7 @@
 #include "Button.h"
 #include "Player.h"
 #include "Bullet.h"
-
+#include "Text.h"
 
 class GSPlay final : public GameStateBase
 {
@@ -62,6 +62,19 @@ private:
 
 	// Enemy
 	std::vector<std::shared_ptr<Enemies>>	m_enemiesList;
+	
+	// HUB
+	std::shared_ptr <Sprite2D>			m_bulletIcon;
+	GLfloat								m_totalTime;
+
+	// Effect
+	std::shared_ptr<SpriteAnimation>	m_loadBullet;
+
+	// Text
+	std::shared_ptr<Text> m_numberBulletText;
+	std::shared_ptr<Text> m_numberEnemiesKilledText;
+	std::shared_ptr<Text> m_totalTimeText;
+	
 
 private:
 	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);

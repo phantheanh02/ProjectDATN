@@ -89,6 +89,7 @@ private:
 
 	DirectionType	m_sprinningDirection;
 	BulletType		m_enemyBulletType;
+	bool			m_isTakeDamage;
 
 	// Sprite
 	std::shared_ptr<SpriteAnimation> m_animation;
@@ -106,6 +107,8 @@ private:
 	b2Body*		m_body;
 	MyRayCastCallback m_rayCallback;
 
+	// Effect
+	std::shared_ptr<SpriteAnimation>	m_blood;
 	
 private:
 	void		PerformRayCasting(b2Vec2 positionPlayer);

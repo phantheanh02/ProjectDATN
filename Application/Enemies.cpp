@@ -17,7 +17,9 @@ Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox)
 	, m_coolDown(0)
 	, m_isReadyAttack(false)
 	, m_timeFinding(TIME_FINDING)
+	, m_isTakeDamage(false)
 {
+	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
 }
 
 Enemies::~Enemies()
@@ -153,6 +155,16 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 				SetAction(EnemyAction::E_IDLE);
 			}
 		}
+
+		// handle when take damage
+		if (m_isTakeDamage)
+		{
+			m_blood->Update(deltaTime);
+			if (m_blood->IsLastFrame())
+			{
+				m_isTakeDamage = false;
+			}
+		}
 	}
 }
 
@@ -161,6 +173,10 @@ void Enemies::Draw()
 	if (m_isActive)
 	{
 		m_animation->Draw();
+		if (m_isTakeDamage)
+		{
+			m_blood->Draw();
+		}
 	}
 }
 
@@ -355,11 +371,17 @@ void Enemies::CalculateSize()
 
 void Enemies::TakeDamage(GLint damage)
 {
+	m_isTakeDamage = true;
+	m_blood->SetCurrentFrame(0);
+	m_blood->Set2DSizeByTile(3, 3);
+	m_blood->Set2DPositionByTile(m_body->GetPosition().x, m_body->GetPosition().y);
+
 	m_health -= damage;
+
 	if (m_health <= 0)
 	{
-		std::cout << "Die\n";
 		m_isDie = true;
+		m_isTakeDamage = false;
 	}
 	m_timeBarDisplay = 2.0f;
 }

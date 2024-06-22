@@ -4,7 +4,6 @@
 #include "SpriteAnimation.h"
 #include "box2d.h"
 #include "Globals.h"
-#include "ConfigClass.h"
 #include "Player.h"
 #include "b2Utilities.h"
 
@@ -12,6 +11,17 @@ constexpr auto DETECTION_DISTANCE_SKILL1 = 2;
 constexpr auto DETECTION_DISTANCE_SKILL2 = 4;
 constexpr auto DETECTION_DISTANCE_ATTACK = 7;
 constexpr auto HP_BOSS_MAX = 15;
+
+enum TypeBossAction
+{
+	DASH_BOSS = 31,
+	DEATH_BOSS,
+	GET_HIT_BOSS,
+	IDLE_BOSS,
+	JUMP_BOSS,
+	RUN_BOSS,
+	SLASH_BOSS
+};
 
 class Boss
 {

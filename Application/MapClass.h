@@ -14,6 +14,18 @@ enum PlanetType
 	MT_TERRAN,
 	MAP_SOLO
 };
+struct TileData
+{
+	int x, y;
+	int gid; // Tile ID
+};
+
+struct MapData
+{
+	int width, height, tileWidth, tileHeight;
+	std::vector<TileData> tiles;
+};
+
 
 class MapClass
 {
@@ -26,7 +38,8 @@ public:
 	void Draw();
 	void OnMouseScroll();
 
-	inline void SetPlaneList(std::vector<Vector4> list) { m_planeList = list; };
+	//inline void SetPlaneList(std::vector<Vector4> list) { m_planeList = list; };
+	inline void SetPlaneList(MapData list) { m_tilePlaneList = list; };
 	inline void SetEnemiesTypeRatio(std::unordered_map<EnemyType, GLfloat> list) { m_enemiesTypeRatio = list; };
 	inline void SetSpawnPosition(std::vector<Vector2> list) { m_spawnPosition = list; };
 	inline void SetItemList(std::vector<Vector3> list) { m_itemsList = list; };
@@ -36,7 +49,8 @@ public:
 	inline GLint					GetMinTileSize() { return m_minTileSize; };
 	inline GLint					GetMaxTileSize() { return m_maxTileSize; };
 	inline Vector2					GetSizeByTile() { return m_sizeByTile; };
-	inline std::vector<Vector4>		GetPlaneList() { return m_planeList; };
+	//inline std::vector<Vector4>		GetPlaneList() { return m_planeList; };
+	inline MapData					GetPlaneList()		{ return m_tilePlaneList; };
 	inline std::vector<Vector3>		GetItemList() { return m_itemsList; };
 	inline std::vector<Vector2>		GetSpawnPosition() { return m_spawnPosition; }
 	inline std::unordered_map<EnemyType, GLfloat> GetEnemiesTypeRatio() { return m_enemiesTypeRatio; };
@@ -49,6 +63,7 @@ private:
 
 	std::vector<Vector4>	m_planeList;		// x, y: position; z, w : size
 	std::vector<Vector3>	m_itemsList;		// x" id texture; y, z: position
+	MapData					m_tilePlaneList;
 
 	// Enemeis list
 	std::unordered_map<EnemyType, GLfloat>	m_enemiesTypeRatio;

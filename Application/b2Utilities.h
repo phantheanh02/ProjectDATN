@@ -12,7 +12,7 @@ enum FixtureTypes
 	FIXTURE_ENEMY_BULLET	= 1 << 5,
 	FIXTURE_BOSS			= 1 << 6,
 	FIXTURE_BOSS_BULLET		= 1 << 7,
-	FIXTURE_ITEM			= 1 << 8
+	FIXTURE_ITEM			= 1 << 8,
 };
 
 enum CollionTypes
@@ -43,6 +43,7 @@ private:
 	void PlayerBulletBoss(b2Fixture* fixtureA, b2Fixture* fixtureB);
 	void BossBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB);
 	void PLayerLootItem(b2Fixture* fixtureA, b2Fixture* fixtureB);
+
 };
 
 class MyRayCastCallback : public b2RayCastCallback {

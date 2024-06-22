@@ -5,7 +5,7 @@
 
 SpriteAnimation::SpriteAnimation(GLint id, std::shared_ptr<Model> model, std::shared_ptr<Shaders> shader, std::shared_ptr<Texture> texture, GLint numFrame, GLfloat timeBtwFrame) 
 	: BaseObject(id, model, shader, texture)
-	, m_defAnimation(id, numFrame, timeBtwFrame)
+	, m_animationDef(id, numFrame, timeBtwFrame)
 {
 	m_changed = true;
 }
@@ -15,7 +15,7 @@ SpriteAnimation::SpriteAnimation(const char* filename, GLint numFrame, GLfloat t
 		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER),
 		ResourcesManager::GetInstance()->GetShader(1),
 		ResourcesManager::GetInstance()->GetTexture(filename))
-	, m_defAnimation(ResourcesManager::GetInstance()->GetTexture(filename)->GetID(), numFrame, timeBtwFrame)
+	, m_animationDef(ResourcesManager::GetInstance()->GetTexture(filename)->GetID(), numFrame, timeBtwFrame)
 {
 	m_changed = true;
 }
@@ -25,7 +25,7 @@ SpriteAnimation::SpriteAnimation(GLint idTexture, GLint numFrame, GLfloat timeBt
 		ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER),
 		ResourcesManager::GetInstance()->GetShader(1),
 		ResourcesManager::GetInstance()->GetTexture(idTexture))
-	, m_defAnimation(idTexture, numFrame, timeBtwFrame)
+	, m_animationDef(idTexture, numFrame, timeBtwFrame)
 {
 	m_changed = true;
 	m_id = idTexture;
@@ -34,7 +34,7 @@ SpriteAnimation::SpriteAnimation(GLint idTexture, GLint numFrame, GLfloat timeBt
 
 void SpriteAnimation::SetAction(GLint action)
 {
-	m_defAnimation.currentAction = action;
+	m_animationDef.currentAction = action;
 }
 
 void SpriteAnimation::Draw()
@@ -81,22 +81,22 @@ void SpriteAnimation::Draw()
 
 	if (m_shader->uniformNumActions != -1)
 	{
-		glUniform1f(m_shader->uniformNumActions, (GLfloat)m_defAnimation.numActions);
+		glUniform1f(m_shader->uniformNumActions, (GLfloat)m_animationDef.numActions);
 	}
 
 	if (m_shader->uniformNumFrames != -1)
 	{
-		glUniform1f(m_shader->uniformNumFrames, (GLfloat)m_defAnimation.numFrames);
+		glUniform1f(m_shader->uniformNumFrames, (GLfloat)m_animationDef.numFrames);
 	}
 
 	if (m_shader->uniformCurrAction != -1)
 	{
-		glUniform1f(m_shader->uniformCurrAction, (GLfloat)m_defAnimation.currentAction);
+		glUniform1f(m_shader->uniformCurrAction, (GLfloat)m_animationDef.currentAction);
 	}
 
 	if (m_shader->uniformCurrFrame != -1)
 	{
-		glUniform1f(m_shader->uniformCurrFrame, (GLfloat)m_defAnimation.currentFrame);
+		glUniform1f(m_shader->uniformCurrFrame, (GLfloat)m_animationDef.currentFrame);
 	}
 
 	glDrawElements(GL_TRIANGLES, m_model->GetNumIndices(), GL_UNSIGNED_INT, 0);
@@ -109,32 +109,32 @@ void SpriteAnimation::Draw()
 void SpriteAnimation::Update(float deltaTime)
 {
 	// change frame
-	if (m_defAnimation.currFrameTime <= 0)
+	if (m_animationDef.currFrameTime <= 0)
 	{
-		m_defAnimation.currFrameTime = m_defAnimation.timeBtwFrame;
-		m_defAnimation.currentFrame++;
-		m_defAnimation.currentFrame = m_defAnimation.currentFrame >= m_defAnimation.numFrames ? 0 : m_defAnimation.currentFrame;
+		m_animationDef.currFrameTime = m_animationDef.timeBtwFrame;
+		m_animationDef.currentFrame++;
+		m_animationDef.currentFrame = m_animationDef.currentFrame >= m_animationDef.numFrames ? 0 : m_animationDef.currentFrame;
 	}
-	m_defAnimation.currFrameTime -= deltaTime;
+	m_animationDef.currFrameTime -= deltaTime;
 }
 
 void SpriteAnimation::SetNumFrame(GLint numFrame)
 {
-	m_defAnimation.numFrames = numFrame;
+	m_animationDef.numFrames = numFrame;
 }
 
 void SpriteAnimation::SetCurrentFrame(GLint currentFrame)
 {
-	m_defAnimation.currentFrame = currentFrame;
+	m_animationDef.currentFrame = currentFrame;
 }
 
 void SpriteAnimation::SetTimeBtwFrame(GLfloat time)
 {
-	m_defAnimation.timeBtwFrame = time;
+	m_animationDef.timeBtwFrame = time;
 }
 
 bool SpriteAnimation::IsLastFrame()
 {
-	return m_defAnimation.currentFrame == m_defAnimation.numFrames - 1 ? true : false;
+	return m_animationDef.currentFrame == m_animationDef.numFrames - 1 ? true : false;
 }
 

@@ -27,6 +27,12 @@ enum BulletType
 	NONE_BULLET = -1
 };
 
+struct BoxBullet
+{
+	GLint id;
+	Vector2 imgSize;
+};
+
 class Bullet
 {
 public:

@@ -8,12 +8,12 @@
 #include "box2d.h"
 #include "Player.h"
 
+
 void ContactListener::BeginContact(b2Contact* contact)
 {
 	auto fixtureA = contact->GetFixtureA();
 	auto fixtureB = contact->GetFixtureB();
 	auto collisionType = fixtureA->GetFilterData().categoryBits | fixtureB->GetFilterData().categoryBits;
-
 	switch (collisionType)
 	{
 	case CollionTypes::PLAYER_FOOT_GROUND:
@@ -66,7 +66,8 @@ void ContactListener::PlayerOnGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
-	player->SetJumpingStatus(false);;
+	player->m_contacCount++;
+	player->SetJumpingStatus(false);
 	player = nullptr;
 }
 
@@ -75,7 +76,11 @@ void ContactListener::PlayerOnAir(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
-	player->SetJumpingStatus(true);
+	player->m_contacCount--;
+	if (player->m_contacCount <= 0)
+	{
+		player->SetJumpingStatus(true);
+	}
 	player = nullptr;
 }
 

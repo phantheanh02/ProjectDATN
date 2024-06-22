@@ -139,119 +139,46 @@ void GSSolo::Exit()
 
 void GSSolo::HandleEvent()
 {
-	auto currentVelocity = m_ownerPlayer->GetBody()->GetLinearVelocity();
-	float desiredVel = 0, velChange, impulse;
-
 	int processKeyAAndDPressed = 0;
 	if (m_key & (1 << 1) && m_keyStack.back() == "A")
 	{
 		// move left
-		desiredVel = b2Max(currentVelocity.x - 0.25f, -MOVEMENT_SPEED);
-		m_ownerPlayer->SetDirection(DirectionType::LEFT);
 		processKeyAAndDPressed = 1;
 	}
 	if (m_key & (1 << 3) && m_keyStack.back() == "D")
 	{
 		// move right
-		desiredVel = b2Min(currentVelocity.x + 0.25f, MOVEMENT_SPEED);
-		m_ownerPlayer->SetDirection(DirectionType::RIGHT);
 		processKeyAAndDPressed = 3;
 	}
-	if (desiredVel != 0 && !m_ownerPlayer->IsJumping())
-	{
-		m_ownerPlayer->SetAction(PlayerAction::RUNNING);
-	}
-	// apply force to move
-	velChange = desiredVel - currentVelocity.x;
-	impulse = m_ownerPlayer->GetBody()->GetMass() * velChange; //disregard time factor
-	m_ownerPlayer->GetBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_ownerPlayer->GetBody()->GetWorldCenter(), true);
 
-	if (m_key & (1 << 0) && velChange == 0 && !m_ownerPlayer->IsJumping())
+	int event = m_key;
+	if (event & (1 << 1) && event & (1 << 3))
 	{
-		// key w
-		m_ownerPlayer->SetAction(PlayerAction::FIRE_TOP);
-		m_ownerPlayer->SetDirection(DirectionType::TOP);
-	}
-	else if (m_ownerPlayer->GetDirection() != m_ownerPlayer->GetSprinningDirection())
-	{
-		m_ownerPlayer->SetCurrentDirectionByPreDirection();
-	}
-
-
-	if (m_key & (1 << 2))
-	{
-		// key s
-		m_ownerPlayer->SetAction(PlayerAction::CROUCH);
-	}
-
-	// JUMP: key space
-	if (m_key & (1 << 4) && !m_ownerPlayer->IsJumping() && m_ownerPlayer->GetCurrentAction() != PlayerAction::JUMPING)
-	{
-		m_ownerPlayer->SetAction(PlayerAction::JUMPING);
-		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
-		float jumpHeight = 5.0f;
-		auto impulse = m_ownerPlayer->GetBody()->GetMass() * sqrt(2 * world->GetGravity().y * jumpHeight);
-		m_ownerPlayer->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
-	}
-
-	if (!(m_key & 0xF))
-	{
-		// none of movement key is pressed
-		m_ownerPlayer->SetAction(PlayerAction::IDLE);
-	}
-	if (m_ownerPlayer->IsJumping())
-	{
-		m_ownerPlayer->SetAction(PlayerAction::JUMPING);
-	}
-
-	// Fire
-	if (m_key & (1 << 5) && m_ownerPlayer->IsReadyAttack())
-	{
-		m_ownerPlayer->ResetCooldown();
-		b2Vec2 pos = m_ownerPlayer->GetBody()->GetPosition();
-		b2Vec2 speed;
-
-		switch (m_ownerPlayer->GetDirection())
+		if (processKeyAAndDPressed == 1)
 		{
-		case DirectionType::TOP:
-			speed = b2Vec2(0.0f, -20.0f);
-			break;
-		case DirectionType::LEFT:
-			speed = b2Vec2(-20.0f, 0.0f);
-			break;
-		case DirectionType::RIGHT:
-			speed = b2Vec2(20.0f, 0.0f);
-			break;
+			event ^= 1 << 3; // pop key "D"
 		}
-		CreateBullet((BulletType)m_ownerPlayer->GetPlayerBulletType(), speed, Vector2(m_ownerPlayer->GetBody()->GetPosition().x, m_ownerPlayer->GetBody()->GetPosition().y));
+		else if (processKeyAAndDPressed == 3)
+		{
+			event ^= 1 << 1; // pop key "A"
+		}
 	}
+
+	m_ownerPlayer->HandleEvent(event);
 
 	// Send information to opponent
 	if (m_isReadyState)
 	{
-		int keySend = m_key;
-		if (keySend & (1 << 1) && keySend & (1 << 3))
-		{
-			if (processKeyAAndDPressed == 1)
-			{
-				keySend ^= 1 << 3; // pop key "D"
-			}
-			else if (processKeyAAndDPressed == 3)
-			{
-				keySend ^= 1 << 1; // pop key "A"
-			}
-		}
 
-		std::string msg = std::to_string(keySend);
+		std::string msg = std::to_string(event);
 		while (msg.size() < 2)
 		{
-			printf("%s\n", msg);
 			msg = "0" + msg;
 		}
 		msg = "events" + msg;
 		if (!SocketManager::GetInstance()->SendNewMessage(msg.c_str()))
 		{
-			printf("Opponent disconnect!!\n");
+			LOG("Opponent disconnect!!");
 		}
 	}
 }
@@ -294,7 +221,7 @@ void GSSolo::OnKey(unsigned char key, bool pressed)
 		{
 		case KEY_W:
 			m_key ^= 1 << 0;
-			m_ownerPlayer->SetCurrentDirectionByPreDirection();
+			//m_ownerPlayer->SetCurrentDirectionByPreDirection();
 			break;
 		case KEY_A:
 			m_key ^= 1 << 1;
@@ -355,23 +282,24 @@ void GSSolo::OnMouseScroll(int x, int y, short delta)
 
 void GSSolo::LoadMap()
 {
-	// Load obs
-	b2Body* obsBody;
-	b2BodyDef obsBodyDef;
-	b2PolygonShape obsShape;
-	b2FixtureDef obsFixDef;
+	// Load obs	
 	auto listPlane = m_map->GetPlaneList();
-	for (auto it : listPlane)
+
+	for (const auto& tile : listPlane.tiles)
 	{
-		obsBody = nullptr;
-		obsBodyDef.position.Set(it.x, it.y);
-		obsShape.SetAsBox(it.z, it.w);
-		obsBody = world->CreateBody(&obsBodyDef);
-		obsFixDef.shape = &obsShape;
+		b2BodyDef bodyDef;
+		b2FixtureDef obsFixDef;
+		bodyDef.type = b2_staticBody;
+		bodyDef.position.Set(tile.x + 0.5, tile.y + 0.5);
+		b2Body* body = world->CreateBody(&bodyDef);
+
+		b2PolygonShape shape;
+		shape.SetAsBox(0.5, 0.5);
 		obsFixDef.filter.categoryBits = FixtureTypes::FIXTURE_GROUND;
 		obsFixDef.filter.maskBits = 0xFFFF;
-		obsBody->CreateFixture(&obsFixDef);
-		m_BodyList.push_back(obsBody);
+		obsFixDef.shape = &shape;
+		body->CreateFixture(&obsFixDef);
+		m_BodyList.push_back(body);
 	}
 }
 
@@ -408,89 +336,7 @@ void GSSolo::HandleRequest()
 	}
 
 	// Handle Key
-	auto currentVelocity = m_opponentPlayer->GetBody()->GetLinearVelocity();
-	float desiredVel = 0, velChange, impulse;
-
-	if (m_opponentKey & (1 << 1) )
-	{
-		// move left
-		desiredVel = b2Max(currentVelocity.x - 0.25f, -MOVEMENT_SPEED);
-		m_opponentPlayer->SetDirection(DirectionType::LEFT);
-	}
-	if (m_opponentKey & (1 << 3))
-	{
-		// move right
-		desiredVel = b2Min(currentVelocity.x + 0.25f, MOVEMENT_SPEED);
-		m_opponentPlayer->SetDirection(DirectionType::RIGHT);
-	}
-	if (desiredVel != 0 && !m_opponentPlayer->IsJumping())
-	{
-		m_opponentPlayer->SetAction(PlayerAction::RUNNING);
-	}
-	// apply force to move
-	velChange = desiredVel - currentVelocity.x;
-	impulse = m_opponentPlayer->GetBody()->GetMass() * velChange; //disregard time factor
-	m_opponentPlayer->GetBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_opponentPlayer->GetBody()->GetWorldCenter(), true);
-
-	if (m_opponentKey & (1 << 0) && velChange == 0 && !m_opponentPlayer->IsJumping())
-	{
-		// key w
-		m_opponentPlayer->SetAction(PlayerAction::FIRE_TOP);
-		m_opponentPlayer->SetDirection(DirectionType::TOP);
-	}
-	else if (m_opponentPlayer->GetDirection() != m_opponentPlayer->GetSprinningDirection())
-	{
-		m_opponentPlayer->SetCurrentDirectionByPreDirection();
-	}
-
-
-	if (m_opponentKey & (1 << 2))
-	{
-		// key s
-		m_opponentPlayer->SetAction(PlayerAction::CROUCH);
-	}
-
-	// JUMP: key space
-	if (m_opponentKey & (1 << 4) && !m_opponentPlayer->IsJumping() && m_opponentPlayer->GetCurrentAction() != PlayerAction::JUMPING)
-	{
-		m_opponentPlayer->SetAction(PlayerAction::JUMPING);
-		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
-		float jumpHeight = 5.0f;
-		auto impulse = m_opponentPlayer->GetBody()->GetMass() * sqrt(2 * world->GetGravity().y * jumpHeight);
-		m_opponentPlayer->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
-	}
-
-	if (!(m_opponentKey & 0xF))
-	{
-		// none of movement key is pressed
-		m_opponentPlayer->SetAction(PlayerAction::IDLE);
-	}
-	if (m_opponentPlayer->IsJumping())
-	{
-		m_opponentPlayer->SetAction(PlayerAction::JUMPING);
-	}
-
-	// Fire
-	if (m_opponentKey & (1 << 5) && m_opponentPlayer->IsReadyAttack())
-	{
-		m_opponentPlayer->ResetCooldown();
-		b2Vec2 pos = m_opponentPlayer->GetBody()->GetPosition();
-		b2Vec2 speed;
-
-		switch (m_opponentPlayer->GetDirection())
-		{
-		case DirectionType::TOP:
-			speed = b2Vec2(0.0f, -20.0f);
-			break;
-		case DirectionType::LEFT:
-			speed = b2Vec2(-20.0f, 0.0f);
-			break;
-		case DirectionType::RIGHT:
-			speed = b2Vec2(20.0f, 0.0f);
-			break;
-		}
-		CreateBullet((BulletType)m_opponentPlayer->GetPlayerBulletType(), speed, Vector2(m_opponentPlayer->GetBody()->GetPosition().x, m_opponentPlayer->GetBody()->GetPosition().y));
-	}
+	m_opponentPlayer->HandleEvent(m_opponentKey);
 }
 
 void GSSolo::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)

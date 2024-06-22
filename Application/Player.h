@@ -10,7 +10,10 @@
 #include "SpriteAnimation.h"
 #include <box2d.h>
 #include "Globals.h"
-#include "Bullet.h"
+#include "Text.h"
+
+class Bullet;
+class Sprite2D;
 
 enum DirectionType
 {
@@ -33,6 +36,16 @@ enum PlayerAction
 	NONE_ACTION	= -1
 };
 
+struct CharacterStats
+{
+	CharacterType type;
+	GLint hp, spd, atk, numberBullet;
+	CharacterStats() : hp(0), spd(0), atk(0), numberBullet(0) {};
+	CharacterStats(GLint _hp, GLint _spd, GLint _atk)
+		: hp(_hp), spd(_spd), atk(_atk) {};
+
+};
+
 class Player
 {
 public:
@@ -42,38 +55,40 @@ public:
 	void Update(float deltaTime);
 	void Draw();
 
-	void HandleEvent();
+	void HandleEvent(int event);
 	void TakeDamage(GLint damage);
 	void ReCalculateWhenScroll();
 
 	void SetCurrentDirectionByPreDirection();
-	void Set2DPosition(GLint x, GLint y);
 	void Set2DPositionByTile(GLfloat x, GLfloat y);
-	void Set2DSize(GLint width, GLint height);
 	void Set2DSizeByTile(GLfloat width, GLfloat height);
-	void SetTileSize(GLint tileSize);
 	void SetDirection(DirectionType direction);
 	void SetAction(PlayerAction action);
 	void SetJumpingStatus(bool status);
 	void SetCharacter(CharacterType type);
+	void SetLoadingBullet(GLfloat time);
 
-	DirectionType			GetDirection();
 	void					GetItem(GLint typeItem);
-	inline Vector2			Get2DPositon()		{ return m_actionAnimation->GetPosition(); };
-	inline Vector2			GetSize()			{ return m_actionAnimation->GetSize(); };
 	inline b2Body*			GetBody()			{ return m_body; };
-	inline PlayerAction		GetCurrentAction()	{ return m_currentAction;};
-	inline DirectionType	GetSprinningDirection() { return m_sprinningDirection; };
-	inline GLint			GetPlayerBulletType() { return m_playerbulletType; };
-	inline bool				IsJumping()			{ return m_isJumping; };
-	inline bool				IsReadyAttack()		{ return m_bulletCooldown <= 0; };
-	inline void				ResetCooldown()		{ m_bulletCooldown = BULLET_COOLDOWN; };
+	inline GLint			GetNumberBullet() { return m_numberBullet; };
+	bool					IsReadyJump();
 	inline bool				IsReadyToReset()	{ return m_resetAfterDieTime <= 0; }
 	inline bool				IsDie()				{ return m_health <= 0; };
+	inline bool				IsLoadingBullet() { return m_isLoadingBullet > 0; };
+
+	GLint								m_contacCount;
 private:
+	// attribute
 	Vector2								m_pos;
 	Vector2								m_size;
 	GLint								m_health;
+	GLint								m_numberBullet;
+	CharacterStats						m_stats;
+
+	// HUB
+	std::shared_ptr <Sprite2D>			m_HPBar;
+
+	// Hanlde action
 	GLint								m_playerbulletType;
 	DirectionType						m_currentDirection;
 	DirectionType						m_sprinningDirection;
@@ -83,10 +98,22 @@ private:
 	bool								m_isDie;
 	GLfloat								m_resetAfterDieTime;
 	CharacterType						m_currentCharacter;
+	GLfloat								m_jumpCooldown;
+	bool								m_isTakeDamage;
+
+	// Bullet
+	std::vector<std::shared_ptr<Bullet>>	m_bulletList;
+	GLfloat								m_isLoadingBullet;
+
 	// box2d
 	b2Body*								m_body;
 	GLfloat								m_bulletCooldown;
 
+	// Effect
+	std::shared_ptr<SpriteAnimation>	m_blood;
+
 private:
 	void HandlePlayerDie(GLfloat deltaTime);
+	void CreateBullet(int type, b2Vec2 speed, Vector2 position);
+
 };

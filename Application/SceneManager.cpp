@@ -4,6 +4,11 @@
 #include "SceneManager.h"
 #include "ResourcesManager.h"
 #include "Globals.h"
+#include "nlohmann/json.hpp"
+#include "Player.h"
+#include "Bullet.h"
+
+using json = nlohmann::json;
 
 int ParseElementType(const std::string& type);
 
@@ -243,13 +248,13 @@ void SceneManager::LoadCharacter(std::ifstream& file)
 {
 	std::string skipStr;
 	BoxBullet box;
-	file >> skipStr >> skipStr >> skipStr >> skipStr;
+	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
 	file >> skipStr;
 	while (skipStr != "$")
 	{
 		CharacterStats character;
 		character.type = (CharacterType)std::stoi(skipStr);
-		file >> character.hp >> character.spd >> character.atk >> skipStr;
+		file >> character.hp >> character.spd >> character.atk >> character.numberBullet >> skipStr;
 		m_characterList.push_back(character);
 	}
 }
@@ -316,17 +321,67 @@ std::shared_ptr<MapClass> SceneManager::LoadElementsMap(std::ifstream& file, std
 
 void SceneManager::LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
-	std::string skipStr;
-	float x, y, z, w;
-	std::vector<Vector4> planeList;
-	file >> skipStr;
-	while (skipStr != "$")
+	//std::string skipStr;
+	//float x, y, z, w;
+	//std::vector<Vector4> planeList;
+	//file >> skipStr;
+	//while (skipStr != "$")
+	//{
+	//	x = std::stoi(skipStr);
+	//	file >> y >> z >> w >> skipStr;
+	//	planeList.push_back(Vector4(x, y, z, w));
+	//}
+	//map->SetPlaneList(planeList);
+	std::string filemap;
+	file >> filemap;
+	
+	std::string path = Globals::scenePath + filemap;
+	std::ifstream fFile(path);
+	if (!fFile.is_open())
 	{
-		x = std::stoi(skipStr);
-		file >> y >> z >> w >> skipStr;
-		planeList.push_back(Vector4(x, y, z, w));
+		std::cerr << "Error opening file " << path << "\n";
+		return;
 	}
-	map->SetPlaneList(planeList);
+
+	json data;
+	fFile >> data;
+
+	MapData mapData;
+	mapData.width = data["width"];
+	mapData.height = data["height"];
+	mapData.tileWidth = data["tilewidth"];
+	mapData.tileHeight = data["tileheight"];
+
+	for (const auto& layer : data["layers"])
+	{
+		for (const auto& chunk : layer["chunks"])
+		{
+
+			int chunkX = chunk["x"];
+			int chunkY = chunk["y"];
+			int chunkWidth = chunk["width"];
+			int chunkHeight = chunk["height"];
+			const auto& data = chunk["data"];
+
+			for (int i = 0; i < chunkHeight; ++i)
+			{
+				for (int j = 0; j < chunkWidth; ++j)
+				{
+					int gid = data[i * chunkWidth + j];
+					if (gid != 0)
+					{ // Non-empty tile
+						TileData tile;
+						tile.x = chunkX + j;
+						tile.y = chunkY + i;
+						tile.gid = gid;
+						mapData.tiles.push_back(tile);
+					}
+				}
+			}
+		}
+	}
+	map->SetPlaneList(mapData);
+	file >> filemap;
 }
 
 void SceneManager::LoadSpawnEnemies(std::ifstream& file, std::shared_ptr<MapClass> map)

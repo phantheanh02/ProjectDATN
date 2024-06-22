@@ -23,14 +23,9 @@ void GSPlay::Init()
 	{
 		world.reset();
 	}
-
 	m_key = 0;
 	tileSizeByPixel = 30;
-
-	// get refresh rate and set time step
-	DEVMODE devMode;
-	EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &devMode);
-	m_timeStep = 1.0f / devMode.dmDisplayFrequency;
+	m_totalTime = 0;
 
 	// Box2d
 	// create world with gravity
@@ -50,7 +45,7 @@ void GSPlay::Init()
 	LoadMap();
 
 	// Enemies
-	//RandomEnemies();
+	RandomEnemies();
 
 	// init camera boundaries
 	auto size = m_map->GetSizeByTile();
@@ -71,6 +66,41 @@ void GSPlay::Init()
 	{
 		m_bulletList.push_back(std::make_shared<Bullet>(world.get()));
 	}
+
+	// HUB and effect
+	m_loadBullet = std::make_shared<SpriteAnimation>(112, 9, 0.1f);
+	m_loadBullet->Set2DSize(50, 50);
+	m_loadBullet->Set2DPosition(40, 40);
+	m_loadBullet->SetTransparency(0.5);
+	m_loadBullet->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+
+	// Bullet sprite
+	m_bulletIcon = std::make_shared<Sprite2D>(110);
+	m_bulletIcon->Set2DSize(30, 30);
+	m_bulletIcon->Set2DPosition(m_loadBullet->GetPosition().x - 15, m_loadBullet->GetPosition().y - 15);
+	m_bulletIcon->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+
+	auto font = ResourcesManager::GetInstance()->GetFont(0);
+	auto staticCamera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
+	std::string text = "x" + std::to_string(m_player->GetNumberBullet());
+	// Text
+	m_numberBulletText = std::make_shared<Text>(0);
+	m_numberBulletText->AttachCamera(staticCamera);
+	m_numberBulletText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
+	m_numberBulletText->Init(font, text);
+	m_numberBulletText->Set2DPosition(70, 30);
+	m_numberBulletText->Set2DScale(0.3f, 0.3f);
+	m_numberBulletText->SetTextColor(YELLOW);
+
+	// Time
+	text = "Time: 0s";
+	m_totalTimeText = std::make_shared<Text>(0);
+	m_totalTimeText->AttachCamera(staticCamera);
+	m_totalTimeText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
+	m_totalTimeText->Init(font, text);
+	m_totalTimeText->Set2DPosition(400, 30);
+	m_totalTimeText->Set2DScale(0.3f, 0.3f);
+	m_totalTimeText->SetTextColor(YELLOW);
 }
 
 void GSPlay::Update(float deltaTime)
@@ -78,8 +108,11 @@ void GSPlay::Update(float deltaTime)
 	if (!m_player->IsDie())
 	{
 		HandleEvent();
+		m_totalTime += deltaTime;
 	}
-	world->Step(m_timeStep, VELOCITY_ITERATION, POSITION_ITERATION);
+	// get refresh rate and set time step
+	world->Step(deltaTime, VELOCITY_ITERATION, POSITION_ITERATION);
+
 	Update2DDrawPosition();
 	
 	for (auto it : m_bulletList)
@@ -127,6 +160,26 @@ void GSPlay::Update(float deltaTime)
 	{
 		GameStateMachine::GetInstance()->PopState();
 	}
+
+	if (m_player->IsLoadingBullet())
+	{
+		if (m_loadBullet->IsLastFrame())
+		{
+			m_loadBullet->SetCurrentFrame(0);
+			m_player->SetLoadingBullet(0);
+		}
+		else
+		{
+			m_loadBullet->Update(deltaTime);
+		}
+	}
+
+	// Update text
+	std::string text = "x" + std::to_string(m_player->GetNumberBullet());
+	m_numberBulletText->SetText(text);
+
+	text = "Time: " + std::to_string((GLint)m_totalTime) + "s";
+	m_totalTimeText->SetText(text);
 }
 
 void GSPlay::Draw()
@@ -149,6 +202,15 @@ void GSPlay::Draw()
 	}
 
 	m_player->Draw();
+
+	// HUB
+	m_bulletIcon->Draw();
+	if (m_player->IsLoadingBullet())
+	{
+		m_loadBullet->Draw();
+	}
+	m_numberBulletText->Draw();
+	m_totalTimeText->Draw();
 }
 
 void GSPlay::Pause()
@@ -165,88 +227,32 @@ void GSPlay::Exit()
 
 void GSPlay::HandleEvent()
 {
-	auto currentVelocity = m_player->GetBody()->GetLinearVelocity();
-	float desiredVel = 0, velChange, impulse;
-
+	int processKeyAAndDPressed = 0;
 	if (m_key & (1 << 1) && m_keyStack.back() == "A")
 	{
 		// move left
-		desiredVel = b2Max(currentVelocity.x - 0.25f, -MOVEMENT_SPEED);
-		m_player->SetDirection(DirectionType::LEFT);
+		processKeyAAndDPressed = 1;
 	}
 	if (m_key & (1 << 3) && m_keyStack.back() == "D")
 	{
 		// move right
-		desiredVel = b2Min(currentVelocity.x + 0.25f, MOVEMENT_SPEED);
-		m_player->SetDirection(DirectionType::RIGHT);
-	}
-	if (desiredVel != 0 && !m_player->IsJumping())
-	{
-		m_player->SetAction(PlayerAction::RUNNING);
-	}
-	// apply force to move
-	velChange = desiredVel - currentVelocity.x;
-	impulse = m_player->GetBody()->GetMass() * velChange; //disregard time factor
-	m_player->GetBody()->ApplyLinearImpulse(b2Vec2(impulse, 0), m_player->GetBody()->GetWorldCenter(), true);
-
-	if (m_key & (1 << 0) && velChange == 0 && !m_player->IsJumping())
-	{
-		// key w
-		m_player->SetAction(PlayerAction::FIRE_TOP);
-		m_player->SetDirection(DirectionType::TOP);
-	}
-	else
-	{
-		m_player->SetCurrentDirectionByPreDirection();
+		processKeyAAndDPressed = 3;
 	}
 
-	if (m_key & (1 << 2))
+	int event = m_key;
+	if (event & (1 << 1) && event & (1 << 3))
 	{
-		// key s
-		m_player->SetAction(PlayerAction::CROUCH);
-	}
-
-	// JUMP: key space
-	if (m_key & (1 << 4) && !m_player->IsJumping() && m_player->GetCurrentAction() != PlayerAction::JUMPING)
-	{
-		m_player->SetAction(PlayerAction::JUMPING);
-		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
-		float jumpHeight = 5.0f;
-		auto impulse = m_player->GetBody()->GetMass() * sqrt(2 * world->GetGravity().y * jumpHeight);
-		m_player->GetBody()->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
-	}
-
-	if (!(m_key & 0xF))
-	{
-		// none of movement key is pressed
-		m_player->SetAction(PlayerAction::IDLE);
-	}
-	if (m_player->IsJumping())
-	{
-		m_player->SetAction(PlayerAction::JUMPING);
-	}
-
-	// Fire
-	if (m_key & (1 << 5) && m_player->IsReadyAttack())
-	{
-		m_player->ResetCooldown();
-		b2Vec2 pos = m_player->GetBody()->GetPosition();
-		b2Vec2 speed;
-
-		switch (m_player->GetDirection())
+		if (processKeyAAndDPressed == 1)
 		{
-		case DirectionType::TOP:
-			speed = b2Vec2(0.0f, -20.0f);
-			break;
-		case DirectionType::LEFT:
-			speed = b2Vec2(-20.0f, 0.0f);
-			break;
-		case DirectionType::RIGHT:
-			speed = b2Vec2(20.0f, 0.0f);
-			break;
+			event ^= 1 << 3; // pop key "D"
 		}
-		CreateBullet((BulletType)m_player->GetPlayerBulletType(), speed, Vector2(m_player->GetBody()->GetPosition().x, m_player->GetBody()->GetPosition().y));
+		else if (processKeyAAndDPressed == 3)
+		{
+			event ^= 1 << 1; // pop key "A"
+		}
 	}
+
+	m_player->HandleEvent(event);
 }
 
 void GSPlay::OnKey(unsigned char key, bool pressed)
@@ -287,7 +293,7 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 		{
 		case KEY_W:
 			m_key ^= 1 << 0;
-			m_player->SetCurrentDirectionByPreDirection();
+			//m_player->SetCurrentDirectionByPreDirection();
 			break;
 		case KEY_A:
 			m_key ^= 1 << 1;
@@ -405,23 +411,24 @@ void GSPlay::Update2DDrawPosition()
 
 void GSPlay::LoadMap()
 {
-	// Load obs
-	b2Body* obsBody;
-	b2BodyDef obsBodyDef;
-	b2PolygonShape obsShape;
-	b2FixtureDef obsFixDef;
+	// Load obs	
 	auto listPlane = m_map->GetPlaneList();
-	for (auto it : listPlane)
+
+	for (const auto& tile : listPlane.tiles)
 	{
-		obsBody = nullptr;
-		obsBodyDef.position.Set(it.x, it.y);
-		obsShape.SetAsBox(it.z, it.w);
-		obsBody = world->CreateBody(&obsBodyDef);
-		obsFixDef.shape = &obsShape;
+		b2BodyDef bodyDef;
+		b2FixtureDef obsFixDef;
+		//bodyDef.type = b2_staticBody;
+		bodyDef.position.Set(tile.x + 0.5, tile.y + 0.5);
+		b2Body* body = world->CreateBody(&bodyDef);
+
+		b2PolygonShape shape;
+		shape.SetAsBox(0.5, 0.5);
 		obsFixDef.filter.categoryBits = FixtureTypes::FIXTURE_GROUND;
 		obsFixDef.filter.maskBits = 0xFFFF;
-		obsBody->CreateFixture(&obsFixDef);
-		m_BodyList.push_back(obsBody);
+		obsFixDef.shape = &shape;
+		body->CreateFixture(&obsFixDef);
+		m_BodyList.push_back(body);
 	}
 }
 
@@ -444,7 +451,6 @@ void GSPlay::RandomEnemies()
 
 	srand(static_cast<unsigned int>(time(0)));
 
-	// Tạo mảng kết quả với n phần tử dựa trên tỷ lệ y
 	for (int i = 0; i < spawnPosition.size(); ++i) 
 	{
 		double randValue = static_cast<double>(rand()) / RAND_MAX;
@@ -462,11 +468,4 @@ void GSPlay::RandomEnemies()
 			}
 		}
 	}
-
-	//for (int i = 0; i < spawnPosition.size(); i++)
-	//{
-	//	auto enemy = SceneManager::GetInstance()->GetEnemy(EnemyType::YUME);
-	//	enemy->Init(spawnPosition[i].x, spawnPosition[i].y);
-	//	m_enemiesList.push_back(enemy);
-	//}
 }

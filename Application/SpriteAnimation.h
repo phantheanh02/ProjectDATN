@@ -3,7 +3,7 @@
 
 #define HP_ENEMY_MAX 3
 
-struct DefAnimation
+struct AnimationDef
 {
 	// need get from RM file
 	GLint		idTexture;
@@ -16,8 +16,8 @@ struct DefAnimation
 	GLint		currentAction;
 	GLfloat		currFrameTime;
 
-	DefAnimation();
-	DefAnimation(GLint id, GLint numFrame, GLfloat time) : idTexture(id), numFrames(numFrame), timeBtwFrame(time)
+	AnimationDef();
+	AnimationDef(GLint id, GLint numFrame, GLfloat time) : idTexture(id), numFrames(numFrame), timeBtwFrame(time)
 	{
 		numActions = 1;
 		currentFrame = 0;
@@ -44,11 +44,11 @@ public:
 	void SetCurrentFrame(GLint currentFrame);
 	void SetTimeBtwFrame(GLfloat time);
 
-	inline GLfloat	GetTimeAction() { return m_defAnimation.timeBtwFrame * m_defAnimation.numFrames; };
+	inline GLfloat	GetTimeAction() { return m_animationDef.timeBtwFrame * m_animationDef.numFrames; };
 	inline Vector2	GetSize() { return Vector2(m_scale.x, m_scale.y); };
-	inline GLint	GetCurrentFrame() { return m_defAnimation.currentFrame; };
+	inline GLint	GetCurrentFrame() { return m_animationDef.currentFrame; };
 	inline Vector2	GetPosition() { return Vector2(m_pos.x, m_pos.y); };
-	inline GLint	GetNumFrames() { return m_defAnimation.numFrames; };
+	inline GLint	GetNumFrames() { return m_animationDef.numFrames; };
 private:
-	DefAnimation	m_defAnimation;
+	AnimationDef	m_animationDef;
 };

@@ -99,7 +99,7 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
         else 
         {
             m_buf[ret] = 0;
-            printf("Receive from server : % s\n", m_buf);
+            //printf("Receive from server : % s\n", m_buf);
         }
         printf("Client started!\n");
     }
@@ -203,7 +203,7 @@ bool SocketManager::SendNewMessage(const char* message)
     }
     else
     {
-        printf("Send a message: %s\n", message);
+        //printf("Send a message: %s\n", message);
     }
     return true;
 }
@@ -222,14 +222,14 @@ bool SocketManager::ReceiveMessage()
             printf("Error receive at server\n");
             return false;
         }
-        printf("%d\n", ret);
+        
         if (ret == 0)
         {
             CloseClientSocket();
             return 0;
         }
         m_buf[ret] = 0;
-        printf("Receive from client: %s\n", m_buf);
+        //printf("Receive from client: %s\n", m_buf);
     }
     else
     {
@@ -244,7 +244,7 @@ bool SocketManager::ReceiveMessage()
             return false;
         }
         m_buf[ret] = 0;
-        printf("Receive from server: %s\n", m_buf);
+        //printf("Receive from server: %s\n", m_buf);
     }
     m_hasNewMsg = true;
     return true;
