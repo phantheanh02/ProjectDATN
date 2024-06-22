@@ -17,7 +17,7 @@ Player::Player()
 	, m_isJumping(false)
 	, m_bulletCooldown(0)
 	, m_isDie(false)
-	, m_resetAfterDieTime(5)
+	, m_resetAfterDieTime(3)
 	, m_health(100)
 	, m_jumpCooldown(0)
 	, m_contacCount(0)
@@ -275,9 +275,19 @@ void Player::SetLoadingBullet(GLfloat time)
 	}
 }
 
-void Player::GetItem(GLint typeItem)
+void Player::GetItem(ItemType typeItem)
 {
-	
+	switch (typeItem)
+	{
+	case HEALING:
+		break;
+	case COIN:
+		break;
+	case ARMOR:
+		break;
+	default:
+		break;
+	}
 }
 
 bool Player::IsReadyJump()

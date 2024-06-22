@@ -27,6 +27,9 @@ void GSPlay::Init()
 	tileSizeByPixel = 30;
 	m_totalTime = 0;
 	m_isShowPopup = false;
+	m_isEndMatch = false;
+	m_isWin = false;
+
 	// Box2d
 	// create world with gravity
 	world = std::make_shared<b2World>(b2Vec2(0, 30));
@@ -106,6 +109,10 @@ void GSPlay::Update(float deltaTime)
 		UpdatePopup(deltaTime);
 		return;
 	}
+
+	// Before update, should check win
+	CheckWin();
+
 	if (!m_player->IsDie())
 	{
 		HandleEvent();
@@ -119,6 +126,11 @@ void GSPlay::Update(float deltaTime)
 	for (auto it : m_bulletList)
 	{
 		it->Update(deltaTime);
+	}
+
+	for (auto item : m_itemList)
+	{
+		item->Update(deltaTime);
 	}
 
 	for (auto enemy : m_enemiesList)
@@ -156,10 +168,13 @@ void GSPlay::Update(float deltaTime)
 	}
 
 	m_map->Update(deltaTime, m_player->GetBody()->GetPosition());
+	
 	m_player->Update(deltaTime);
 	if (m_player->IsReadyToReset())
 	{
-		GameStateMachine::GetInstance()->PopState();
+		m_isEndMatch = true;
+		CreatePopUp();
+		//GameStateMachine::GetInstance()->PopState();
 	}
 
 	if (m_player->IsLoadingBullet())
@@ -197,6 +212,10 @@ void GSPlay::Draw()
 		it->Draw();
 	}
 	
+	for (auto item : m_itemList)
+	{
+		item->Draw();
+	}
 	for (auto enemy : m_enemiesList)
 	{
 		enemy->Draw();
@@ -402,7 +421,6 @@ void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				GameStateMachine::GetInstance()->PushState(StateType::STATE_SETTING);
 				break;
 			case BUTTON_PAUSE:
-				m_isShowPopup = true;
 				CreatePopUp();
 				break;
 			default:
@@ -508,13 +526,20 @@ void GSPlay::LoadMap()
 	for (const auto& it : itemList)
 	{
 		auto item = std::make_shared<Item>(it.type, it.posX, it.posY);
+		m_itemList.push_back(item);
 	}
 }
 
 void GSPlay::CreatePopUp()
 {
+	m_isShowPopup = true;
 	m_listPopupSprite.clear();
 	m_buttonList.clear();
+
+	// add new button
+	Vector2 size = Vector2(137, 64);
+	GLfloat posX = 430;
+	GLfloat posY = 233;
 
 	// Background
 	auto sprite = std::make_shared<Sprite2D>("Background/bg_black.png");
@@ -524,33 +549,61 @@ void GSPlay::CreatePopUp()
 	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 	m_listPopupSprite.push_back(sprite);
 
-	sprite = std::make_shared<Sprite2D>("Background/bg_popup.png");
-	sprite->Set2DSize(850, 430);
-	sprite->Set2DPosition(55, 145);
-	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
-	m_listPopupSprite.push_back(sprite);
+	if (m_isEndMatch)
+	{
+		if (m_isWin)
+		{
+			if (m_totalTime < 10)
+			{
+				sprite = std::make_shared<Sprite2D>("Background/bg_victory3star.png");
+			}
+			else if (m_totalTime < 20)
+			{
+				sprite = std::make_shared<Sprite2D>("Background/bg_victory2star.png");
+			}
+			else
+			{
+				sprite = std::make_shared<Sprite2D>("Background/bg_victory1star.png");
+			}
+		}
+		else
+		{
+			sprite = std::make_shared<Sprite2D>("Background/bg_lost.png");
+		}
 
+		sprite->Set2DSize(640, 480);
+		sprite->Set2DPosition(480, 360);
+		sprite->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
+		sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+		m_listPopupSprite.push_back(sprite);
 
-	// add new button
-	Vector2 size = Vector2(137, 64);
-	GLfloat posX = 430;
-	GLfloat posY = 233;
+		CreateButton("Button/btn_retry.png", 220, 70, 190, 462, BUTTON_RETRY);
+		CreateButton("Button/btn_menu.png", 220, 70, 550, 462, BUTTON_MENU);
+	}
+	else
+	{
+		sprite = std::make_shared<Sprite2D>("Background/bg_popup.png");
+		sprite->Set2DSize(850, 430);
+		sprite->Set2DPosition(55, 145);
+		sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+		m_listPopupSprite.push_back(sprite);
 
-	CreateButton("Button/btn_resume.png", 193, 61, 679, 225, BUTTON_RESUME);
-	CreateButton("Button/btn_retry.png", 193, 61, 679, 304, BUTTON_RETRY);
-	CreateButton("Button/btn_menu.png", 193, 61, 679, 383, BUTTON_MENU);
-	CreateButton("Button/btn_setting.png", 193, 61, 679, 462, BUTTON_SETTING);
+		CreateButton("Button/btn_resume.png", 193, 61, 679, 225, BUTTON_RESUME);
+		CreateButton("Button/btn_retry.png", 193, 61, 679, 304, BUTTON_RETRY);
+		CreateButton("Button/btn_menu.png", 193, 61, 679, 383, BUTTON_MENU);
+		CreateButton("Button/btn_setting.png", 193, 61, 679, 462, BUTTON_SETTING);
 
-	CreateButton("Button/btn_buy.png", 137, 63, 431, 234, BUTTON_BUY_BULLET_UPGRADE);
-	CreateButton("Button/btn_buy.png", 137, 63, 431, 351, BUTTON_BUY_ARMOR_UPGRADE);
-	CreateButton("Button/btn_buy.png", 137, 63, 431, 466, BUTTON_BUY_HP_UPGRADE);
+		CreateButton("Button/btn_buy.png", 137, 63, 431, 234, BUTTON_BUY_BULLET_UPGRADE);
+		CreateButton("Button/btn_buy.png", 137, 63, 431, 351, BUTTON_BUY_ARMOR_UPGRADE);
+		CreateButton("Button/btn_buy.png", 137, 63, 431, 466, BUTTON_BUY_HP_UPGRADE);
 
-	CreateButton("Button/btn_plus_on.png", 19, 19, 380, 255, BUTTON_PLUS_ON_BULLET_UPGRADE);
-	CreateButton("Button/btn_plus_on.png", 19, 19, 380, 373, BUTTON_PLUS_ON_ARMOR_UPGRADE);
-	CreateButton("Button/btn_plus_on.png", 19, 19, 380, 487, BUTTON_PLUS_ON_HP_UPGRADE);
-	CreateButton("Button/btn_plus_off.png", 19, 8, 257, 260, BUTTON_PLUS_OFF_BULLET_UPGRADE);
-	CreateButton("Button/btn_plus_off.png", 19, 8, 257, 378, BUTTON_PLUS_OFF_ARMOR_UPGRADE);
-	CreateButton("Button/btn_plus_off.png", 19, 8, 257, 487, BUTTON_PLUS_OFF_HP_UPGRADE);
+		CreateButton("Button/btn_plus_on.png", 19, 19, 380, 255, BUTTON_PLUS_ON_BULLET_UPGRADE);
+		CreateButton("Button/btn_plus_on.png", 19, 19, 380, 373, BUTTON_PLUS_ON_ARMOR_UPGRADE);
+		CreateButton("Button/btn_plus_on.png", 19, 19, 380, 487, BUTTON_PLUS_ON_HP_UPGRADE);
+		CreateButton("Button/btn_plus_off.png", 19, 8, 257, 260, BUTTON_PLUS_OFF_BULLET_UPGRADE);
+		CreateButton("Button/btn_plus_off.png", 19, 8, 257, 378, BUTTON_PLUS_OFF_ARMOR_UPGRADE);
+		CreateButton("Button/btn_plus_off.png", 19, 8, 257, 487, BUTTON_PLUS_OFF_HP_UPGRADE);
+	}
 }
 
 void GSPlay::DrawPopup()
@@ -577,6 +630,21 @@ void GSPlay::CreateButton(const char* filename, GLfloat width, GLfloat height, G
 	button->Set2DSize(width, height);
 	button->Set2DPosition(posX, posY);
 	m_buttonList.push_back(button);
+}
+
+void GSPlay::CheckWin()
+{
+	for (auto enemy : m_enemiesList)
+	{
+		if (enemy->IsActive())
+		{
+			return;
+		}
+	}
+
+	m_isEndMatch = true;
+	m_isWin = true;
+	CreatePopUp();
 }
 
 void GSPlay::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)

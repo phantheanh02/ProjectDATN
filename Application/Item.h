@@ -1,3 +1,9 @@
+#pragma once
+
+#ifndef __ITEM__
+#define __ITEM__
+#endif
+
 #include <GLES2/gl2.h>
 #include <memory>
 #include "Sprite2D.h"

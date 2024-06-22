@@ -2,6 +2,7 @@
 #include "Item.h"
 #include "ResourcesManager.h"
 #include "b2Utilities.h"
+#include "SceneManager.h"
 
 extern int tileSizeByPixel;
 extern std::shared_ptr<b2World> world;
@@ -27,7 +28,7 @@ Item::Item(ItemType type, GLfloat posX, GLfloat posY):
 	}
 	m_sprite->Set2DSizeByTile(1, 1);
 	m_sprite->Set2DPositionByTile(posX, posY);
-
+	m_sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::DYNAMIC_CAMERA));
 	m_position = Vector2(posX, posY);
 
 	// Box
@@ -61,6 +62,10 @@ void Item::Update(GLfloat deltaTime)
 	if (m_isLoot)
 	{
 		m_body->SetEnabled(false);
+	}
+	else
+	{
+		m_sprite->Set2DPositionByTile(m_position.x, m_position.y);
 	}
 }
 

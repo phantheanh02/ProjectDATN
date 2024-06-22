@@ -81,6 +81,11 @@ private:
 	// Popup
 	std::vector<std::shared_ptr<Sprite2D>>	m_listPopupSprite;
 	bool								m_isShowPopup;
+
+	// Check result match
+	bool								m_isEndMatch;
+	bool								m_isWin;
+	
 private:
 	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);
 	void RandomEnemies();
@@ -89,6 +94,6 @@ private:
 	void DrawPopup();
 	void UpdatePopup(float deltaTime);
 	void CreateButton(const char* filename, GLfloat width, GLfloat height, GLfloat posX, GLfloat posY, ButtonType buttonType);
-
+	void CheckWin();
 };
 	

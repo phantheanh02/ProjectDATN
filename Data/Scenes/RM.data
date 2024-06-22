@@ -258,17 +258,29 @@ FILE "Button/btn_retry.png"
 ID 117
 FILE "Button/btn_menu.png"
 ID 118
-FILE "Background/bg_pause.png"
-ID 119
-FILE "Background/bg_popup.png"
-ID 120
 FILE "Button/btn_buy.png"
-ID 121
+ID 119
 FILE "Button/btn_plus_on.png"
-ID 122
+ID 120
 FILE "Button/btn_plus_off.png"
-ID 123
+ID 121
 FILE "Icons/icon_exit.png"
+ID 122
+FILE "Background/bg_popup.png"
+ID 123
+FILE "Item/item_hp.png"
+ID 124
+FILE "Item/item_coin.png"
+ID 125
+FILE "Item/item_armor.png"
+ID 126
+FILE "Background/bg_victory1star.png"
+ID 127
+FILE "Background/bg_victory2star.png"
+ID 128
+FILE "Background/bg_victory3star.png"
+ID 129
+FILE "Background/bg_lost.png"
 $
 
 #Sounds

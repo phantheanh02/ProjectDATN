@@ -11,9 +11,11 @@
 #include <box2d.h>
 #include "Globals.h"
 #include "Text.h"
+#include "Item.h"
 
 class Bullet;
 class Sprite2D;
+class Item;
 
 enum DirectionType
 {
@@ -68,7 +70,7 @@ public:
 	void SetCharacter(CharacterType type);
 	void SetLoadingBullet(GLfloat time);
 
-	void					GetItem(GLint typeItem);
+	void					GetItem(ItemType typeItem);
 	inline b2Body*			GetBody()			{ return m_body; };
 	inline GLint			GetNumberBullet() { return m_numberBullet; };
 	bool					IsReadyJump();
