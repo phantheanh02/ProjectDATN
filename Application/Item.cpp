@@ -4,31 +4,39 @@
 #include "b2Utilities.h"
 
 extern int tileSizeByPixel;
+extern std::shared_ptr<b2World> world;
+ 
+Item::Item(ItemType type, GLfloat posX, GLfloat posY):
+	  m_type(type)
+	, m_isLoot(false)
 
-Item::Item(b2World* world, GLint idTexture, GLfloat posX, GLfloat posY)
 {
-	m_tileSizeByPixel = tileSizeByPixel;
+	switch (type)
+	{
+	case HEALING:
+		m_sprite = std::make_shared<Sprite2D>("Item/item_hp.png");
+		break;
+	case COIN:
+		m_sprite = std::make_shared<Sprite2D>("Item/item_coin.png");
+		break;
+	case ARMOR:
+		m_sprite = std::make_shared<Sprite2D>("Item/item_armor.png");
+		break;
+	default:
+		break;
+	}
+	m_sprite->Set2DSizeByTile(1, 1);
+	m_sprite->Set2DPositionByTile(posX, posY);
 
-	auto model = ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT);
-	auto shader = ResourcesManager::GetInstance()->GetShader(0);
-	auto texture = ResourcesManager::GetInstance()->GetTexture(idTexture);
-
-	m_sprite = std::make_shared<Sprite2D>(0, model, shader, texture);
-	m_sprite->Set2DSize(m_tileSizeByPixel, m_tileSizeByPixel);
-	m_sprite->Set2DPosition(m_tileSizeByPixel * posX, m_tileSizeByPixel * posY);
-
-	m_isLoot = false;
 	m_position = Vector2(posX, posY);
-	m_typeItem = idTexture;
 
 	// Box
-	b2Body* obsBody;
 	b2BodyDef obsBodyDef;
 	b2FixtureDef obsFixDef;
 
 	obsBodyDef.position.Set(posX, posY + 0.5f);
 	obsBodyDef.type = b2_staticBody;
-	obsBody = world->CreateBody(&obsBodyDef);
+	m_body = world->CreateBody(&obsBodyDef);
 
 	// Fixture
 	b2PolygonShape sensorShape;
@@ -40,10 +48,9 @@ Item::Item(b2World* world, GLint idTexture, GLfloat posX, GLfloat posY)
 	sensorFixtureDef.filter.categoryBits = FixtureTypes::FIXTURE_ITEM;
 	sensorFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_PLAYER;
 	sensorFixtureDef.userData.pointer = (uintptr_t)this;
-	obsBody->CreateFixture(&sensorFixtureDef);
-
-	m_body = obsBody;
+	m_body->CreateFixture(&sensorFixtureDef);
 }
+
 
 Item::~Item()
 {
@@ -54,10 +61,6 @@ void Item::Update(GLfloat deltaTime)
 	if (m_isLoot)
 	{
 		m_body->SetEnabled(false);
-	}
-	else
-	{
-		m_sprite->Set2DPosition(m_tileSizeByPixel * m_position.x, m_tileSizeByPixel * m_position.y);
 	}
 }
 
@@ -71,8 +74,5 @@ void Item::Draw()
 
 void Item::Set2DSize(GLint w, GLint h)
 {
-	m_sprite->Set2DSize(w, h);
-	m_tileSizeByPixel = w;
-	m_sprite->Set2DPosition(m_tileSizeByPixel * m_position.x, m_tileSizeByPixel * m_position.y);
-
+	printf("Excute from Item class\n");
 }

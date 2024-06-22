@@ -247,6 +247,28 @@ ID 111
 FILE "Effect/blood.png"
 ID 112
 FILE "Effect/loading.png"
+ID 113
+FILE "Icons/icon_pause.png"
+ID 114
+FILE "Background/bg_black.png"
+ID 115
+FILE "Button/btn_resume.png"
+ID 116
+FILE "Button/btn_retry.png"
+ID 117
+FILE "Button/btn_menu.png"
+ID 118
+FILE "Background/bg_pause.png"
+ID 119
+FILE "Background/bg_popup.png"
+ID 120
+FILE "Button/btn_buy.png"
+ID 121
+FILE "Button/btn_plus_on.png"
+ID 122
+FILE "Button/btn_plus_off.png"
+ID 123
+FILE "Icons/icon_exit.png"
 $
 
 #Sounds

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "GSPlay.h"
-#include <cstdlib>  // Thư viện cần cho srand và rand
+#include <cstdlib>
 #include <ctime>    
 
 extern int tileSizeByPixel;
@@ -26,7 +26,7 @@ void GSPlay::Init()
 	m_key = 0;
 	tileSizeByPixel = 30;
 	m_totalTime = 0;
-
+	m_isShowPopup = false;
 	// Box2d
 	// create world with gravity
 	world = std::make_shared<b2World>(b2Vec2(0, 30));
@@ -55,11 +55,7 @@ void GSPlay::Init()
 	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
 	// button back
-	auto button = std::make_shared<Button>("Button/btn_back.png", BUTTON_BACK);
-	button->Set2DSize(220, 70);
-	button->Set2DPosition(Globals::screenWidth / 2.0 - 78, Globals::screenHeight / 2.0f - 194);
-	button->AttachCamera(m_staticCamera);
-	m_buttonList.push_back(button);
+	CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
 
 	// Create bullet pooling
 	for (int i = 0; i < 100; i++)
@@ -105,6 +101,11 @@ void GSPlay::Init()
 
 void GSPlay::Update(float deltaTime)
 {
+	if (m_isShowPopup)
+	{
+		UpdatePopup(deltaTime);
+		return;
+	}
 	if (!m_player->IsDie())
 	{
 		HandleEvent();
@@ -211,6 +212,11 @@ void GSPlay::Draw()
 	}
 	m_numberBulletText->Draw();
 	m_totalTimeText->Draw();
+
+	if (m_isShowPopup)
+	{
+		DrawPopup();
+	}
 }
 
 void GSPlay::Pause()
@@ -283,6 +289,8 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 		case KEY_J:
 			m_key |= 1 << 5;
 			break;
+		case KEY_ESC:
+			break;
 		default:
 			break;
 		}
@@ -318,6 +326,18 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 		case KEY_J:
 			m_key ^= 1 << 5;
 			break;
+		case KEY_ESC:
+			m_isShowPopup = m_isShowPopup ? false : true;
+			if (m_isShowPopup)
+			{
+				CreatePopUp();
+			}
+			else
+			{
+				m_buttonList.clear();
+				CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
+			}
+			break;
 		default:
 			break;
 		}
@@ -326,6 +346,7 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 
 void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 {
+	bool isResumButtonPressed = false;
 	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))
@@ -333,16 +354,66 @@ void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			ResourcesManager::GetInstance()->GetSound(1)->Play();
 			switch (button->m_type)
 			{
-			case BUTTON_BACK:
-				GameStateMachine::GetInstance()->PopState();
+			case BUTTON_BUY_BULLET_UPGRADE:
+	
 				break;
-			case BUTTON_EXIT:
-				GameStateMachine::GetInstance()->Exit();
+			case BUTTON_BUY_ARMOR_UPGRADE:
+				
+				break;
+			case BUTTON_BUY_HP_UPGRADE:
+				
+				break;
+			case BUTTON_PLUS_ON_BULLET_UPGRADE:
+			
+				break;
+			case BUTTON_PLUS_OFF_BULLET_UPGRADE:
+			
+				break;
+			case BUTTON_PLUS_ON_ARMOR_UPGRADE:
+
+				break;
+			case BUTTON_PLUS_OFF_ARMOR_UPGRADE:
+			
+				break;
+			case BUTTON_PLUS_ON_HP_UPGRADE:
+
+				break;
+			case BUTTON_PLUS_OFF_HP_UPGRADE:
+			
+				break;
+			case BUTTON_RESUME:
+				m_isShowPopup = false;
+				isResumButtonPressed = true;
+				ResourcesManager::GetInstance()->GetSound(3)->Play();
+				break;
+			case BUTTON_RETRY:
+				ResourcesManager::GetInstance()->StopAllSounds();
+				ResourcesManager::GetInstance()->GetSound(1)->Play();
+				GameStateMachine::GetInstance()->PopState();
+				GameStateMachine::GetInstance()->PushState(StateType::STATE_PLAY);
+				break;
+			case BUTTON_MENU:
+				ResourcesManager::GetInstance()->StopAllSounds();
+				ResourcesManager::GetInstance()->GetSound(1)->Play();
+				GameStateMachine::GetInstance()->PopState(); // pop play state
+				GameStateMachine::GetInstance()->PopState(); // pop choose map state
+				break;
+			case BUTTON_SETTING:
+				GameStateMachine::GetInstance()->PushState(StateType::STATE_SETTING);
+				break;
+			case BUTTON_PAUSE:
+				m_isShowPopup = true;
+				CreatePopUp();
 				break;
 			default:
 				break;
 			}
-		};
+		}
+	}
+	if (isResumButtonPressed)
+	{
+		m_buttonList.clear();
+		CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
 	}
 }
 
@@ -411,10 +482,11 @@ void GSPlay::Update2DDrawPosition()
 
 void GSPlay::LoadMap()
 {
-	// Load obs	
-	auto listPlane = m_map->GetPlaneList();
+	auto data = m_map->GetData();
 
-	for (const auto& tile : listPlane.tiles)
+	// Load obs	
+	auto planeList = data->tiles;
+	for (const auto& tile : planeList)
 	{
 		b2BodyDef bodyDef;
 		b2FixtureDef obsFixDef;
@@ -430,6 +502,81 @@ void GSPlay::LoadMap()
 		body->CreateFixture(&obsFixDef);
 		m_BodyList.push_back(body);
 	}
+
+	// Load item
+	auto itemList = data->items;
+	for (const auto& it : itemList)
+	{
+		auto item = std::make_shared<Item>(it.type, it.posX, it.posY);
+	}
+}
+
+void GSPlay::CreatePopUp()
+{
+	m_listPopupSprite.clear();
+	m_buttonList.clear();
+
+	// Background
+	auto sprite = std::make_shared<Sprite2D>("Background/bg_black.png");
+	sprite->Set2DSize(Globals::screenWidth, Globals::screenHeight);
+	sprite->Set2DPosition(0, 0);
+	sprite->SetTransparency(0.5f);
+	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_listPopupSprite.push_back(sprite);
+
+	sprite = std::make_shared<Sprite2D>("Background/bg_popup.png");
+	sprite->Set2DSize(850, 430);
+	sprite->Set2DPosition(55, 145);
+	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_listPopupSprite.push_back(sprite);
+
+
+	// add new button
+	Vector2 size = Vector2(137, 64);
+	GLfloat posX = 430;
+	GLfloat posY = 233;
+
+	CreateButton("Button/btn_resume.png", 193, 61, 679, 225, BUTTON_RESUME);
+	CreateButton("Button/btn_retry.png", 193, 61, 679, 304, BUTTON_RETRY);
+	CreateButton("Button/btn_menu.png", 193, 61, 679, 383, BUTTON_MENU);
+	CreateButton("Button/btn_setting.png", 193, 61, 679, 462, BUTTON_SETTING);
+
+	CreateButton("Button/btn_buy.png", 137, 63, 431, 234, BUTTON_BUY_BULLET_UPGRADE);
+	CreateButton("Button/btn_buy.png", 137, 63, 431, 351, BUTTON_BUY_ARMOR_UPGRADE);
+	CreateButton("Button/btn_buy.png", 137, 63, 431, 466, BUTTON_BUY_HP_UPGRADE);
+
+	CreateButton("Button/btn_plus_on.png", 19, 19, 380, 255, BUTTON_PLUS_ON_BULLET_UPGRADE);
+	CreateButton("Button/btn_plus_on.png", 19, 19, 380, 373, BUTTON_PLUS_ON_ARMOR_UPGRADE);
+	CreateButton("Button/btn_plus_on.png", 19, 19, 380, 487, BUTTON_PLUS_ON_HP_UPGRADE);
+	CreateButton("Button/btn_plus_off.png", 19, 8, 257, 260, BUTTON_PLUS_OFF_BULLET_UPGRADE);
+	CreateButton("Button/btn_plus_off.png", 19, 8, 257, 378, BUTTON_PLUS_OFF_ARMOR_UPGRADE);
+	CreateButton("Button/btn_plus_off.png", 19, 8, 257, 487, BUTTON_PLUS_OFF_HP_UPGRADE);
+}
+
+void GSPlay::DrawPopup()
+{
+	for (auto sprite : m_listPopupSprite)
+	{
+		sprite->Draw();
+	}
+	for (auto& button : m_buttonList)
+	{
+		button->Draw();
+	}
+
+
+}
+
+void GSPlay::UpdatePopup(float deltaTime)
+{
+}
+
+void GSPlay::CreateButton(const char* filename, GLfloat width, GLfloat height, GLfloat posX, GLfloat posY, ButtonType buttonType)
+{
+	auto button = std::make_shared<Button>(filename, buttonType);
+	button->Set2DSize(width, height);
+	button->Set2DPosition(posX, posY);
+	m_buttonList.push_back(button);
 }
 
 void GSPlay::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)
@@ -446,8 +593,9 @@ void GSPlay::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)
 
 void GSPlay::RandomEnemies()
 {
-	auto spawnPosition = m_map->GetSpawnPosition();
-	auto enemiesRatio = m_map->GetEnemiesTypeRatio();
+	auto data = m_map->GetData();
+	auto spawnPosition = m_map->GetData()->enemiesSpawn.spawnPosition;
+	auto enemiesRatio = m_map->GetData()->enemiesSpawn.enemiesTypeRatio;
 
 	srand(static_cast<unsigned int>(time(0)));
 

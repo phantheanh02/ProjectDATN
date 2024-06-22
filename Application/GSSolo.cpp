@@ -283,9 +283,9 @@ void GSSolo::OnMouseScroll(int x, int y, short delta)
 void GSSolo::LoadMap()
 {
 	// Load obs	
-	auto listPlane = m_map->GetPlaneList();
+	auto listPlane = m_map->GetData()->tiles;
 
-	for (const auto& tile : listPlane.tiles)
+	for (const auto& tile : listPlane)
 	{
 		b2BodyDef bodyDef;
 		b2FixtureDef obsFixDef;

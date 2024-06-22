@@ -5,8 +5,7 @@
 MapClass::MapClass(PlanetType type)
 	: m_type(type)
 {
-	m_planeList.clear();
-	m_itemsList.clear();
+	m_data = std::make_shared<MapData>();
 }
 
 MapClass::~MapClass()
@@ -16,12 +15,13 @@ MapClass::~MapClass()
 void MapClass::Init(GLint idTexture, GLint minTileSize, GLint maxTileSize, Vector2 sizeByTile)
 {
 	m_idTexture		= idTexture;
-	m_minTileSize	= minTileSize;
-	m_maxTileSize	= maxTileSize;
-	m_sizeByTile	= sizeByTile;
+	m_data->minTileSize = minTileSize;
+	m_data->maxTileSize	= maxTileSize;
+	m_data->width	= sizeByTile.x;
+	m_data->height = sizeByTile.y;
 
 	m_background = std::make_shared<Sprite2D>(m_idTexture);
-	m_background->Set2DSizeByTile(m_sizeByTile.x, m_sizeByTile.y);
+	m_background->Set2DSizeByTile(m_data->width, m_data->height);
 	m_background->Set2DPosition(0, 0);
 }
 
@@ -38,5 +38,5 @@ void MapClass::Draw()
 
 void MapClass::OnMouseScroll()
 {
-	m_background->Set2DSizeByTile(m_sizeByTile.x, m_sizeByTile.y);
+	m_background->Set2DSizeByTile(m_data->width, m_data->height);
 }

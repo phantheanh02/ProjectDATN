@@ -5,7 +5,6 @@ enum ButtonType
 {
 	BUTTON_PLAY,
 	BUTTON_EXIT,
-	BUTTON_RESUM,
 	BUTTON_BACK,
 	BUTTON_NEXT,
 	BUTTON_SETTING,
@@ -24,7 +23,6 @@ enum ButtonType
 	BUTTON_SAVE,
 	BUTTON_CANCEL,
 	BUTTON_SOUND,
-	BUTTON_RETRY,
 	BUTTON_MENU,
 	BUTTON_CHOOSE_CHARACTER,
 	BUTTON_NEXT_LEFT,
@@ -32,13 +30,17 @@ enum ButtonType
 	BUTTON_CREAT,
 	BUTTON_JOIN,
 	BUTTON_READY,
-	BUTTON_START
+	BUTTON_START,
+	BUTTON_PAUSE,
+	BUTTON_RESUME,
+	BUTTON_RETRY
 };
 class Button : public Sprite2D
 {
 public:
 	Button(std::shared_ptr<Model> model, std::shared_ptr<Shaders> shader, std::shared_ptr<Texture> texture, ButtonType type);
 	Button(const char* filename, ButtonType type);
+	Button(GLint idTexture, ButtonType type);
 	Button();
 	~Button();
 

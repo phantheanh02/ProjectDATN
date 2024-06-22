@@ -14,6 +14,12 @@ Button::Button(const char* filename, ButtonType type) :
 	m_camera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
 }
 
+Button::Button(GLint idTexture, ButtonType type) :
+	Sprite2D(idTexture), m_type(type)
+{
+	m_camera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
+}
+
 Button::Button()
 {
 

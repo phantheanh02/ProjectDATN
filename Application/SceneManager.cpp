@@ -321,17 +321,6 @@ std::shared_ptr<MapClass> SceneManager::LoadElementsMap(std::ifstream& file, std
 
 void SceneManager::LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> map)
 {
-	//std::string skipStr;
-	//float x, y, z, w;
-	//std::vector<Vector4> planeList;
-	//file >> skipStr;
-	//while (skipStr != "$")
-	//{
-	//	x = std::stoi(skipStr);
-	//	file >> y >> z >> w >> skipStr;
-	//	planeList.push_back(Vector4(x, y, z, w));
-	//}
-	//map->SetPlaneList(planeList);
 	std::string filemap;
 	file >> filemap;
 	
@@ -346,11 +335,10 @@ void SceneManager::LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> 
 	json data;
 	fFile >> data;
 
-	MapData mapData;
-	mapData.width = data["width"];
-	mapData.height = data["height"];
-	mapData.tileWidth = data["tilewidth"];
-	mapData.tileHeight = data["tileheight"];
+	auto mapData = map->GetData();
+	mapData->width = data["width"];
+	mapData->height = data["height"];
+
 
 	for (const auto& layer : data["layers"])
 	{
@@ -374,13 +362,13 @@ void SceneManager::LoadPlanesMap(std::ifstream& file, std::shared_ptr<MapClass> 
 						tile.x = chunkX + j;
 						tile.y = chunkY + i;
 						tile.gid = gid;
-						mapData.tiles.push_back(tile);
+						mapData->tiles.push_back(tile);
 					}
 				}
 			}
 		}
 	}
-	map->SetPlaneList(mapData);
+
 	file >> filemap;
 }
 
@@ -389,15 +377,14 @@ void SceneManager::LoadSpawnEnemies(std::ifstream& file, std::shared_ptr<MapClas
 	std::string skipStr;
 	int type, x, y;
 	GLfloat ratio;
-	std::unordered_map<EnemyType, GLfloat>	enemiesTypeRatio;
-	std::vector<Vector2>					spawnPosition;
+	auto data = map->GetData();
 	file >> skipStr >> skipStr >> skipStr;
 
 	while (skipStr != "POSX")
 	{
 		type = std::stoi(skipStr);
 		file >> ratio >> skipStr;
-		enemiesTypeRatio.insert(std::make_pair((EnemyType)type, ratio));
+		data->enemiesSpawn.enemiesTypeRatio.insert(std::make_pair((EnemyType)type, ratio));
 	}
 
 	file >> skipStr >> skipStr;
@@ -405,11 +392,8 @@ void SceneManager::LoadSpawnEnemies(std::ifstream& file, std::shared_ptr<MapClas
 	{
 		x = std::stoi(skipStr);
 		file >> y >> skipStr;
-		spawnPosition.push_back(Vector2(x, y));
+		data->enemiesSpawn.spawnPosition.push_back(Vector2(x, y));
 	}
-	
-	map->SetEnemiesTypeRatio(enemiesTypeRatio);
-	map->SetSpawnPosition(spawnPosition);
 }
 
 void SceneManager::LoadItemsMap(std::ifstream& file, std::shared_ptr<MapClass> map)
@@ -417,14 +401,15 @@ void SceneManager::LoadItemsMap(std::ifstream& file, std::shared_ptr<MapClass> m
 	std::string skipStr;
 	int x, y, z;
 	std::vector<Vector3> itemList;
+	auto data = map->GetData();
+
 	file >> skipStr >> skipStr >> skipStr >> skipStr;
 	while (skipStr != "$")
 	{
 		x = std::stoi(skipStr);
 		file >> y >> z >> skipStr;
-		itemList.push_back(Vector3(x, y, z));
+		data->items.push_back(ItemData((ItemType)x, y, z));
 	}
-	map->SetItemList(itemList);
 }
 
 int ParseElementType(const std::string& type)

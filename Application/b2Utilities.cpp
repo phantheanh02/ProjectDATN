@@ -186,6 +186,6 @@ void ContactListener::PLayerLootItem(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	auto player = fixtureA->GetFilterData().categoryBits == FixtureTypes::FIXTURE_PLAYER ? fixtureA : fixtureB;
 	auto pPlayer = (Player*)player->GetBody()->GetUserData().pointer;
 	// TODO: get item
-	pPlayer->GetItem(pItem->m_typeItem);
+	pPlayer->GetItem(pItem->GetType());
 }
 

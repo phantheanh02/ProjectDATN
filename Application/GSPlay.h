@@ -63,6 +63,9 @@ private:
 	// Enemy
 	std::vector<std::shared_ptr<Enemies>>	m_enemiesList;
 	
+	// Item
+	std::vector<std::shared_ptr<Item>>		m_itemList;
+
 	// HUB
 	std::shared_ptr <Sprite2D>			m_bulletIcon;
 	GLfloat								m_totalTime;
@@ -75,11 +78,17 @@ private:
 	std::shared_ptr<Text> m_numberEnemiesKilledText;
 	std::shared_ptr<Text> m_totalTimeText;
 	
-
+	// Popup
+	std::vector<std::shared_ptr<Sprite2D>>	m_listPopupSprite;
+	bool								m_isShowPopup;
 private:
 	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);
 	void RandomEnemies();
 	void LoadMap();
+	void CreatePopUp();
+	void DrawPopup();
+	void UpdatePopup(float deltaTime);
+	void CreateButton(const char* filename, GLfloat width, GLfloat height, GLfloat posX, GLfloat posY, ButtonType buttonType);
 
 };
 	
