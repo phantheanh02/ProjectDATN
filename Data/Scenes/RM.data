@@ -281,6 +281,20 @@ ID 128
 FILE "Background/bg_victory3star.png"
 ID 129
 FILE "Background/bg_lost.png"
+ID 130
+FILE "Striker/spr_StrikerDash_strip.png"
+ID 131
+FILE "Striker/spr_StrikerDeath_strip.png"
+ID 132
+FILE "Striker/spr_StrikerGetHit_strip.png"
+ID 133
+FILE "Striker/spr_StrikerIdle_strip.png"
+ID 134
+FILE "Striker/spr_StrikerJump_strip.png"
+ID 135
+FILE "Striker/spr_StrikerRun_strip.png"
+ID 136
+FILE "Striker/spr_StrikerSlash_stripWithEffect.png"
 $
 
 #Sounds

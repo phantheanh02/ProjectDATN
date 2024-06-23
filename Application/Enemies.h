@@ -37,7 +37,7 @@ enum EnemyType
 class Enemies
 {
 public:
-	Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox);
+	Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox, GLint hp, GLint damage);
 	~Enemies();
 
 	void Update(float deltaTime, b2Vec2 positionPlayer);
@@ -67,7 +67,7 @@ public:
 	inline DirectionType				GetSprinningDirection() { return m_sprinningDirection; }
 	inline EnemyType					GetType() { return m_type; };
 	inline BulletType					GetEnemyBulletType() { return m_enemyBulletType; };
-
+	inline GLint						GetDamage() { return m_damage;	};
 	inline bool							IsActive() { return m_isActive; };
 	inline bool							IsDie() { return m_isDie; };
 	inline bool							IsReadyAttack() { return m_isReadyAttack; };
@@ -78,6 +78,7 @@ private:
 	EnemyType		m_type;
 	EnemyAction		m_currentAction;
 	GLint			m_health;
+	GLint			m_damage;
 	b2Vec2			m_speed;
 	GLfloat			m_coolDown;
 	GLfloat			m_timeFinding;
@@ -110,10 +111,15 @@ private:
 	// Effect
 	std::shared_ptr<SpriteAnimation>	m_blood;
 	
+	// Bullet
+	std::vector<std::shared_ptr<Bullet>>	m_bulletList;
+
 private:
 	void		PerformRayCasting(b2Vec2 positionPlayer);
 	void		RunModUpdate(std::shared_ptr<Player> player);
 	void		FindPlayerUpdate(std::shared_ptr<Player> player);
 	void		AttackUpdate(std::shared_ptr<Player> player);
 	void		EnemyFlyUpdate(std::shared_ptr<Player> player);
+	void		CreateBullet(b2Vec2 speed);
+
 };

@@ -12,6 +12,7 @@
 #include "Globals.h"
 #include "Text.h"
 #include "Item.h"
+#include "Bullet.h"
 
 class Bullet;
 class Sprite2D;
@@ -116,6 +117,6 @@ private:
 
 private:
 	void HandlePlayerDie(GLfloat deltaTime);
-	void CreateBullet(int type, b2Vec2 speed, Vector2 position);
+	void CreateBullet(b2Vec2 speed);
 
 };

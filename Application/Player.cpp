@@ -40,7 +40,7 @@ Player::Player()
 	playerFixtureDef.shape = &playerShape;
 	playerFixtureDef.density = 1.0f; 
 	playerFixtureDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER;
-	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_ENEMY_BULLET | FixtureTypes::FIXTURE_ENEMY | FixtureTypes::FIXTURE_ITEM;
+	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_ENEMY_BULLET | FixtureTypes::FIXTURE_BOSS_BULLET | FixtureTypes::FIXTURE_ENEMY | FixtureTypes::FIXTURE_ITEM;
 	playerFixtureDef.friction = 0.3f; // Adjusted friction
 	m_body->CreateFixture(&playerFixtureDef);
 	m_body->SetFixedRotation(true); 
@@ -237,6 +237,7 @@ void Player::SetCharacter(CharacterType type)
 	if (stats.type)
 	{
 		m_stats = stats;
+		stats.hp *= 10;
 		m_health = stats.hp;
 		m_numberBullet = stats.numberBullet;
 	}
@@ -245,19 +246,19 @@ void Player::SetCharacter(CharacterType type)
 	switch (m_currentCharacter)
 	{
 	case C_BLACK:
-		m_playerbulletType = 1;
+		m_playerbulletType = BLACK_BULLET;
 		break;
 	case C_BLUE:
-		m_playerbulletType = 2;
+		m_playerbulletType = BLUE_BULLET;
 		break;
 	case C_GREEN:
-		m_playerbulletType = 3;
+		m_playerbulletType = GREEN_BULLET;
 		break;
 	case C_RED:
-		m_playerbulletType = 4;
+		m_playerbulletType = RED_BULLET;
 		break;
 	case C_YELLOW:
-		m_playerbulletType = 5;
+		m_playerbulletType = YELLOW_BULLET;
 		break;
 	default:
 		break;
@@ -299,29 +300,42 @@ void Player::HandleEvent(int event)
 {
 	// Handle Key
 	auto currentVelocity = m_body->GetLinearVelocity();
-	float desiredVel = 0, velChange = 0, impulse = 0;
+	float desiredVel = 0, velChange = 0, impulseMove = 0, impulseJump = 0;
 
+	// MOVE LEFT
 	if (event & (1 << 1) )
 	{
-		// move left
 		desiredVel = b2Max(currentVelocity.x - 0.25f, -MOVEMENT_SPEED);
 		SetDirection(DirectionType::LEFT);
 	}
+	// MOVE RIGHT
 	if (event & (1 << 3))
 	{
 		// move right
 		desiredVel = b2Min(currentVelocity.x + 0.25f, MOVEMENT_SPEED);
 		SetDirection(DirectionType::RIGHT);
 	}
+	// apply force to move
+	velChange = desiredVel - currentVelocity.x;
+	impulseMove = m_body->GetMass() * velChange; //disregard time factor
+	m_body->ApplyLinearImpulse(b2Vec2(impulseMove, 0), m_body->GetLocalCenter(), true);
+
+	// JUMP: key space
+	if (event & (1 << 4) && IsReadyJump())
+	{
+		SetAction(PlayerAction::JUMPING);
+		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
+		float jumpHeight = 5.0f;
+		impulseJump = m_body->GetMass() * sqrt(2 * world->GetGravity().y * jumpHeight);
+		m_jumpCooldown = JUMP_COOLDOWN;
+		m_body->ApplyLinearImpulse(b2Vec2(0, -impulseJump), m_body->GetWorldCenter(), true);
+	}
+
+	
 	if (desiredVel != 0 && !m_isJumping)
 	{
 		SetAction(PlayerAction::RUNNING);
 	}
-	// apply force to move
-	velChange = desiredVel - currentVelocity.x;
-	impulse = m_body->GetMass() * velChange; //disregard time factor
-
-	m_body->ApplyLinearImpulse(b2Vec2(impulse, 0), m_body->GetWorldCenter(), true);
 
 	if (event & (1 << 0) && velChange == 0 && !m_isJumping)
 	{
@@ -341,17 +355,6 @@ void Player::HandleEvent(int event)
 		SetAction(PlayerAction::CROUCH);
 	}
 
-	// JUMP: key space
-	if (event & (1 << 4) && IsReadyJump())
-	{
-		SetAction(PlayerAction::JUMPING);
-		desiredVel = b2Min(currentVelocity.x, currentVelocity.y - 3.0f);
-		float jumpHeight = 5.0f;
-		impulse = m_body->GetMass() * sqrt(2 * world->GetGravity().y * jumpHeight);
-		m_jumpCooldown = JUMP_COOLDOWN;
-		m_body->ApplyLinearImpulse(b2Vec2(0, -impulse), m_body->GetWorldCenter(), true);
-		//m_body->ApplyLinearImpulseToCenter(b2Vec2(0.0f, -impulse), true);
-	}
 
 	if (!(event & 0xF))
 	{
@@ -383,7 +386,7 @@ void Player::HandleEvent(int event)
 			speed = b2Vec2(20.0f, 0.0f);
 			break;
 		}
-		CreateBullet(m_playerbulletType, speed, Vector2(m_body->GetPosition().x, m_body->GetPosition().y));
+		CreateBullet(speed);
 
 		m_numberBullet--;
 		if (m_numberBullet <= 0)
@@ -423,13 +426,13 @@ void Player::HandlePlayerDie(GLfloat deltaTime)
 {
 }
 
-void Player::CreateBullet(int type, b2Vec2 speed, Vector2 position)
+void Player::CreateBullet(b2Vec2 speed)
 {
 	for (auto bullet : m_bulletList)
 	{
 		if (!bullet->IsActive())
 		{
-			bullet->CreateNewBullet((BulletType)type, speed, position);
+			bullet->CreateNewBullet((BulletType)m_playerbulletType, speed, Vector2(m_body->GetPosition().x, m_body->GetPosition().y), m_stats.atk);
 			break;
 		}
 	}

@@ -7,7 +7,7 @@
 extern int tileSizeByPixel;
 extern std::shared_ptr<b2World> world;
 
-Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox)
+Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox, GLint hp, GLint damage)
 	: m_type(type)
 	, m_currentAction(E_IDLE)
 	, m_imgSize(sizeImg)
@@ -18,6 +18,8 @@ Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox)
 	, m_isReadyAttack(false)
 	, m_timeFinding(TIME_FINDING)
 	, m_isTakeDamage(false)
+	, m_health(hp)
+	, m_damage(damage)
 {
 	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
 }
@@ -66,35 +68,29 @@ void Enemies::Init(GLfloat posX, GLfloat posY)
 	{
 	case AR_MOD:
 		m_animation = std::make_shared<SpriteAnimation>("Enemy/ARMod_Idle.png", 8, 0.1f);
-		m_health = 3;
 		m_enemyBulletType = BulletType::AR_BULLET;
 		break;
 	case RPG_MOD:
 		m_animation = std::make_shared<SpriteAnimation>("Enemy/ARMod_Idle.png", 8, 0.1f);
-		m_health = 3;
 		m_enemyBulletType = BulletType::RPG_BULLET;
 		break;
 	case Sniper_MOD:
 		m_animation = std::make_shared<SpriteAnimation>("Enemy/ARMod_Idle.png", 8, 0.1f);
-		m_health = 3;
 		m_enemyBulletType = BulletType::SNIPER_BULLET;
 		break;
 	case PATREON:
 		m_animation = std::make_shared<SpriteAnimation>("Enemy/Patreon.png", 5, 0.1f);
 		m_body->SetGravityScale(0);
-		m_health = 3;
 		m_enemyBulletType = BulletType::PATREON_BULLET;
 		break;
 	case MEGAMAN:
 		m_animation = std::make_shared<SpriteAnimation>("Enemy/Megaman.png", 4, 0.1f);
 		m_body->SetGravityScale(0);
-		m_health = 3;
 		m_enemyBulletType = BulletType::MEGAMAN_BULLET;
 		break;
 	case YUME:
 		m_animation = std::make_shared<SpriteAnimation>("Enemy/Yume.png", 4, 0.1f);
 		m_body->SetGravityScale(0);
-		m_health = 3;
 		m_enemyBulletType = BulletType::YUME_BULLET;
 		break;
 	default:
@@ -102,6 +98,12 @@ void Enemies::Init(GLfloat posX, GLfloat posY)
 	}
 	m_animation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 	m_sizeByTile = Vector2(SCALE_SIZE, SCALE_SIZE);
+
+	// Create bullet pooling
+	for (int i = 0; i < 20; i++)
+	{
+		m_bulletList.push_back(std::make_shared<Bullet>(world.get()));
+	}
 }
 
 void Enemies::OnMouseScroll()
@@ -113,6 +115,10 @@ void Enemies::OnMouseScroll()
 
 void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 {
+	for (auto it : m_bulletList)
+	{
+		it->Update(deltaTime);
+	}
 	if (m_isDie && m_isActive)
 	{
 		SetAction(EnemyAction::E_DIE);
@@ -156,6 +162,31 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 			}
 		}
 
+		if (m_isReadyAttack)
+		{
+			b2Vec2 speed = b2Vec2_zero;
+
+			switch (m_type)
+			{
+			case AR_MOD:
+			case RPG_MOD:
+			case Sniper_MOD:
+				speed = m_sprinningDirection == DirectionType::RIGHT ? b2Vec2(-10, 0) : b2Vec2(10, 0);
+				break;
+			case PATREON:
+			case MEGAMAN:
+			case YUME:
+				speed = m_body->GetPosition() - m_body->GetPosition();
+				speed.Normalize();
+				speed *= 10;
+				break;
+			default:
+				break;
+			}
+			CreateBullet(speed);
+			m_isReadyAttack = false;
+		}
+
 		// handle when take damage
 		if (m_isTakeDamage)
 		{
@@ -172,6 +203,10 @@ void Enemies::Draw()
 {
 	if (m_isActive)
 	{
+		for (auto it : m_bulletList)
+		{
+			it->Draw();
+		}
 		m_animation->Draw();
 		if (m_isTakeDamage)
 		{
@@ -394,7 +429,7 @@ void Enemies::Set2DPositionByTile(GLfloat x, GLfloat y)
 
 std::shared_ptr<Enemies> Enemies::Clone()
 {
-	return std::make_shared<Enemies>(m_type, m_imgSize, m_boxSize);
+	return std::make_shared<Enemies>(m_type, m_imgSize, m_boxSize, m_health, m_damage);
 }
 
 void Enemies::RunModUpdate(std::shared_ptr<Player> player)
@@ -414,5 +449,18 @@ void Enemies::AttackUpdate(std::shared_ptr<Player> player)
 void Enemies::EnemyFlyUpdate(std::shared_ptr<Player> player)
 {
 	
+}
+
+void Enemies::CreateBullet(b2Vec2 speed)
+{
+	for (auto bullet : m_bulletList)
+	{
+		if (!bullet->IsActive())
+		{
+			Vector2 pos = Vector2(m_body->GetPosition().x, m_body->GetPosition().y);
+			bullet->CreateNewBullet(m_enemyBulletType, speed, pos, m_damage);
+			break;
+		}
+	}
 }
 

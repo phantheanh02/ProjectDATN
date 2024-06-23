@@ -339,14 +339,3 @@ void GSSolo::HandleRequest()
 	m_opponentPlayer->HandleEvent(m_opponentKey);
 }
 
-void GSSolo::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)
-{
-	for (auto bullet : m_bulletList)
-	{
-		if (!bullet->IsActive())
-		{
-			bullet->CreateNewBullet(type, speed, position);
-			break;
-		}
-	}
-}

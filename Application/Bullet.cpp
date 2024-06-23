@@ -100,7 +100,7 @@ void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, in
 	case PLAYER_BULLET:
 		m_animation = std::make_shared<SpriteAnimation>("Bullet/BlackBullet.png", 4, 0.1);
 		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
-		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS | FIXTURE_PLAYER;
 		break;
 	case BLACK_BULLET:
 		m_animation = std::make_shared<SpriteAnimation>("Bullet/BlackBullet.png", 4, 0.1);

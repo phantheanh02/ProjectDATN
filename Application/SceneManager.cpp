@@ -216,15 +216,15 @@ void SceneManager::LoadCamera(std::ifstream& file)
 void SceneManager::LoadEnemies(std::ifstream& file)
 {
 	std::string skipStr;
-	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
+	file >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr >> skipStr;
 	file >> skipStr;
-	GLint id;
+	GLint id, hp, damage;
 	Vector2 imgSize, boxSize;
 	while (skipStr != "$")
 	{
 		id = std::stoi(skipStr);
-		file >> imgSize.x >> imgSize.y >> boxSize.x >> boxSize.y >> skipStr;
-		auto enemy = std::make_shared<Enemies>((EnemyType)id, imgSize, boxSize);
+		file >> imgSize.x >> imgSize.y >> boxSize.x >> boxSize.y >> hp >> damage >> skipStr;
+		auto enemy = std::make_shared<Enemies>((EnemyType)id, imgSize, boxSize, hp, damage);
 		m_enemiesList.push_back(enemy);
 	}
 }

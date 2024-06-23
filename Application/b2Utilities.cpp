@@ -155,13 +155,12 @@ void ContactListener::PlayerBulletBoss(b2Fixture* fixtureA, b2Fixture* fixtureB)
 {
 	auto playerBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_BULLET ? fixtureA : fixtureB;
 	auto pBullet = (Bullet*)playerBulletFixture->GetBody()->GetUserData().pointer;
-	//pBullet->m_disabled = true;
+	pBullet->SetActiveStatus(false);;
+
 	// TODO: mark boss as dead
 	auto bossFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_BOSS ? fixtureA : fixtureB;
 	auto pBoss = (Boss*)bossFixture->GetBody()->GetUserData().pointer;
 	pBoss->TakeDamage(pBullet->GetDamage());
-
-	pBullet->SetBulletLinearVelocity(b2Vec2(0.0f, 0.0f));
 }
 
 void ContactListener::BossBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB)
@@ -173,6 +172,7 @@ void ContactListener::BossBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	auto playerFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER ? fixtureA : fixtureB;
 	auto pPlayer = (Player*)playerFixture->GetBody()->GetUserData().pointer;
 	pPlayer->TakeDamage(pBullet->GetDamage());
+	LOG("Get damage\n");
 }
 
 void ContactListener::PLayerLootItem(b2Fixture* fixtureA, b2Fixture* fixtureB)

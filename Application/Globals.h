@@ -45,25 +45,24 @@ public:
 #define GREEN			0, 255, 0
 #define BLACK			0, 0, 0
 #define WHITE			255, 255, 255
-// other
-#define HP_MAX						50
-#define ARMOR_MAX					100
-#define NUMBER_BULLET_MAX			100
-#define DETECTION_DISTANCE			8.0f
-#define DETECTION_DISTANCE_SNIPER	8.0f
-#define HEIGHT_BULLET				10.0f
-#define BULLET_SIZE					0.1f
-#define VELOCITY_ITERATION			8
-#define POSITION_ITERATION			3
-#define MOVEMENT_SPEED				10.0f
-#define BULLET_COOLDOWN				0.3f
-#define LOADING_BULLET_TIME			0.9f
-#define	SCALE_SIZE					2.8f
-#define	MAX_DISTANCE				15
+
+// Time
+#define	TIME_END_3S					10
+#define TIME_END_2S					20
 #define COOLDOWN_ENEMY_BULLET		1.2f
 #define TIME_FINDING				3.0f
 #define JUMP_COOLDOWN				0.3
+#define BULLET_COOLDOWN				0.3f
 
+// Local wifi
 #define MAX_CLIENTS 1
 
-
+// other
+#define DETECTION_DISTANCE			8.0f
+#define DETECTION_DISTANCE_SNIPER	8.0f
+#define VELOCITY_ITERATION			8
+#define POSITION_ITERATION			3
+#define MOVEMENT_SPEED				10.0f
+#define LOADING_BULLET_TIME			0.9f
+#define	SCALE_SIZE					2.8f
+#define	MAX_DISTANCE				15

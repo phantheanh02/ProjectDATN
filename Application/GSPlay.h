@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Bullet.h"
 #include "Text.h"
+#include "Boss.h"
 
 class GSPlay final : public GameStateBase
 {
@@ -62,7 +63,8 @@ private:
 
 	// Enemy
 	std::vector<std::shared_ptr<Enemies>>	m_enemiesList;
-	
+	std::shared_ptr<Boss>					m_boss;
+
 	// Item
 	std::vector<std::shared_ptr<Item>>		m_itemList;
 

@@ -48,6 +48,7 @@ void GSPlay::Init()
 	LoadMap();
 
 	// Enemies
+	m_boss = std::make_shared<Boss>();
 	RandomEnemies();
 
 	// init camera boundaries
@@ -138,7 +139,7 @@ void GSPlay::Update(float deltaTime)
 		if (enemy->IsActive())
 		{
 			enemy->Update(deltaTime, m_player->GetBody()->GetPosition());
-			if (enemy->IsReadyAttack())
+			/*if (enemy->IsReadyAttack())
 			{
 				auto type = enemy->GetType();
 				b2Vec2 speed = b2Vec2_zero;
@@ -163,10 +164,11 @@ void GSPlay::Update(float deltaTime)
 				Vector2 pos = Vector2(enemy->GetBody()->GetPosition().x, enemy->GetBody()->GetPosition().y);
 				CreateBullet(enemy->GetEnemyBulletType(), speed, pos);
 				enemy->SetAttack(false);
-			}
+			}*/
 		}
 	}
 
+	m_boss->Update(deltaTime, m_player);
 	m_map->Update(deltaTime, m_player->GetBody()->GetPosition());
 	
 	m_player->Update(deltaTime);
@@ -220,7 +222,7 @@ void GSPlay::Draw()
 	{
 		enemy->Draw();
 	}
-
+	m_boss->Draw();
 	m_player->Draw();
 
 	// HUB
@@ -553,11 +555,11 @@ void GSPlay::CreatePopUp()
 	{
 		if (m_isWin)
 		{
-			if (m_totalTime < 10)
+			if (m_totalTime < TIME_END_3S)
 			{
 				sprite = std::make_shared<Sprite2D>("Background/bg_victory3star.png");
 			}
-			else if (m_totalTime < 20)
+			else if (m_totalTime < TIME_END_2S)
 			{
 				sprite = std::make_shared<Sprite2D>("Background/bg_victory2star.png");
 			}
