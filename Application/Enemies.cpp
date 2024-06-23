@@ -20,6 +20,7 @@ Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox, GLint hp, GLi
 	, m_isTakeDamage(false)
 	, m_health(hp)
 	, m_damage(damage)
+	, m_isGetCoin(false)
 {
 	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
 }
@@ -327,12 +328,6 @@ void Enemies::SetAction(EnemyAction action)
 		m_animation->SetModel(model);
 	}
 }
-
-void Enemies::SetAttack(bool isAttack)
-{
-	m_isReadyAttack = isAttack;
-}
-
 
 void Enemies::SetActive(bool isActive)
 {

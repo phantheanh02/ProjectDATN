@@ -70,6 +70,9 @@ public:
 	void SetJumpingStatus(bool status);
 	void SetCharacter(CharacterType type);
 	void SetLoadingBullet(GLfloat time);
+	inline void SetCoin(GLint number) { m_coin = number; };
+	inline void SetArmor(GLint number) { m_armor = number; };
+	inline void AddCoin(GLint number) { m_coin += number; };
 
 	void					GetItem(ItemType typeItem);
 	inline b2Body*			GetBody()			{ return m_body; };
@@ -78,6 +81,8 @@ public:
 	inline bool				IsReadyToReset()	{ return m_resetAfterDieTime <= 0; }
 	inline bool				IsDie()				{ return m_health <= 0; };
 	inline bool				IsLoadingBullet() { return m_isLoadingBullet > 0; };
+	inline GLint			GetCoin() { return m_coin; };
+	inline GLint			GetArmor() { return m_armor; };
 
 	GLint								m_contacCount;
 private:
@@ -114,6 +119,10 @@ private:
 
 	// Effect
 	std::shared_ptr<SpriteAnimation>	m_blood;
+
+	// Item
+	GLint		m_coin;
+	GLint		m_armor;
 
 private:
 	void HandlePlayerDie(GLfloat deltaTime);

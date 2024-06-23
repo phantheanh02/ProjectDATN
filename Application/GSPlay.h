@@ -58,9 +58,6 @@ private:
 	// player
 	std::shared_ptr<Player>					m_player;
 
-	// Bullet
-	std::vector<std::shared_ptr<Bullet>>	m_bulletList;
-
 	// Enemy
 	std::vector<std::shared_ptr<Enemies>>	m_enemiesList;
 	std::shared_ptr<Boss>					m_boss;
@@ -68,18 +65,20 @@ private:
 	// Item
 	std::vector<std::shared_ptr<Item>>		m_itemList;
 
-	// HUB
-	std::shared_ptr <Sprite2D>			m_bulletIcon;
+	// HUD
+	std::vector<std::shared_ptr <Sprite2D>>	m_spriteHUDList;
 	GLfloat								m_totalTime;
-
-	// Effect
-	std::shared_ptr<SpriteAnimation>	m_loadBullet;
 
 	// Text
 	std::shared_ptr<Text> m_numberBulletText;
 	std::shared_ptr<Text> m_numberEnemiesKilledText;
 	std::shared_ptr<Text> m_totalTimeText;
-	
+	std::shared_ptr<Text> m_numberCoinText;
+	std::shared_ptr<Text> m_numberArmorText;
+
+	// Effect
+	std::shared_ptr<SpriteAnimation>	m_loadBullet;
+
 	// Popup
 	std::vector<std::shared_ptr<Sprite2D>>	m_listPopupSprite;
 	bool								m_isShowPopup;
@@ -89,7 +88,6 @@ private:
 	bool								m_isWin;
 	
 private:
-	void CreateBullet(BulletType type, b2Vec2 speed, Vector2 position);
 	void RandomEnemies();
 	void LoadMap();
 	void CreatePopUp();

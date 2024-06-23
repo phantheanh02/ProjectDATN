@@ -23,6 +23,8 @@ Player::Player()
 	, m_contacCount(0)
 	, m_isTakeDamage(false)
 	, m_isLoadingBullet(false)
+	, m_coin(0)
+	, m_armor(0)
 {
 	SetCharacter(currentCharacter);
 
@@ -237,9 +239,9 @@ void Player::SetCharacter(CharacterType type)
 	if (stats.type)
 	{
 		m_stats = stats;
-		stats.hp *= 10;
-		m_health = stats.hp;
-		m_numberBullet = stats.numberBullet;
+		m_stats.hp *= 10;
+		m_health = m_stats.hp;
+		m_numberBullet = m_stats.numberBullet;
 	}
 
 	m_currentCharacter = type;
@@ -281,10 +283,15 @@ void Player::GetItem(ItemType typeItem)
 	switch (typeItem)
 	{
 	case HEALING:
+		m_health += 5;
+		m_health = m_health > m_stats.hp ? m_stats.hp : m_health;
+		m_HPBar->Set2DSizeByTile(1.5f * m_health / m_stats.hp, 0.1f);
 		break;
 	case COIN:
+		m_coin += 100;
 		break;
 	case ARMOR:
+		m_armor++;
 		break;
 	default:
 		break;

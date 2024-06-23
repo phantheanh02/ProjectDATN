@@ -58,20 +58,15 @@ public:
 	void SetTexture(GLint typeAction);
 	void SetActive(bool isActive);
 	void SetAction(EnemyAction action);
-	void SetAttack(bool isAttack);
+	inline void SetGetCoinStatus(bool status) { m_isGetCoin = status; };
 
 	Vector2								Get2DSize();
-	std::shared_ptr<SpriteAnimation>	GetAnimation() { return m_animation; };
 	b2Body*								GetBody();
-	inline DirectionType				GetCurrentDirection() { return m_currentDirection; }
-	inline DirectionType				GetSprinningDirection() { return m_sprinningDirection; }
 	inline EnemyType					GetType() { return m_type; };
-	inline BulletType					GetEnemyBulletType() { return m_enemyBulletType; };
 	inline GLint						GetDamage() { return m_damage;	};
 	inline bool							IsActive() { return m_isActive; };
 	inline bool							IsDie() { return m_isDie; };
-	inline bool							IsReadyAttack() { return m_isReadyAttack; };
-
+	inline bool							IsGetCoin() { return m_isGetCoin; };
 private:
 	// Attribute
 	GLint			m_id; // ID texture
@@ -91,7 +86,7 @@ private:
 	DirectionType	m_sprinningDirection;
 	BulletType		m_enemyBulletType;
 	bool			m_isTakeDamage;
-
+	bool			m_isGetCoin; // when die, check to get coin
 	// Sprite
 	std::shared_ptr<SpriteAnimation> m_animation;
 	std::shared_ptr<Sprite2D> m_hpBar;

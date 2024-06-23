@@ -61,13 +61,9 @@ void GSPlay::Init()
 	// button back
 	CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
 
-	// Create bullet pooling
-	for (int i = 0; i < 100; i++)
-	{
-		m_bulletList.push_back(std::make_shared<Bullet>(world.get()));
-	}
+	// HUD and effect
+	auto posOrigin = Vector2(40, 40);
 
-	// HUB and effect
 	m_loadBullet = std::make_shared<SpriteAnimation>(112, 9, 0.1f);
 	m_loadBullet->Set2DSize(50, 50);
 	m_loadBullet->Set2DPosition(40, 40);
@@ -75,15 +71,31 @@ void GSPlay::Init()
 	m_loadBullet->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 
 	// Bullet sprite
-	m_bulletIcon = std::make_shared<Sprite2D>(110);
-	m_bulletIcon->Set2DSize(30, 30);
-	m_bulletIcon->Set2DPosition(m_loadBullet->GetPosition().x - 15, m_loadBullet->GetPosition().y - 15);
-	m_bulletIcon->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	auto sprite = std::make_shared<Sprite2D>(110);
+	sprite->Set2DSize(30, 30);
+	sprite->Set2DPosition(25, 25);
+	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_spriteHUDList.push_back(sprite);
+	// Coin sprite
+	sprite = std::make_shared<Sprite2D>("Item/item_coin.png");
+	sprite->Set2DSize(30, 30);
+	sprite->Set2DPosition(200, 25);
+	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_spriteHUDList.push_back(sprite);
+	// Armor sprite
+	sprite = std::make_shared<Sprite2D>("Item/item_armor.png");
+	sprite->Set2DSize(30, 30);
+	sprite->Set2DPosition(375, 25);
+	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_spriteHUDList.push_back(sprite);
 
+
+	// Text
 	auto font = ResourcesManager::GetInstance()->GetFont(0);
 	auto staticCamera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
 	std::string text = "x" + std::to_string(m_player->GetNumberBullet());
-	// Text
+
+	// number bullet
 	m_numberBulletText = std::make_shared<Text>(0);
 	m_numberBulletText->AttachCamera(staticCamera);
 	m_numberBulletText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
@@ -92,13 +104,33 @@ void GSPlay::Init()
 	m_numberBulletText->Set2DScale(0.3f, 0.3f);
 	m_numberBulletText->SetTextColor(YELLOW);
 
+	// Number coin
+	text = "x" + std::to_string(m_player->GetCoin());
+	m_numberCoinText = std::make_shared<Text>(0);
+	m_numberCoinText->AttachCamera(staticCamera);
+	m_numberCoinText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
+	m_numberCoinText->Init(font, text);
+	m_numberCoinText->Set2DPosition(235, 30);
+	m_numberCoinText->Set2DScale(0.3f, 0.3f);
+	m_numberCoinText->SetTextColor(YELLOW);
+
+	// Number armor
+	text = "x" + std::to_string(m_player->GetArmor());
+	m_numberArmorText = std::make_shared<Text>(0);
+	m_numberArmorText->AttachCamera(staticCamera);
+	m_numberArmorText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
+	m_numberArmorText->Init(font, text);
+	m_numberArmorText->Set2DPosition(410, 30);
+	m_numberArmorText->Set2DScale(0.3f, 0.3f);
+	m_numberArmorText->SetTextColor(YELLOW);
+
 	// Time
 	text = "Time: 0s";
 	m_totalTimeText = std::make_shared<Text>(0);
 	m_totalTimeText->AttachCamera(staticCamera);
 	m_totalTimeText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
 	m_totalTimeText->Init(font, text);
-	m_totalTimeText->Set2DPosition(400, 30);
+	m_totalTimeText->Set2DPosition(600, 30);
 	m_totalTimeText->Set2DScale(0.3f, 0.3f);
 	m_totalTimeText->SetTextColor(YELLOW);
 }
@@ -123,11 +155,6 @@ void GSPlay::Update(float deltaTime)
 	world->Step(deltaTime, VELOCITY_ITERATION, POSITION_ITERATION);
 
 	Update2DDrawPosition();
-	
-	for (auto it : m_bulletList)
-	{
-		it->Update(deltaTime);
-	}
 
 	for (auto item : m_itemList)
 	{
@@ -139,32 +166,11 @@ void GSPlay::Update(float deltaTime)
 		if (enemy->IsActive())
 		{
 			enemy->Update(deltaTime, m_player->GetBody()->GetPosition());
-			/*if (enemy->IsReadyAttack())
+			if (enemy->IsDie() && !enemy->IsGetCoin())
 			{
-				auto type = enemy->GetType();
-				b2Vec2 speed = b2Vec2_zero;
-
-				switch (type)
-				{
-				case AR_MOD:
-				case RPG_MOD:
-				case Sniper_MOD:
-					speed = enemy->GetSprinningDirection() == DirectionType::RIGHT ? b2Vec2(-10, 0) : b2Vec2(10, 0);
-					break;
-				case PATREON:
-				case MEGAMAN:
-				case YUME:
-					speed = m_player->GetBody()->GetPosition() - enemy->GetBody()->GetPosition();
-					speed.Normalize();
-					speed *= 10;
-					break;
-				default:
-					break;
-				}
-				Vector2 pos = Vector2(enemy->GetBody()->GetPosition().x, enemy->GetBody()->GetPosition().y);
-				CreateBullet(enemy->GetEnemyBulletType(), speed, pos);
-				enemy->SetAttack(false);
-			}*/
+				m_player->AddCoin(50);
+				enemy->SetGetCoinStatus(true);
+			}
 		}
 	}
 
@@ -196,6 +202,12 @@ void GSPlay::Update(float deltaTime)
 	std::string text = "x" + std::to_string(m_player->GetNumberBullet());
 	m_numberBulletText->SetText(text);
 
+	text = "x" + std::to_string(m_player->GetCoin());
+	m_numberCoinText->SetText(text);
+
+	text = "x" + std::to_string(m_player->GetArmor());
+	m_numberArmorText->SetText(text);
+
 	text = "Time: " + std::to_string((GLint)m_totalTime) + "s";
 	m_totalTimeText->SetText(text);
 }
@@ -207,11 +219,6 @@ void GSPlay::Draw()
 	for (auto& button : m_buttonList)
 	{
 		button->Draw();
-	}
-
-	for (auto it : m_bulletList)
-	{
-		it->Draw();
 	}
 	
 	for (auto item : m_itemList)
@@ -226,12 +233,17 @@ void GSPlay::Draw()
 	m_player->Draw();
 
 	// HUB
-	m_bulletIcon->Draw();
+	for (auto sprite : m_spriteHUDList)
+	{
+		sprite->Draw();
+	}
 	if (m_player->IsLoadingBullet())
 	{
 		m_loadBullet->Draw();
 	}
 	m_numberBulletText->Draw();
+	m_numberCoinText->Draw();
+	m_numberArmorText->Draw();
 	m_totalTimeText->Draw();
 
 	if (m_isShowPopup)
@@ -464,14 +476,6 @@ void GSPlay::OnMouseScroll(int x, int y, short delta)
 			enemy->OnMouseScroll();
 		}
 	}
-
-	for (auto bullet : m_bulletList)
-	{
-		if (bullet->IsActive())
-		{
-			bullet->OnMouseScroll();
-		}
-	}
 }
 
 void GSPlay::Update2DDrawPosition()
@@ -647,18 +651,6 @@ void GSPlay::CheckWin()
 	m_isEndMatch = true;
 	m_isWin = true;
 	CreatePopUp();
-}
-
-void GSPlay::CreateBullet(BulletType type, b2Vec2 speed, Vector2 position)
-{
-	for (auto bullet : m_bulletList)
-	{
-		if (!bullet->IsActive())
-		{
-			bullet->CreateNewBullet(type, speed, position);
-			break;
-		}
-	}
 }
 
 void GSPlay::RandomEnemies()
