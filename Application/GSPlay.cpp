@@ -59,7 +59,7 @@ void GSPlay::Init()
 	m_cameraPositionBoudaries.w = size.y * tileSizeByPixel - (GLfloat)Globals::screenHeight;
 
 	// button back
-	CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
+	CreateButton("Icons/icon_pause.png", 40, 40, 890, 20, BUTTON_PAUSE);
 
 	// HUD and effect
 	auto posOrigin = Vector2(40, 40);
@@ -368,7 +368,7 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 			else
 			{
 				m_buttonList.clear();
-				CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
+				CreateButton("Icons/icon_pause.png", 40, 40, 890, 20, BUTTON_PAUSE);
 			}
 			break;
 		default:
@@ -445,7 +445,7 @@ void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 	if (isResumButtonPressed)
 	{
 		m_buttonList.clear();
-		CreateButton("Button/btn_back.png", 220, 70, 710, 30, BUTTON_PAUSE);
+		CreateButton("Icons/icon_pause.png", 40, 40, 890, 20, BUTTON_PAUSE);
 	}
 }
 

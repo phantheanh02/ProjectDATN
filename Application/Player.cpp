@@ -25,6 +25,7 @@ Player::Player()
 	, m_isLoadingBullet(false)
 	, m_coin(0)
 	, m_armor(0)
+	, m_isOpponentCharacter(false)
 {
 	SetCharacter(currentCharacter);
 
@@ -68,6 +69,74 @@ Player::Player()
 	// HUB
 	// HP bar
 	m_HPBar  = std::make_shared<Sprite2D>(109);
+	m_HPBar->Set2DSizeByTile(1.5, 0.1f);
+
+	// Create bullet pooling
+	for (int i = 0; i < 100; i++)
+	{
+		m_bulletList.push_back(std::make_shared<Bullet>(world.get()));
+	}
+}
+
+Player::Player(CharacterType currentOpponentCharacter)
+	: m_currentDirection(DirectionType::RIGHT)
+	, m_sprinningDirection(DirectionType::RIGHT)
+	, m_currentAction(PlayerAction::IDLE)
+	, m_isJumping(false)
+	, m_bulletCooldown(0)
+	, m_isDie(false)
+	, m_resetAfterDieTime(3)
+	, m_health(100)
+	, m_jumpCooldown(0)
+	, m_contacCount(0)
+	, m_isTakeDamage(false)
+	, m_isLoadingBullet(false)
+	, m_coin(0)
+	, m_armor(0)
+	, m_isOpponentCharacter(true)
+{
+	SetCharacter(currentOpponentCharacter);
+
+	// create player body
+	b2BodyDef playerBodyDef;
+	playerBodyDef.type = b2_dynamicBody;
+	playerBodyDef.position.Set(9.0f, 18.0f);
+	playerBodyDef.userData.pointer = (uintptr_t)this;
+	m_body = world->CreateBody(&playerBodyDef);
+
+	// set player body properties
+	b2PolygonShape playerShape;
+	playerShape.SetAsBox(0.5 * SCALE_SIZE / 2, 2 / 3.0f * SCALE_SIZE / 2); // size box = size img / 2
+	b2FixtureDef playerFixtureDef;
+	playerFixtureDef.shape = &playerShape;
+	playerFixtureDef.density = 1.0f;
+	playerFixtureDef.filter.categoryBits = FixtureTypes::FIXTURE_ENEMY;
+	playerFixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_PLAYER_BULLET | FixtureTypes::FIXTURE_ITEM;
+	playerFixtureDef.friction = 0.3f; // Adjusted friction
+	m_body->CreateFixture(&playerFixtureDef);
+	m_body->SetFixedRotation(true);
+	// Create sensor foot to check in ground
+	b2PolygonShape sensorBox;
+	b2FixtureDef sensorDef;
+	sensorBox.SetAsBox(0.5f, 0.1f, b2Vec2(0, 1), 0); // sensor foot
+	sensorDef.shape = &sensorBox;
+	sensorDef.isSensor = true;
+	sensorDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER_FOOT;
+	sensorDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND;
+	sensorDef.userData.pointer = (uintptr_t)this;
+	m_body->CreateFixture(&sensorDef);
+
+	// animation
+	Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
+	m_actionAnimation = std::make_shared<SpriteAnimation>(m_currentCharacter, 5, 0.1);
+	m_actionAnimation->Set2DPositionByTile(3, 5);
+	m_actionAnimation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
+
+	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
+
+	// HUB
+	// HP bar
+	m_HPBar = std::make_shared<Sprite2D>(109);
 	m_HPBar->Set2DSizeByTile(1.5, 0.1f);
 
 	// Create bullet pooling
@@ -439,7 +508,7 @@ void Player::CreateBullet(b2Vec2 speed)
 	{
 		if (!bullet->IsActive())
 		{
-			bullet->CreateNewBullet((BulletType)m_playerbulletType, speed, Vector2(m_body->GetPosition().x, m_body->GetPosition().y), m_stats.atk);
+			bullet->CreateNewBullet((BulletType)m_playerbulletType, speed, Vector2(m_body->GetPosition().x, m_body->GetPosition().y), m_stats.atk, m_isOpponentCharacter);
 			break;
 		}
 	}

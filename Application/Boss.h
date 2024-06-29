@@ -10,7 +10,7 @@
 constexpr auto DETECTION_DISTANCE_SKILL1 = 2;
 constexpr auto DETECTION_DISTANCE_SKILL2 = 4;
 constexpr auto DETECTION_DISTANCE_ATTACK = 7;
-constexpr auto HP_BOSS_MAX = 15;
+constexpr auto HP_BOSS_MAX = 100;
 
 enum BossActionType
 {

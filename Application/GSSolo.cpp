@@ -56,9 +56,9 @@ void GSSolo::Init()
 
 	// Init player
 	m_ownerPlayer = std::make_shared<Player>();
-	m_opponentPlayer = std::make_shared<Player>();
-	m_opponentPlayer->SetCharacter(currentOpponentCharacter);
+	m_opponentPlayer = std::make_shared<Player>(currentOpponentCharacter);
 	m_opponentPlayer->SetAction(PlayerAction::JUMPING);
+
 	// set new position
 	if (SocketManager::GetInstance()->IsHost())
 	{

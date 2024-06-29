@@ -40,6 +40,9 @@ void ContactListener::BeginContact(b2Contact* contact)
 	case CollionTypes::PLAYER_ITEM:
 		PLayerLootItem(fixtureA, fixtureB);
 		break;
+	case CollionTypes::PLAYER_BULLET_PLAYER:
+		PlayerBulletPlayer(fixtureA, fixtureB);
+		break;
 	default:
 		break;
 	}
@@ -116,12 +119,22 @@ void ContactListener::PlayerBulletEnemy(b2Fixture* fixtureA, b2Fixture* fixtureB
 
 	// TODO: mark enemy as dead
 	auto enemyFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_ENEMY ? fixtureA : fixtureB;
+
 	auto pEnenmy = (Enemies*)enemyFixture->GetBody()->GetUserData().pointer;
+
 	if (!pEnenmy->IsDie())
 	{
 		pEnenmy->TakeDamage(pBullet->GetDamage());
 		ResourcesManager::GetInstance()->GetSound(8)->Play();
+		return;
 	}
+
+	auto pPLayer = (Player*)enemyFixture->GetBody()->GetUserData().pointer;
+	if (!pPLayer->IsDie())
+	{
+		pPLayer->TakeDamage(pBullet->GetDamage());
+		ResourcesManager::GetInstance()->GetSound(8)->Play();
+	}	
 }
 
 void ContactListener::PlayerBulletGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
@@ -187,5 +200,17 @@ void ContactListener::PLayerLootItem(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	auto pPlayer = (Player*)player->GetBody()->GetUserData().pointer;
 	// TODO: get item
 	pPlayer->GetItem(pItem->GetType());
+}
+
+void ContactListener::PlayerBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB)
+{
+	auto playerBulletFixture = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_BULLET ? fixtureA : fixtureB;
+	auto pBullet = (Bullet*)playerBulletFixture->GetBody()->GetUserData().pointer;
+	pBullet->SetActiveStatus(false);;
+
+	// TODO: mark boss as dead
+	auto playerFixture = fixtureA->GetFilterData().categoryBits == FixtureTypes::FIXTURE_PLAYER ? fixtureA : fixtureB;
+	auto pPlayer = (Boss*)playerFixture->GetBody()->GetUserData().pointer;
+	pPlayer->TakeDamage(pBullet->GetDamage());
 }
 

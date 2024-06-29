@@ -84,7 +84,7 @@ void Bullet::Draw()
 	}
 }
 
-void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage)
+void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage, bool isOpponentCharacter)
 {
 	m_isActive = true;
 	m_damage = damage;
@@ -100,7 +100,7 @@ void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, in
 	case PLAYER_BULLET:
 		m_animation = std::make_shared<SpriteAnimation>("Bullet/BlackBullet.png", 4, 0.1);
 		bulletFixtureDef.filter.categoryBits = FIXTURE_PLAYER_BULLET;
-		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS | FIXTURE_PLAYER;
+		bulletFixtureDef.filter.maskBits = FIXTURE_ENEMY | FIXTURE_GROUND | FIXTURE_BOSS;
 		break;
 	case BLACK_BULLET:
 		m_animation = std::make_shared<SpriteAnimation>("Bullet/BlackBullet.png", 4, 0.1);
@@ -164,6 +164,22 @@ void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, in
 		break;
 	}
 
+	if (isOpponentCharacter)
+	{
+		bulletFixtureDef.filter.categoryBits = FIXTURE_ENEMY_BULLET;
+		bulletFixtureDef.filter.maskBits = FIXTURE_PLAYER | FIXTURE_GROUND;
+	}
+	bulletShape.SetAsBox(0.5, 0.5);
+	bulletFixtureDef.shape = &bulletShape;
+	if (m_bulletFixture)
+	{
+		m_body->DestroyFixture(m_bulletFixture);
+	}
+	m_body->SetTransform(b2Vec2(position.x, position.y), 0);
+	m_bulletFixture = m_body->CreateFixture(&bulletFixtureDef);
+	m_body->SetLinearVelocity(speed);
+	m_body->SetEnabled(true);
+
 	m_animation->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
 	m_animation->Set2DPositionByTile(position.x, position.y);
 	m_animation->Set2DSizeByTile(1, 1);
@@ -179,17 +195,6 @@ void Bullet::CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, in
 	{
 		m_animation->FlipHorizontal(true);
 	}
-
-	bulletShape.SetAsBox(0.5, 0.5);
-	bulletFixtureDef.shape = &bulletShape;
-	if (m_bulletFixture)
-	{
-		m_body->DestroyFixture(m_bulletFixture);
-	}
-	m_body->SetTransform(b2Vec2(position.x, position.y), 0);
-	m_bulletFixture = m_body->CreateFixture(&bulletFixtureDef);
-	m_body->SetLinearVelocity(speed);
-	m_body->SetEnabled(true);
 }
 
 void Bullet::OnMouseScroll()

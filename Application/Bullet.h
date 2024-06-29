@@ -42,7 +42,7 @@ public:
 	void Update(float deltaTime);
 	void Draw();
 
-	void CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage = 1);
+	void CreateNewBullet(BulletType type, b2Vec2 speed, Vector2 position, int damage = 1, bool isOpponentCharacter = false);
 	void OnMouseScroll();
 	void SetBulletLinearVelocity(b2Vec2 speed);
 	void Set2DPosition(float x, float y);

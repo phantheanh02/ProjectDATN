@@ -53,6 +53,7 @@ class Player
 {
 public:
 	Player();
+	Player(CharacterType currentOpponentCharacter);
 	~Player();
 
 	void Update(float deltaTime);
@@ -124,6 +125,8 @@ private:
 	GLint		m_coin;
 	GLint		m_armor;
 
+	// solo
+	bool		m_isOpponentCharacter;
 private:
 	void HandlePlayerDie(GLfloat deltaTime);
 	void CreateBullet(b2Vec2 speed);

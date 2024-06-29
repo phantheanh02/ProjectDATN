@@ -34,12 +34,6 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     memset(m_buf, 0, BUFLEN);
 
     m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    //if (!m_host)
-    //{
-        // Set time-out for receiving
-        //int tv = 1000; //Time-out interval: 1000ms
-        //setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)(&tv), sizeof(int));
-    //}
 
     if (m_socket == INVALID_SOCKET) 
     {
@@ -72,7 +66,6 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     }
     else
     {
-        //m_clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (connect(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
         {
             printf("Error! Cannot connect server.");
@@ -80,8 +73,6 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
         }
         // Ping to server
         SendNewMessage("action00"); // CONNECT
-        //int serverAddrSize = sizeof(m_serverAddr);
-        //int ret = recvfrom(m_socket, m_buf, BUFLEN, 0, (sockaddr*)&m_serverAddr, &serverAddrSize);
         int ret = recv(m_socket, m_buf, BUFLEN, 0);
         if (ret == SOCKET_ERROR) 
         {
@@ -99,7 +90,6 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
         else 
         {
             m_buf[ret] = 0;
-            //printf("Receive from server : % s\n", m_buf);
         }
         printf("Client started!\n");
     }
