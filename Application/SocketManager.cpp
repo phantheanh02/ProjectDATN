@@ -32,7 +32,6 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     m_port = port;
     m_hasNewMsg = false;
     memset(m_buf, 0, BUFLEN);
-
     m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     if (m_socket == INVALID_SOCKET) 
@@ -44,10 +43,10 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     
     m_serverAddr.sin_family = AF_INET;
     m_serverAddr.sin_port = htons(SERVER_PORT);
-    inet_pton(AF_INET, IP_ADDRESS, &m_serverAddr.sin_addr);
-
+    //inet_pton(AF_INET, IP_ADDRESS, &m_serverAddr.sin_addr);
     if (m_host)
     {
+        m_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
         // Bind address to socket
         if (bind(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
         {
@@ -66,6 +65,7 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     }
     else
     {
+        m_serverAddr.sin_addr.s_addr = inet_addr(IP_ADDRESS);//inet_addr("192.168.1.160");
         if (connect(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
         {
             printf("Error! Cannot connect server.");
@@ -219,6 +219,11 @@ bool SocketManager::ReceiveMessage()
             return 0;
         }
         m_buf[ret] = 0;
+
+        // Lock thread to save data
+        m_mutex.lock();
+        m_dataQueue.push(std::string(m_buf));
+        m_mutex.unlock();
         //printf("Receive from client: %s\n", m_buf);
     }
     else
@@ -234,6 +239,12 @@ bool SocketManager::ReceiveMessage()
             return false;
         }
         m_buf[ret] = 0;
+
+        // Lock thread to save data
+        m_mutex.lock();
+        m_dataQueue.push(std::string(m_buf));
+        m_mutex.unlock();
+
         //printf("Receive from server: %s\n", m_buf);
     }
     m_hasNewMsg = true;
@@ -252,7 +263,17 @@ void SocketManager::SetStatusMsg(bool isReceives)
 
 std::string SocketManager::GetDataMsg()
 {
-    return std::string(m_buf);
+    if (m_dataQueue.empty())
+    {
+        return "";
+    }
+
+    m_mutex.lock();
+    auto data = m_dataQueue.front();
+    m_dataQueue.pop();
+    m_mutex.unlock();
+
+    return data;
 }
 
 bool SocketManager::IsHost()
@@ -273,7 +294,7 @@ void SocketManager::ThreadProc(void* lpParameter)
     {
         SocketManager::GetInstance()->AcceptClientConnect();
     }
-
+    
     while (SocketManager::GetInstance()->ReceiveMessage()){}
 }
 

@@ -4,6 +4,8 @@
 #include <ws2tcpip.h>
 #include <string>
 #include <thread>
+#include <mutex>
+#include <queue>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -65,11 +67,14 @@ private:
 	SOCKET	m_clientSock;
 
 	char	m_buf[BUFLEN];
+	std::queue<std::string> m_dataQueue;
+
 	//struct addrinfo m_hints, * m_addrInfo;
 	sockaddr_in m_serverAddr, m_clientAddr;
 
 	bool		m_hasNewMsg;
 	HANDLE		m_threadHandle;
+	std::mutex	m_mutex;
 
 private:
 	static void ThreadProc(void* lpParameter);

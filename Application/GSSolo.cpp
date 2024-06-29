@@ -89,6 +89,7 @@ void GSSolo::Init()
 
 void GSSolo::Update(float deltaTime)
 {
+	printf("Update\n");
 	if (!m_isReadyState)
 	{
 		SocketManager::GetInstance()->SendNewMessage("action11");
@@ -305,9 +306,10 @@ void GSSolo::LoadMap()
 
 void GSSolo::HandleRequest()
 {
-	if (SocketManager::GetInstance()->HasNewMsg())
+	std::string msg = SocketManager::GetInstance()->GetDataMsg();
+	if (msg != "")
 	{
-		std::string msg = SocketManager::GetInstance()->GetDataMsg();
+		 
 		std::string header = msg.substr(0, 6);
 		std::string body = msg.substr(6, 8);
 		int check = std::stoi(body);
@@ -317,8 +319,11 @@ void GSSolo::HandleRequest()
 			switch (check)
 			{
 			case START_PLAY:
-				m_isReadyState = true;
-				SocketManager::GetInstance()->SendNewMessage("action11");
+				if (!m_isReadyState)
+				{
+					m_isReadyState = true;
+					SocketManager::GetInstance()->SendNewMessage("action11");
+				}
 				break;
 			case EXIT_BATTLE:
 				GameStateMachine::GetInstance()->PopState();

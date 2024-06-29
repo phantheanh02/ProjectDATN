@@ -270,10 +270,10 @@ void GSLocalWifi::PopButton(ButtonType type)
 
 void GSLocalWifi::HandleRequest()
 {
-	if (SocketManager::GetInstance()->HasNewMsg())
+	std::string msg = SocketManager::GetInstance()->GetDataMsg();
+	if (msg != "")
 	{
 		m_hasClient = true;
-		std::string msg = SocketManager::GetInstance()->GetDataMsg();
 		std::string header = msg.substr(0, 6);
 		std::string body = msg.substr(6, 8);
 		RequestType request = (RequestType)std::stoi(body);
