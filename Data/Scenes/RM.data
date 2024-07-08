@@ -295,6 +295,8 @@ ID 135
 FILE "Striker/spr_StrikerRun_strip.png"
 ID 136
 FILE "Striker/spr_StrikerSlash_stripWithEffect.png"
+ID 137
+FILE "Button/btn_ready_b.png"
 $
 
 #Sounds

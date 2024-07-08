@@ -83,6 +83,10 @@ void GSLocalWifi::Draw()
 
 	for (auto button : m_buttonList)
 	{
+		if (button->m_type == BUTTON_START && !m_isClientReady)
+		{
+			continue;
+		}
 		button->Draw();
 	}
 
@@ -198,11 +202,13 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				if (m_isClientReady)
 				{
 					m_isClientReady = false;
+					button->SetTexture(ResourcesManager::GetInstance()->GetTexture("Button/btn_ready.png"));
 					SocketManager::GetInstance()->SendNewMessage("action13");
 				}
 				else
 				{
 					m_isClientReady = true;
+					button->SetTexture(ResourcesManager::GetInstance()->GetTexture("Button/btn_ready_b.png"));
 					SocketManager::GetInstance()->SendNewMessage("action12");
 				}
 				break;
@@ -216,7 +222,6 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				{
 					// noti client not ready
 					printf("Client hasn't ready\n");
-
 				}
 				break;
 			default:
