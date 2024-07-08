@@ -366,6 +366,8 @@ void Player::SetLoadingBullet(GLfloat time)
 
 void Player::GetItem(ItemType typeItem)
 {
+	ResourcesManager::GetInstance()->GetSound(11)->Play();
+
 	switch (typeItem)
 	{
 	case HEALING:
@@ -480,6 +482,7 @@ void Player::HandleEvent(int event)
 			break;
 		}
 		CreateBullet(speed);
+		ResourcesManager::GetInstance()->GetSound(4)->Play();
 
 		m_numberBullet--;
 		if (m_numberBullet <= 0)
@@ -506,6 +509,7 @@ void Player::TakeDamage(GLint damage)
 	{
 		m_isDie = true;
 		m_isTakeDamage = false;
+		ResourcesManager::GetInstance()->GetSound(5)->Play();
 	}
 
 	m_HPBar->Set2DSizeByTile(1.5f * m_health / m_stats.hp, 0.1f);

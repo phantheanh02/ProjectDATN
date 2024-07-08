@@ -7,21 +7,17 @@ Sound::Sound()
 	m_currentVolume = 100;
 	m_lastPlayingChannel = -1;
 	m_sound = nullptr;
-	m_music = nullptr;
 }
 
 Sound::~Sound()
 {
 	Mix_FreeChunk(m_sound);
-	Mix_FreeMusic(m_music);
 	m_sound = nullptr;
-	m_music = nullptr;
 }
 
 int Sound::LoadSound(const std::string& filename)
 {
 	m_sound = Mix_LoadWAV(filename.c_str());
-	m_music = Mix_LoadMUS(filename.c_str());
 	if (!m_sound)
 	{
 		return -1;
@@ -37,24 +33,18 @@ void Sound::FreeSound()
 
 void Sound::Play(int timesLoop)
 {
-	if (timesLoop)
-	{
-		if (m_lastPlayingChannel = Mix_PlayMusic(m_music, -1) == -1)
-		{
-			std::cerr << "Background music error\n " << Mix_GetError() << std::endl;
-			return;
-		}
-	}
 	m_lastPlayingChannel = Mix_PlayChannel(-1, m_sound, timesLoop);
 }
 
 void Sound::Pause()
 {
+	Mix_PauseMusic();
 	Mix_Pause(m_lastPlayingChannel);
 }
 
 void Sound::Resume()
 {
+	Mix_ResumeMusic();
 	Mix_Resume(m_lastPlayingChannel);
 }
 

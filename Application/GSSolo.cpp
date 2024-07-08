@@ -21,6 +21,8 @@ GSSolo::~GSSolo()
 
 	world.reset();
 	delete m_contactListener;
+	ResourcesManager::GetInstance()->GetSound(9)->Stop();
+	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
 }
 
 void GSSolo::Init()
@@ -88,6 +90,9 @@ void GSSolo::Init()
 	button->Set2DPosition(710, 30);
 	m_buttonList.push_back(button);
 
+	// Music
+	ResourcesManager::GetInstance()->GetSound(10)->Stop();
+	ResourcesManager::GetInstance()->GetSound(9)->Play(true);
 }
 
 void GSSolo::Update(float deltaTime)

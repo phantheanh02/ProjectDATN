@@ -115,9 +115,11 @@ void Boss::TakeDamage(GLint damage)
 
 	if (m_health <= 0)
 	{
+		ResourcesManager::GetInstance()->GetSound(13)->Play();
 		Kill();
 		return;
 	}
+	ResourcesManager::GetInstance()->GetSound(8)->Play();
 }
 
 void Boss::Kill()

@@ -15,6 +15,10 @@ GSPlay::~GSPlay()
 	}
 	world.reset();
 	delete m_contactListener;
+	ResourcesManager::GetInstance()->GetSound(9)->Stop();
+	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
+	ResourcesManager::GetInstance()->GetSound(10)->SetVolume(20);
+
 }
 
 void GSPlay::Init()
@@ -139,8 +143,10 @@ void GSPlay::Init()
 	m_totalTimeText->SetTextColor(YELLOW);
 
 	// Music
-	ResourcesManager::GetInstance()->GetSound(10)->Pause();
+	ResourcesManager::GetInstance()->GetSound(10)->Stop();
 	ResourcesManager::GetInstance()->GetSound(9)->Play(true);
+	ResourcesManager::GetInstance()->GetSound(9)->SetVolume(20);
+
 }
 
 void GSPlay::Update(float deltaTime)
@@ -402,18 +408,21 @@ void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			switch (button->m_type)
 			{
 			case BUTTON_BUY_BULLET_UPGRADE:
+				ResourcesManager::GetInstance()->GetSound(14)->Play();
 				m_player->SetCoin(m_player->GetCoin() - m_totalCoinCostBullet);
 				m_totalCoinCost -= m_totalCoinCostBullet;
 				m_player->SetNumberBullet(m_player->GetNumberBullet() + m_totalCoinCostBullet / BULLET_UPGRADE_COST);
 				m_totalCoinCostBullet = 0;
 				break;
 			case BUTTON_BUY_ARMOR_UPGRADE:
+				ResourcesManager::GetInstance()->GetSound(14)->Play();
 				m_player->SetCoin(m_player->GetCoin() - m_totalCoinCostArmor);
 				m_totalCoinCost -= m_totalCoinCostArmor;
 				m_player->SetArmor(m_player->GetArmor() + m_totalCoinCostArmor / ARMOR_UPGRADE_COST);
 				m_totalCoinCostArmor = 0;
 				break;
 			case BUTTON_BUY_HP_UPGRADE:
+				ResourcesManager::GetInstance()->GetSound(14)->Play();
 				m_player->SetCoin(m_player->GetCoin() - m_totalCoinCostHP);
 				m_totalCoinCost -= m_totalCoinCostHP;
 				for (int i = 0; i < m_totalCoinCostHP / HP_UPGRADE_COST; i++)

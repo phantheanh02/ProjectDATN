@@ -320,6 +320,14 @@ ID 9
 FILE "PlaySound.wav"
 ID 10
 FILE "background.wav"
+ID 11
+FILE "coin.wav"
+ID 12
+FILE "enemy_dead.wav"
+ID 13
+FILE "boss_dead.wav"
+ID 14
+FILE "power_up.wav"
 $
 
 #Fonts

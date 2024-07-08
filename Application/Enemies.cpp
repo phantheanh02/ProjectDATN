@@ -187,7 +187,7 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 			case PATREON:
 			case MEGAMAN:
 			case YUME:
-				speed = m_body->GetPosition() - m_body->GetPosition();
+				speed = positionPlayer - m_body->GetPosition();
 				speed.Normalize();
 				speed *= 10;
 				break;
@@ -422,6 +422,21 @@ void Enemies::TakeDamage(GLint damage)
 	{
 		m_isDie = true;
 		m_isTakeDamage = false;
+		switch (m_type)
+		{
+		case AR_MOD:
+		case RPG_MOD:
+		case Sniper_MOD:
+			ResourcesManager::GetInstance()->GetSound(12)->Play();
+			break;
+		case PATREON:
+		case MEGAMAN:
+		case YUME:
+			ResourcesManager::GetInstance()->GetSound(2)->Play();
+			break;
+		default:
+			break;
+		}
 	}
 	m_timeBarDisplay = 2.0f;
 }
