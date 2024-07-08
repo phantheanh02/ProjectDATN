@@ -65,7 +65,7 @@ bool SocketManager::CreateSocket(bool host, unsigned int port)
     }
     else
     {
-        m_serverAddr.sin_addr.s_addr = inet_addr(IP_ADDRESS);//inet_addr("192.168.1.160");
+        m_serverAddr.sin_addr.s_addr = inet_addr(IP_ADDRESS);// inet_addr("192.168.1.78"); 
         if (connect(m_socket, (sockaddr*)&m_serverAddr, sizeof(m_serverAddr)))
         {
             printf("Error! Cannot connect server.");

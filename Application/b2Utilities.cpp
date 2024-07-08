@@ -44,7 +44,7 @@ void ContactListener::BeginContact(b2Contact* contact)
 		PlayerBulletPlayer(fixtureA, fixtureB);
 		break;
 	case CollionTypes::ENEMY_GROUND:
-		EnemyGround(fixtureA, fixtureB);
+		//EnemyGround(fixtureA, fixtureB);
 		break;
 	default:
 		break;
@@ -63,7 +63,7 @@ void ContactListener::EndContact(b2Contact* contact)
 		PlayerOnAir(fixtureA, fixtureB);
 		break;
 	case CollionTypes::ENEMY_GROUND:
-		EnemyEndGround(fixtureA, fixtureB);
+		//EnemyEndGround(fixtureA, fixtureB);
 		break;
 	default:
 		break;
@@ -75,6 +75,10 @@ void ContactListener::PlayerOnGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
 	b2Fixture* sensor;
 	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_PLAYER_FOOT ? fixtureA : fixtureB;
 	auto player = (Player*)sensor->GetUserData().pointer;
+	if (!player)
+	{
+		return;
+	}
 	player->m_contacCount++;
 	player->SetJumpingStatus(false);
 	player = nullptr;

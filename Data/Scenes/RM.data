@@ -297,6 +297,10 @@ ID 136
 FILE "Striker/spr_StrikerSlash_stripWithEffect.png"
 ID 137
 FILE "Button/btn_ready_b.png"
+ID 138
+FILE "Item/item_cup.png"
+ID 139
+FILE "Background/bg_guide.png"
 $
 
 #Sounds

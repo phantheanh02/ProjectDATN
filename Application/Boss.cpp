@@ -192,6 +192,7 @@ void Boss::SetAction(BossActionType typeAction)
 
 void Boss::OnMouseScroll()
 {
+	m_animation->Set2DSizeByTile(SCALE_SIZE * m_imgSize.x / m_imgSize.y, SCALE_SIZE);
 }
 
 void Boss::CreateBossBox()

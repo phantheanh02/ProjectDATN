@@ -17,8 +17,6 @@ GSPlay::~GSPlay()
 	delete m_contactListener;
 	ResourcesManager::GetInstance()->GetSound(9)->Stop();
 	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
-	ResourcesManager::GetInstance()->GetSound(10)->SetVolume(20);
-
 }
 
 void GSPlay::Init()
@@ -547,6 +545,11 @@ void GSPlay::OnMouseScroll(int x, int y, short delta)
 			enemy->OnMouseScroll();
 		}
 	}
+	for (auto item : m_itemList)
+	{
+		item->OnMouseScroll();
+	}
+	m_boss->OnMouseScroll();
 }
 
 void GSPlay::Update2DDrawPosition()
@@ -760,6 +763,10 @@ void GSPlay::CreateButton(const char* filename, GLfloat width, GLfloat height, G
 
 void GSPlay::CheckWin()
 {
+	if (!m_player->IsHasCup())
+	{
+		return;
+	}
 	for (auto enemy : m_enemiesList)
 	{
 		if (enemy->IsActive())

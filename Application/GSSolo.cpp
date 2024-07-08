@@ -23,7 +23,6 @@ GSSolo::~GSSolo()
 	delete m_contactListener;
 	ResourcesManager::GetInstance()->GetSound(9)->Stop();
 	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
-	ResourcesManager::GetInstance()->GetSound(10)->SetVolume(20);
 }
 
 void GSSolo::Init()

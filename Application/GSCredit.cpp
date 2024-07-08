@@ -15,10 +15,16 @@ void GSCredit::Init()
 	m_button->Set2DPosition(479 * 960 / 608.0f, 18 * 960 / 608.0f);
 
 	// bg
-	m_background = std::make_shared<Sprite2D>("Background/bg_help.png");
+	m_background = std::make_shared<Sprite2D>("Background/bg_rank.png");
 	m_background->Set2DPosition(0, 0);
 	m_background->Set2DSize(Globals::screenWidth, Globals::screenHeight);
 	m_background->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+
+	m_guide = std::make_shared<Sprite2D>("Background/bg_guide.png");
+	m_guide->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
+	m_guide->Set2DPosition(Globals::screenWidth / 2, Globals::screenHeight / 2);
+	m_guide->Set2DSize(585, 480);
+	m_guide->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 }
 
 void GSCredit::Update(float deltaTime)
@@ -28,6 +34,7 @@ void GSCredit::Update(float deltaTime)
 void GSCredit::Draw()
 {
 	m_background->Draw();
+	m_guide->Draw();
 	m_button->Draw();
 }
 

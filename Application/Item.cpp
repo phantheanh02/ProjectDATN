@@ -23,6 +23,9 @@ Item::Item(ItemType type, GLfloat posX, GLfloat posY):
 	case ARMOR:
 		m_sprite = std::make_shared<Sprite2D>("Item/item_armor.png");
 		break;
+	case CUP:
+		m_sprite = std::make_shared<Sprite2D>("Item/item_cup.png");
+		break;
 	default:
 		break;
 	}
@@ -75,6 +78,11 @@ void Item::Draw()
 	{
 		m_sprite->Draw();
 	}
+}
+
+void Item::OnMouseScroll()
+{
+	m_sprite->Set2DSizeByTile(1, 1);
 }
 
 void Item::Set2DSize(GLint w, GLint h)

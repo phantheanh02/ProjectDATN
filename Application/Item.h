@@ -14,7 +14,8 @@ enum ItemType
 {
 	HEALING = 0,
 	COIN	= 1	,
-	ARMOR	= 2
+	ARMOR	= 2,
+	CUP
 };
 
 class Item
@@ -26,6 +27,7 @@ public:
 
 	void Update(GLfloat deltaTime);
 	void Draw();
+	void OnMouseScroll();
 
 	void Set2DSize(GLint w, GLint h);
 

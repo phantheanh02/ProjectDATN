@@ -39,4 +39,5 @@ void MapClass::Draw()
 void MapClass::OnMouseScroll()
 {
 	m_background->Set2DSizeByTile(m_data->width, m_data->height);
+
 }

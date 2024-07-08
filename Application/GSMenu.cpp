@@ -21,7 +21,6 @@ void GSMenu::Init()
 
 	Vector2 posButton = Vector2(370, 100);
 	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
-	ResourcesManager::GetInstance()->GetSound(10)->SetVolume(20);
 
 	// button play
 	std::shared_ptr<Button> button = std::make_shared<Button>("Button/btn_play.png", BUTTON_PLAY);

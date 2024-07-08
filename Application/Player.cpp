@@ -27,6 +27,7 @@ Player::Player()
 	, m_armor(0)
 	, m_isOpponentCharacter(false)
 	, m_armorActiveTime(0)
+	, m_isHasCup(false)
 {
 	SetCharacter(currentCharacter);
 
@@ -381,6 +382,9 @@ void Player::GetItem(ItemType typeItem)
 	case ARMOR:
 		m_armor++;
 		break;
+	case CUP:
+		m_isHasCup = true;
+		break;
 	default:
 		break;
 	}
@@ -511,7 +515,10 @@ void Player::TakeDamage(GLint damage)
 		m_isTakeDamage = false;
 		ResourcesManager::GetInstance()->GetSound(5)->Play();
 	}
-
+	else
+	{
+		ResourcesManager::GetInstance()->GetSound(7)->Play();
+	}
 	m_HPBar->Set2DSizeByTile(1.5f * m_health / m_stats.hp, 0.1f);
 	
 }
@@ -522,6 +529,13 @@ void Player::ReCalculateWhenScroll()
 	m_actionAnimation->Set2DSizeByTile(m_size.x, m_size.y);
 
 	m_HPBar->Set2DSizeByTile(1.5f * m_health / m_stats.hp, 0.1f);
+	for (auto bullet : m_bulletList)
+	{
+		if (bullet->IsActive())
+		{
+			bullet->OnMouseScroll();
+		}
+	}
 }
 
 void Player::ActiveArmorItem()

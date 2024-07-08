@@ -56,16 +56,16 @@ void Enemies::Init(GLfloat posX, GLfloat posY)
 	m_body->SetFixedRotation(true);
 
 	// Create sensor foot to check in ground
-	b2PolygonShape sensorBox;
-	b2FixtureUserData userData;
-	b2FixtureDef sensorDef;
-	sensorBox.SetAsBox(0.1f, 0.1f, b2Vec2(0, 1), 0); // sensor dưới chân
-	sensorDef.shape = &sensorBox;
-	sensorDef.isSensor = true;
-	sensorDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER_FOOT;
-	sensorDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND;
-	sensorDef.userData.pointer = (uintptr_t)this;
-	m_body->CreateFixture(&sensorDef);
+	//b2PolygonShape sensorBox;
+	//b2FixtureUserData userData;
+	//b2FixtureDef sensorDef;
+	//sensorBox.SetAsBox(0.1f, 0.1f, b2Vec2(0, 1), 0); // sensor dưới chân
+	//sensorDef.shape = &sensorBox;
+	//sensorDef.isSensor = true;
+	//sensorDef.filter.categoryBits = FixtureTypes::FIXTURE_PLAYER_FOOT;
+	//sensorDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND;
+	//sensorDef.userData.pointer = (uintptr_t)this;
+	//m_body->CreateFixture(&sensorDef);
 
 	switch (m_type)
 	{
@@ -114,6 +114,13 @@ void Enemies::OnMouseScroll()
 	auto pos = m_body->GetPosition();
 	m_animation->Set2DPositionByTile(pos.x, pos.y);
 	m_animation->Set2DSizeByTile(m_sizeByTile.x, m_sizeByTile.y);
+	for (auto bullet : m_bulletList)
+	{
+		if (bullet->IsActive())
+		{
+			bullet->OnMouseScroll();
+		}
+	}
 }
 
 void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
@@ -141,7 +148,6 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 	{
 		// ray casting 
 		PerformRayCasting(positionPlayer);
-
 		m_animation->Set2DPositionByTile(m_body->GetPosition().x, m_body->GetPosition().y);
 		m_animation->Update(deltaTime);
 
@@ -165,7 +171,7 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 			{
 				//m_body->SetLinearVelocity(m_speed);
 			}
-
+			
 			m_timeFinding -= deltaTime;
 			if (m_timeFinding <= 0)
 			{
@@ -280,10 +286,11 @@ void Enemies::SetAction(EnemyAction action)
 			m_animation->SetCurrentFrame(0);
 			m_animation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 			break;
-		case 01:
+		case 01: 
 		case 11:
 		case 21:
-			m_animation = std::make_shared<SpriteAnimation>("Enemy/Enemy_run.png", 8, 0.15f);
+			m_animation = std::make_shared<SpriteAnimation>("Enemy/ARMod_Idle.png", 8, 0.1f);
+			//m_animation = std::make_shared<SpriteAnimation>("Enemy/Enemy_run.png", 8, 0.15f);
 			m_animation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 			break;
 		case 02:

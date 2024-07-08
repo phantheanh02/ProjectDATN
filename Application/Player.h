@@ -86,6 +86,7 @@ public:
 	inline bool				IsLoadingBullet() { return m_isLoadingBullet > 0; };
 	inline GLint			GetCoin() { return m_coin; };
 	inline GLint			GetArmor() { return m_armor; };
+	inline bool				IsHasCup() { return m_isHasCup; };
 
 	GLint								m_contacCount;
 private:
@@ -128,6 +129,7 @@ private:
 	GLint		m_armor;
 	GLfloat		m_armorActiveTime;
 	std::shared_ptr<Sprite2D>	m_armorSprite;
+	bool		m_isHasCup;
 
 	// solo
 	bool		m_isOpponentCharacter;

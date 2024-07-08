@@ -31,5 +31,6 @@ public:
 private:
 	float m_time;
 	std::shared_ptr<Sprite2D>	m_background;
+	std::shared_ptr<Sprite2D>	m_guide;
 	std::shared_ptr<Button>  m_button;
 };
