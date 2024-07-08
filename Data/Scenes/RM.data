@@ -316,6 +316,10 @@ ID 7
 FILE "player_hit.wav"
 ID 8
 FILE "enemy_hit.wav"
+ID 9
+FILE "PlaySound.wav"
+ID 10
+FILE "background.wav"
 $
 
 #Fonts

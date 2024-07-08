@@ -43,6 +43,9 @@ void ContactListener::BeginContact(b2Contact* contact)
 	case CollionTypes::PLAYER_BULLET_PLAYER:
 		PlayerBulletPlayer(fixtureA, fixtureB);
 		break;
+	case CollionTypes::ENEMY_GROUND:
+		EnemyGround(fixtureA, fixtureB);
+		break;
 	default:
 		break;
 	}
@@ -58,6 +61,9 @@ void ContactListener::EndContact(b2Contact* contact)
 	{
 	case CollionTypes::PLAYER_FOOT_GROUND:
 		PlayerOnAir(fixtureA, fixtureB);
+		break;
+	case CollionTypes::ENEMY_GROUND:
+		EnemyEndGround(fixtureA, fixtureB);
 		break;
 	default:
 		break;
@@ -212,5 +218,42 @@ void ContactListener::PlayerBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixture
 	auto playerFixture = fixtureA->GetFilterData().categoryBits == FixtureTypes::FIXTURE_PLAYER ? fixtureA : fixtureB;
 	auto pPlayer = (Boss*)playerFixture->GetBody()->GetUserData().pointer;
 	pPlayer->TakeDamage(pBullet->GetDamage());
+}
+
+void ContactListener::EnemyGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
+{
+	b2Fixture* sensor;
+	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_ENEMY ? fixtureA : fixtureB;
+	auto enemy = (Enemies*)sensor->GetUserData().pointer;
+	if (enemy)
+	{
+		enemy->m_contacCount++;
+		return;
+	}
+
+	auto pPLayer = (Player*)sensor->GetBody()->GetUserData().pointer;
+	if (pPLayer)
+	{
+		pPLayer->m_contacCount++;
+	}
+}
+
+void ContactListener::EnemyEndGround(b2Fixture* fixtureA, b2Fixture* fixtureB)
+{
+	b2Fixture* sensor;
+	sensor = fixtureA->GetFilterData().categoryBits == FIXTURE_ENEMY ? fixtureA : fixtureB;
+	auto enemy = (Enemies*)sensor->GetUserData().pointer;
+
+	if (enemy)
+	{
+		enemy->m_contacCount--;
+		return;
+	}
+
+	auto pPLayer = (Player*)sensor->GetBody()->GetUserData().pointer;
+	if (pPLayer)
+	{
+		pPLayer->m_contacCount--;
+	}
 }
 

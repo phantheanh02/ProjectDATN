@@ -29,6 +29,10 @@ void GSPlay::Init()
 	m_isShowPopup = false;
 	m_isEndMatch = false;
 	m_isWin = false;
+	m_totalCoinCostBullet = 0;
+	m_totalCoinCostArmor = 0;
+	m_totalCoinCostHP = 0;
+	m_totalCoinCost = 0;
 
 	// Box2d
 	// create world with gravity
@@ -133,10 +137,27 @@ void GSPlay::Init()
 	m_totalTimeText->Set2DPosition(600, 30);
 	m_totalTimeText->Set2DScale(0.3f, 0.3f);
 	m_totalTimeText->SetTextColor(YELLOW);
+
+	// Music
+	ResourcesManager::GetInstance()->GetSound(10)->Pause();
+	ResourcesManager::GetInstance()->GetSound(9)->Play(true);
 }
 
 void GSPlay::Update(float deltaTime)
 {
+	// Update text
+	std::string text = "x" + std::to_string(m_player->GetNumberBullet());
+	m_numberBulletText->SetText(text);
+
+	text = "x" + std::to_string(m_player->GetCoin());
+	m_numberCoinText->SetText(text);
+
+	text = "x" + std::to_string(m_player->GetArmor());
+	m_numberArmorText->SetText(text);
+
+	text = "Time: " + std::to_string((GLint)m_totalTime) + "s";
+	m_totalTimeText->SetText(text);
+
 	if (m_isShowPopup)
 	{
 		UpdatePopup(deltaTime);
@@ -197,19 +218,6 @@ void GSPlay::Update(float deltaTime)
 			m_loadBullet->Update(deltaTime);
 		}
 	}
-
-	// Update text
-	std::string text = "x" + std::to_string(m_player->GetNumberBullet());
-	m_numberBulletText->SetText(text);
-
-	text = "x" + std::to_string(m_player->GetCoin());
-	m_numberCoinText->SetText(text);
-
-	text = "x" + std::to_string(m_player->GetArmor());
-	m_numberArmorText->SetText(text);
-
-	text = "Time: " + std::to_string((GLint)m_totalTime) + "s";
-	m_totalTimeText->SetText(text);
 }
 
 void GSPlay::Draw()
@@ -324,6 +332,8 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 			break;
 		case KEY_ESC:
 			break;
+		case KEY_K:
+			break;
 		default:
 			break;
 		}
@@ -371,6 +381,10 @@ void GSPlay::OnKey(unsigned char key, bool pressed)
 				CreateButton("Icons/icon_pause.png", 40, 40, 890, 20, BUTTON_PAUSE);
 			}
 			break;
+		case KEY_K:
+			// TODO: active armor item
+			m_player->ActiveArmorItem();
+			break;
 		default:
 			break;
 		}
@@ -388,31 +402,79 @@ void GSPlay::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			switch (button->m_type)
 			{
 			case BUTTON_BUY_BULLET_UPGRADE:
-	
+				m_player->SetCoin(m_player->GetCoin() - m_totalCoinCostBullet);
+				m_totalCoinCost -= m_totalCoinCostBullet;
+				m_player->SetNumberBullet(m_player->GetNumberBullet() + m_totalCoinCostBullet / BULLET_UPGRADE_COST);
+				m_totalCoinCostBullet = 0;
 				break;
 			case BUTTON_BUY_ARMOR_UPGRADE:
-				
+				m_player->SetCoin(m_player->GetCoin() - m_totalCoinCostArmor);
+				m_totalCoinCost -= m_totalCoinCostArmor;
+				m_player->SetArmor(m_player->GetArmor() + m_totalCoinCostArmor / ARMOR_UPGRADE_COST);
+				m_totalCoinCostArmor = 0;
 				break;
 			case BUTTON_BUY_HP_UPGRADE:
-				
+				m_player->SetCoin(m_player->GetCoin() - m_totalCoinCostHP);
+				m_totalCoinCost -= m_totalCoinCostHP;
+				for (int i = 0; i < m_totalCoinCostHP / HP_UPGRADE_COST; i++)
+				{
+					m_player->GetItem(ItemType::HEALING);
+				}
+				m_totalCoinCostHP = 0;
 				break;
 			case BUTTON_PLUS_ON_BULLET_UPGRADE:
-			
+			{
+				if (m_totalCoinCost + BULLET_UPGRADE_COST <= m_player->GetCoin())
+				{
+					m_totalCoinCost += BULLET_UPGRADE_COST;
+					m_totalCoinCostBullet += BULLET_UPGRADE_COST;
+				}
+			}
 				break;
 			case BUTTON_PLUS_OFF_BULLET_UPGRADE:
-			
+			{
+				if (m_totalCoinCost - BULLET_UPGRADE_COST >= 0 && m_totalCoinCostBullet - BULLET_UPGRADE_COST >= 0)
+				{
+					m_totalCoinCost -= BULLET_UPGRADE_COST;
+					m_totalCoinCostBullet -= BULLET_UPGRADE_COST;
+				}
+			}
 				break;
 			case BUTTON_PLUS_ON_ARMOR_UPGRADE:
-
+			{
+				if (m_totalCoinCost + ARMOR_UPGRADE_COST <= m_player->GetCoin())
+				{
+					m_totalCoinCost += ARMOR_UPGRADE_COST;
+					m_totalCoinCostArmor += ARMOR_UPGRADE_COST;
+				}
+			}
 				break;
 			case BUTTON_PLUS_OFF_ARMOR_UPGRADE:
-			
+			{
+				if (m_totalCoinCost - ARMOR_UPGRADE_COST >= 0 && m_totalCoinCostArmor - ARMOR_UPGRADE_COST >= 0)
+				{
+					m_totalCoinCost -= ARMOR_UPGRADE_COST;
+					m_totalCoinCostArmor -= ARMOR_UPGRADE_COST;
+				}
+			}
 				break;
 			case BUTTON_PLUS_ON_HP_UPGRADE:
-
+			{
+				if (m_totalCoinCost + HP_UPGRADE_COST <= m_player->GetCoin())
+				{
+					m_totalCoinCost += HP_UPGRADE_COST;
+					m_totalCoinCostHP += HP_UPGRADE_COST;
+				}
+			}
 				break;
 			case BUTTON_PLUS_OFF_HP_UPGRADE:
-			
+			{
+				if (m_totalCoinCost - HP_UPGRADE_COST >= 0 && m_totalCoinCostHP - HP_UPGRADE_COST >= 0)
+				{
+					m_totalCoinCost -= HP_UPGRADE_COST;
+					m_totalCoinCostHP -= HP_UPGRADE_COST;
+				}
+			}
 				break;
 			case BUTTON_RESUME:
 				m_isShowPopup = false;
@@ -541,6 +603,7 @@ void GSPlay::CreatePopUp()
 	m_isShowPopup = true;
 	m_listPopupSprite.clear();
 	m_buttonList.clear();
+	m_textCoinList.clear();
 
 	// add new button
 	Vector2 size = Vector2(137, 64);
@@ -609,6 +672,43 @@ void GSPlay::CreatePopUp()
 		CreateButton("Button/btn_plus_off.png", 19, 8, 257, 260, BUTTON_PLUS_OFF_BULLET_UPGRADE);
 		CreateButton("Button/btn_plus_off.png", 19, 8, 257, 378, BUTTON_PLUS_OFF_ARMOR_UPGRADE);
 		CreateButton("Button/btn_plus_off.png", 19, 8, 257, 487, BUTTON_PLUS_OFF_HP_UPGRADE);
+
+		// Number Bullet coin
+		auto font = ResourcesManager::GetInstance()->GetFont(0);
+		std::shared_ptr<Text> text = std::make_shared<Text>(0);
+		text->AttachCamera(m_staticCamera);
+		text->Init(font, "0");
+		text->SetTextColor(152, 121, 36);
+		text->Set2DScale(0.5f, 0.5f);
+		posX = 300;
+		posY = 252;
+		text->Set2DPosition(posX, posY);
+		m_textCoinList.push_back(text);
+
+		// Number ARMOR
+		text = std::make_shared<Text>(0);
+		text->AttachCamera(m_staticCamera);
+		text->Init(font, "0");
+		text->SetTextColor(152, 121, 36);
+		text->Set2DScale(0.5f, 0.5f);
+		posY = 369;
+		text->Set2DPosition(posX, posY);
+		m_textCoinList.push_back(text);
+
+		// Number HP
+		text = std::make_shared<Text>(0);
+		text->AttachCamera(m_staticCamera);
+		text->Init(font, "0");
+		text->SetTextColor(152, 121, 36);
+		text->Set2DScale(0.5f, 0.5f);
+		posY = 480;
+		text->Set2DPosition(posX, posY);
+		m_textCoinList.push_back(text);
+
+		m_totalCoinCostBullet = 0;
+		m_totalCoinCostArmor = 0;
+		m_totalCoinCostHP = 0;
+		m_totalCoinCost = 0;
 	}
 }
 
@@ -622,12 +722,23 @@ void GSPlay::DrawPopup()
 	{
 		button->Draw();
 	}
-
+	for (auto& text : m_textCoinList)
+	{
+		text->Draw();
+	}
 
 }
 
 void GSPlay::UpdatePopup(float deltaTime)
 {
+	if (m_isEndMatch)
+	{
+		return;
+	}
+
+	m_textCoinList[0]->SetText(std::to_string(m_totalCoinCostBullet));
+	m_textCoinList[1]->SetText(std::to_string(m_totalCoinCostArmor));
+	m_textCoinList[2]->SetText(std::to_string(m_totalCoinCostHP));
 }
 
 void GSPlay::CreateButton(const char* filename, GLfloat width, GLfloat height, GLfloat posX, GLfloat posY, ButtonType buttonType)

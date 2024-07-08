@@ -20,6 +20,7 @@ void GSMenu::Init()
 	m_mouse = 0;
 
 	Vector2 posButton = Vector2(370, 100);
+	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
 
 	// button play
 	std::shared_ptr<Button> button = std::make_shared<Button>("Button/btn_play.png", BUTTON_PLAY);
@@ -132,6 +133,8 @@ void GSMenu::OnKey(unsigned char key, bool pressed)
 
 void GSMenu::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 {
+	ResourcesManager::GetInstance()->GetSound(10)->Stop();
+	//ResourcesManager::GetInstance()->GetSound(9)->Play(true);
 	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))

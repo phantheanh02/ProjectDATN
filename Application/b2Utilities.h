@@ -26,7 +26,8 @@ enum CollionTypes
 	PLAYER_BULLET_BOSS		= FIXTURE_PLAYER_BULLET | FIXTURE_BOSS,
 	BOSS_BULLET_PLAYER		= FIXTURE_BOSS_BULLET | FIXTURE_PLAYER,
 	PLAYER_ITEM				= FIXTURE_PLAYER | FIXTURE_ITEM,
-	PLAYER_BULLET_PLAYER	= FIXTURE_PLAYER_BULLET | FIXTURE_PLAYER
+	PLAYER_BULLET_PLAYER	= FIXTURE_PLAYER_BULLET | FIXTURE_PLAYER,
+	ENEMY_GROUND			= FIXTURE_ENEMY | FIXTURE_GROUND
 };
 
 class ContactListener : public b2ContactListener
@@ -45,6 +46,9 @@ private:
 	void BossBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB);
 	void PLayerLootItem(b2Fixture* fixtureA, b2Fixture* fixtureB);
 	void PlayerBulletPlayer(b2Fixture* fixtureA, b2Fixture* fixtureB);
+	void EnemyGround(b2Fixture* fixtureA, b2Fixture* fixtureB);
+	void EnemyEndGround(b2Fixture* fixtureA, b2Fixture* fixtureB);
+
 };
 
 class MyRayCastCallback : public b2RayCastCallback {

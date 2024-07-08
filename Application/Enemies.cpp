@@ -21,6 +21,7 @@ Enemies::Enemies(EnemyType type, Vector2 sizeImg, Vector2 sizeBox, GLint hp, GLi
 	, m_health(hp)
 	, m_damage(damage)
 	, m_isGetCoin(false)
+	, m_contacCount(0)
 {
 	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
 }
@@ -50,6 +51,7 @@ void Enemies::Init(GLfloat posX, GLfloat posY)
 	fixtureDef.density = 1.0f;
 	fixtureDef.filter.categoryBits = FixtureTypes::FIXTURE_ENEMY;
 	fixtureDef.filter.maskBits = FixtureTypes::FIXTURE_GROUND | FixtureTypes::FIXTURE_PLAYER_BULLET;
+	fixtureDef.userData.pointer = (uintptr_t)this;
 	m_body->CreateFixture(&fixtureDef);
 	m_body->SetFixedRotation(true);
 
@@ -155,7 +157,15 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 
 		if (m_currentAction == EnemyAction::E_RUN)
 		{
-			m_body->SetLinearVelocity(m_speed);
+			if (m_type == EnemyType::MEGAMAN || m_type == EnemyType::PATREON || m_type == EnemyType::YUME || m_contacCount > 0)
+			{
+				m_body->SetLinearVelocity(m_speed);
+			}
+			else 
+			{
+				//m_body->SetLinearVelocity(m_speed);
+			}
+
 			m_timeFinding -= deltaTime;
 			if (m_timeFinding <= 0)
 			{

@@ -23,9 +23,10 @@ Player::Player()
 	, m_contacCount(0)
 	, m_isTakeDamage(false)
 	, m_isLoadingBullet(false)
-	, m_coin(0)
+	, m_coin(1000)
 	, m_armor(0)
 	, m_isOpponentCharacter(false)
+	, m_armorActiveTime(0)
 {
 	SetCharacter(currentCharacter);
 
@@ -65,7 +66,9 @@ Player::Player()
 	m_actionAnimation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 
 	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
-	
+	m_armorSprite = std::make_shared<Sprite2D>("Item/item_armor.png");
+	m_armorSprite->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
+
 	// HUB
 	// HP bar
 	m_HPBar  = std::make_shared<Sprite2D>(109);
@@ -94,6 +97,7 @@ Player::Player(CharacterType currentOpponentCharacter)
 	, m_coin(0)
 	, m_armor(0)
 	, m_isOpponentCharacter(true)
+	, m_armorActiveTime(0)
 {
 	SetCharacter(currentOpponentCharacter);
 
@@ -133,6 +137,8 @@ Player::Player(CharacterType currentOpponentCharacter)
 	m_actionAnimation->Set2DSizeByTile(SCALE_SIZE, SCALE_SIZE);
 
 	m_blood = std::make_shared<SpriteAnimation>(111, 18, 0.02f);
+	m_armorSprite = std::make_shared<Sprite2D>("Item/item_armor.png");
+	m_armorSprite->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
 
 	// HUB
 	// HP bar
@@ -206,6 +212,13 @@ void Player::Update(float deltaTime)
 			m_numberBullet = m_stats.numberBullet;
 		}
 	}
+
+	if (m_armorActiveTime > 0)
+	{
+		m_armorActiveTime -= deltaTime;
+		m_armorSprite->Set2DPositionByTile(pos.x, pos.y);
+		m_armorSprite->SetTransparency(m_armorActiveTime / ARMOR_ACTIVE_TIME);
+	}
 }
 
 void Player::Draw()
@@ -220,6 +233,10 @@ void Player::Draw()
 	if (m_isTakeDamage)
 	{
 		m_blood->Draw();
+	}
+	if (m_armorActiveTime > 0)
+	{
+		m_armorSprite->Draw();
 	}
 }
 
@@ -474,6 +491,11 @@ void Player::HandleEvent(int event)
 
 void Player::TakeDamage(GLint damage)
 {
+	if (m_armorActiveTime > 0)
+	{
+		return;
+	}
+
 	m_isTakeDamage = true;
 	m_blood->SetCurrentFrame(0);
 	m_blood->Set2DSizeByTile(3, 3);
@@ -496,6 +518,17 @@ void Player::ReCalculateWhenScroll()
 	m_actionAnimation->Set2DSizeByTile(m_size.x, m_size.y);
 
 	m_HPBar->Set2DSizeByTile(1.5f * m_health / m_stats.hp, 0.1f);
+}
+
+void Player::ActiveArmorItem()
+{
+	if (m_armor > 0)
+	{
+		m_armor--;
+		m_armorActiveTime = ARMOR_ACTIVE_TIME;
+		m_armorSprite->Set2DSizeByTile(1, 1);
+		m_armorSprite->SetTransparency(1);
+	}
 }
 
 void Player::HandlePlayerDie(GLfloat deltaTime)

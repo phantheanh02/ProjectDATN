@@ -286,6 +286,16 @@ void SocketManager::SetHost(bool host)
     m_host = host;
 }
 
+void SocketManager::ClearData()
+{
+    m_mutex.lock();
+    while (!m_dataQueue.empty())
+    {
+        m_dataQueue.pop();
+    }
+    m_mutex.unlock();
+}
+
 void SocketManager::ThreadProc(void* lpParameter)
 {
     LPVOID* param = reinterpret_cast<LPVOID*>(lpParameter);

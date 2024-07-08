@@ -67,6 +67,9 @@ public:
 	inline bool							IsActive() { return m_isActive; };
 	inline bool							IsDie() { return m_isDie; };
 	inline bool							IsGetCoin() { return m_isGetCoin; };
+
+	GLint								m_contacCount;
+
 private:
 	// Attribute
 	GLint			m_id; // ID texture

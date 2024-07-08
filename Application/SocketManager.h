@@ -25,6 +25,7 @@ enum RequestType
 	JOIN_BATTLE		= 14,
 	EXIT_ROOM		= 15,
 	EXIT_BATTLE		= 16,
+	RETRY_STATE		= 17,
 
 	CHARACTER_BLACK = 20,
 	CHARACTER_BLUE	= 21,
@@ -57,6 +58,8 @@ public:
 
 	bool IsHost();
 	void SetHost(bool host);
+	void ClearData();
+
 private:
 	bool	m_host;
 	int		m_port;

@@ -11,8 +11,7 @@ GSLocalWifi::~GSLocalWifi()
 
 void GSLocalWifi::Init()
 {
-	m_hasClient = false;
-	m_isClientReady = false;
+	ResetLobby();
 	m_preCharacter = currentCharacter;
 	// chacracter
 	m_hostCharacter = std::make_shared<SpriteAnimation>(currentCharacter, 5, 0.1);
@@ -64,7 +63,6 @@ void GSLocalWifi::Init()
 
 	// Net
 	//SocketManager::GetInstance()->Init();
-
 }
 
 void GSLocalWifi::Update(float deltaTime)
@@ -291,6 +289,8 @@ void GSLocalWifi::HandleRequest()
 				break;
 			case READY_STATE:
 				break;
+			case RETRY_STATE:
+				break;
 			case CHARACTER_BLACK:
 				if (SocketManager::GetInstance()->IsHost())
 				{
@@ -392,7 +392,13 @@ void GSLocalWifi::HandleRequest()
 			}
 
 		}
-		SocketManager::GetInstance()->SetStatusMsg(false);
+		//SocketManager::GetInstance()->SetStatusMsg(false);
 	}
 
+}
+
+void GSLocalWifi::ResetLobby()
+{
+	m_isClientReady = false;
+	m_hasClient = false;
 }

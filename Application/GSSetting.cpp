@@ -91,7 +91,7 @@ void GSSetting::Init()
 	{
 		m_buttonSoundToggle = std::make_shared<Button>("Icons/icon_sound_on.png", BUTTON_SOUND);
 	}
-	m_buttonSoundToggle->Set2DPosition(570, 250);
+	m_buttonSoundToggle->Set2DPosition(590, 250);
 	m_buttonSoundToggle->Set2DSize(50, 50);
 
 }
@@ -118,7 +118,7 @@ void GSSetting::Draw()
 {
 	m_background->Draw();
 	m_textVolumeLevel->CalculateWVPMatrix();
-
+	m_buttonSoundToggle->Draw();
 	for (auto& text : m_listText)
 	{
 		text->Draw();
@@ -152,6 +152,23 @@ void GSSetting::OnKey(unsigned char key, bool pressed)
 
 void GSSetting::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 {
+	if (m_buttonSoundToggle->HandleTouchMouse(x, y, pressed))
+	{
+		ResourcesManager::GetInstance()->GetSound(1)->Play();
+		if (m_currentVolume == 0)
+		{
+			// click when volume == 0 - toggle from mute
+			m_currentVolume = m_lastNonZeroVolume;
+			m_volumeChanged = true;
+		}
+		else
+		{
+			// click when volume != 0 - mute
+			m_lastNonZeroVolume = m_currentVolume;
+			m_currentVolume = 0;
+			m_volumeChanged = true;
+		}
+	}
 	for (auto& button : m_buttonList)
 	{
 		if (button->HandleTouchMouse(x, y, pressed))

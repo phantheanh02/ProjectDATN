@@ -37,6 +37,7 @@ public:
 #define KEY_D			'D'
 #define KEY_E			'E'
 #define KEY_J			'J'
+#define KEY_K			'K'
 
 // Color
 #define	YELLOW			255, 255, 0
@@ -53,9 +54,15 @@ public:
 #define TIME_FINDING				3.0f
 #define JUMP_COOLDOWN				0.3
 #define BULLET_COOLDOWN				0.3f
+#define	ARMOR_ACTIVE_TIME			5.0f
 
 // Local wifi
 #define MAX_CLIENTS 1
+
+// Item cost
+#define BULLET_UPGRADE_COST			50
+#define ARMOR_UPGRADE_COST			50
+#define HP_UPGRADE_COST				50
 
 // other
 #define DETECTION_DISTANCE			8.0f

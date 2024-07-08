@@ -62,6 +62,7 @@ public:
 	void HandleEvent(int event);
 	void TakeDamage(GLint damage);
 	void ReCalculateWhenScroll();
+	void ActiveArmorItem();
 
 	void SetCurrentDirectionByPreDirection();
 	void Set2DPositionByTile(GLfloat x, GLfloat y);
@@ -74,6 +75,7 @@ public:
 	inline void SetCoin(GLint number) { m_coin = number; };
 	inline void SetArmor(GLint number) { m_armor = number; };
 	inline void AddCoin(GLint number) { m_coin += number; };
+	inline void SetNumberBullet(GLint number) { m_numberBullet = number; };
 
 	void					GetItem(ItemType typeItem);
 	inline b2Body*			GetBody()			{ return m_body; };
@@ -124,6 +126,8 @@ private:
 	// Item
 	GLint		m_coin;
 	GLint		m_armor;
+	GLfloat		m_armorActiveTime;
+	std::shared_ptr<Sprite2D>	m_armorSprite;
 
 	// solo
 	bool		m_isOpponentCharacter;

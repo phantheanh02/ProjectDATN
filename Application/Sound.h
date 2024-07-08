@@ -19,6 +19,7 @@ public:
 
 private:
 	Mix_Chunk* m_sound;
+	Mix_Music* m_music;
 	GLint m_currentVolume;
 	GLint m_lastPlayingChannel;
 };

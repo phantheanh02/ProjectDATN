@@ -34,7 +34,7 @@ public:
 	void Update2DDrawPosition();
 
 private:
-	// Kry/mouse event
+	// Key/mouse event
 	unsigned int	m_key;
 	unsigned int	m_mouse;
 	std::vector<std::string> m_keyStack;
@@ -82,6 +82,12 @@ private:
 	// Popup
 	std::vector<std::shared_ptr<Sprite2D>>	m_listPopupSprite;
 	bool								m_isShowPopup;
+	std::vector<std::shared_ptr<Text>>	m_textCoinList;
+	GLint								m_totalCoinCostBullet;
+	GLint								m_totalCoinCostArmor;
+	GLint								m_totalCoinCostHP;
+	GLint								m_totalCoinCost;
+
 
 	// Check result match
 	bool								m_isEndMatch;

@@ -49,4 +49,5 @@ private:
 private:
 	void PopButton(ButtonType type);
 	void HandleRequest();
+	void ResetLobby();
 };

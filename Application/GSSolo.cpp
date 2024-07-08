@@ -28,6 +28,9 @@ void GSSolo::Init()
 	m_key = 0;
 	m_opponentKey = 0;
 	m_isReadyState = false;
+	m_isShowPopup = false;
+	m_isEndMatch = false;
+	m_isWin = false;
 
 	if (world)
 	{
@@ -89,7 +92,12 @@ void GSSolo::Init()
 
 void GSSolo::Update(float deltaTime)
 {
-	printf("Update\n");
+	if (m_isShowPopup)
+	{
+		UpdatePopup(deltaTime);
+		return;
+	}
+
 	if (!m_isReadyState)
 	{
 		SocketManager::GetInstance()->SendNewMessage("action11");
@@ -106,6 +114,8 @@ void GSSolo::Update(float deltaTime)
 
 	m_ownerPlayer->Update(deltaTime);
 	m_opponentPlayer->Update(deltaTime);
+
+	CheckWin();
 }
 
 void GSSolo::Draw()
@@ -123,6 +133,11 @@ void GSSolo::Draw()
 
 	m_ownerPlayer->Draw();
 	m_opponentPlayer->Draw();
+
+	if (m_isShowPopup)
+	{
+		DrawPopup();
+	}
 }
 
 void GSSolo::Pause()
@@ -264,6 +279,12 @@ void GSSolo::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 			{
 			case BUTTON_BACK:
 				SocketManager::GetInstance()->SendNewMessage("action16"); // exit battle
+				SocketManager::GetInstance()->ClearData();
+				GameStateMachine::GetInstance()->PopState();
+				break;
+			case BUTTON_MENU:
+				SocketManager::GetInstance()->ClearData();
+				GameStateMachine::GetInstance()->PopState();
 				GameStateMachine::GetInstance()->PopState();
 				break;
 			default:
@@ -342,5 +363,87 @@ void GSSolo::HandleRequest()
 
 	// Handle Key
 	m_opponentPlayer->HandleEvent(m_opponentKey);
+}
+
+void GSSolo::CreateButton(const char* filename, GLfloat width, GLfloat height, GLfloat posX, GLfloat posY, ButtonType buttonType)
+{
+	auto button = std::make_shared<Button>(filename, buttonType);
+	button->Set2DSize(width, height);
+	button->Set2DPosition(posX, posY);
+	m_buttonList.push_back(button);
+}
+
+void GSSolo::CreatePopUp()
+{
+	m_isShowPopup = true;
+	m_listPopupSprite.clear();
+	m_buttonList.clear();
+
+	// add new button
+	Vector2 size = Vector2(137, 64);
+	GLfloat posX = 430;
+	GLfloat posY = 233;
+
+	// Background
+	auto sprite = std::make_shared<Sprite2D>("Background/bg_black.png");
+	sprite->Set2DSize(Globals::screenWidth, Globals::screenHeight);
+	sprite->Set2DPosition(0, 0);
+	sprite->SetTransparency(0.5f);
+	sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+	m_listPopupSprite.push_back(sprite);
+
+	if (m_isEndMatch)
+	{
+		if (m_isWin)
+		{
+
+			sprite = std::make_shared<Sprite2D>("Background/bg_victory3star.png");
+		}
+		else
+		{
+			sprite = std::make_shared<Sprite2D>("Background/bg_lost.png");
+		}
+
+		sprite->Set2DSize(640, 480);
+		sprite->Set2DPosition(480, 360);
+		sprite->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
+		sprite->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
+		m_listPopupSprite.push_back(sprite);
+
+		CreateButton("Button/btn_menu.png", 220, 70, 370, 462, BUTTON_MENU);
+	}
+}
+
+void GSSolo::DrawPopup()
+{
+	for (auto sprite : m_listPopupSprite)
+	{
+		sprite->Draw();
+	}
+	for (auto& button : m_buttonList)
+	{
+		button->Draw();
+	}
+}
+
+void GSSolo::UpdatePopup(float deltaTime)
+{
+
+}
+
+void GSSolo::CheckWin()
+{
+	if (m_ownerPlayer->IsDie())
+	{
+		m_isEndMatch = true;
+		m_isWin = false;
+		CreatePopUp();
+	}
+	else if (m_opponentPlayer->IsDie())
+	{
+		m_isEndMatch = true;
+		m_isWin = true;
+		CreatePopUp();
+	}
 }
 
