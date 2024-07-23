@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include "SocketManager.h"
+#include "Globals.h"
 
 bool SocketManager::Init()
 {
@@ -271,6 +272,7 @@ std::string SocketManager::GetDataMsg()
     m_mutex.lock();
     auto data = m_dataQueue.front();
     m_dataQueue.pop();
+    LOG(m_dataQueue.size());
     m_mutex.unlock();
 
     return data;

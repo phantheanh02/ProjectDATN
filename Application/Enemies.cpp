@@ -208,6 +208,7 @@ void Enemies::Update(float deltaTime, b2Vec2 positionPlayer)
 		if (m_isTakeDamage)
 		{
 			m_blood->Update(deltaTime);
+			m_blood->Set2DPositionByTile(m_body->GetPosition().x, m_body->GetPosition().y);
 			if (m_blood->IsLastFrame())
 			{
 				m_isTakeDamage = false;

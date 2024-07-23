@@ -75,6 +75,7 @@ private:
 	std::shared_ptr<Text> m_totalTimeText;
 	std::shared_ptr<Text> m_numberCoinText;
 	std::shared_ptr<Text> m_numberArmorText;
+	std::shared_ptr<Text> m_totalTimeEndText;
 
 	// Effect
 	std::shared_ptr<SpriteAnimation>	m_loadBullet;

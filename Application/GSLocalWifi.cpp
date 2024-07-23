@@ -117,26 +117,7 @@ void GSLocalWifi::Resume()
 	if (m_preCharacter != currentCharacter)
 	{
 		m_preCharacter = currentCharacter;
-		switch (currentCharacter)
-		{
-		case C_BLACK:
-			SocketManager::GetInstance()->SendNewMessage("action20");
-			break;
-		case C_BLUE:
-			SocketManager::GetInstance()->SendNewMessage("action21");
-			break;
-		case C_GREEN:
-			SocketManager::GetInstance()->SendNewMessage("action22");
-			break;
-		case C_RED:
-			SocketManager::GetInstance()->SendNewMessage("action23");
-			break;
-		case C_YELLOW:
-			SocketManager::GetInstance()->SendNewMessage("action24");
-			break;
-		default:
-			break;
-		}
+		SendCharacterType();
 	}
 	
 }
@@ -177,7 +158,7 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				else
 				{
 					// noti error
-					printf("Create room fail!!\n");
+					LOG("Create room fail!!\n");
 				}
 				break;
 			case BUTTON_JOIN:
@@ -185,11 +166,14 @@ void GSLocalWifi::OnMouseClick(int x, int y, unsigned char key, bool pressed)
 				{
 					m_hasClient = true;
 					isCreatedSocket = true;
+					SocketManager::GetInstance()->SendNewMessage("action00");
+					SendCharacterType();
+					m_clientCharacter->SetTexture(ResourcesManager::GetInstance()->GetTexture(currentCharacter));
 				}
 				else
 				{
 					// noti error
-					printf("Join room fail!!\n");
+					LOG("Join room fail!!\n");
 				}
 				break;
 			case BUTTON_CANCEL:
@@ -287,9 +271,7 @@ void GSLocalWifi::HandleRequest()
 			case CONNECT:
 				if (SocketManager::GetInstance()->IsHost())
 				{
-					{
-						SocketManager::GetInstance()->SendNewMessage("action00");
-					}
+					SendCharacterType();
 				}
 				break;
 			case READY_STATE:
@@ -367,12 +349,12 @@ void GSLocalWifi::HandleRequest()
 					m_isClientReady = false;
 					//SocketManager::GetInstance()->CloseClientSocket();
 				}
-				/*else
+				else
 				{
 					m_hasClient = false;					
 					SocketManager::GetInstance()->CloseSocket();
 					GameStateMachine::GetInstance()->PopState();
-				}*/
+				}
 				break;
 			case READY:
 				m_isClientReady = true;
@@ -406,4 +388,28 @@ void GSLocalWifi::ResetLobby()
 {
 	m_isClientReady = false;
 	m_hasClient = false;
+}
+
+void GSLocalWifi::SendCharacterType()
+{
+	switch (currentCharacter)
+	{
+	case C_BLACK:
+		SocketManager::GetInstance()->SendNewMessage("action20");
+		break;
+	case C_BLUE:
+		SocketManager::GetInstance()->SendNewMessage("action21");
+		break;
+	case C_GREEN:
+		SocketManager::GetInstance()->SendNewMessage("action22");
+		break;
+	case C_RED:
+		SocketManager::GetInstance()->SendNewMessage("action23");
+		break;
+	case C_YELLOW:
+		SocketManager::GetInstance()->SendNewMessage("action24");
+		break;
+	default:
+		break;
+	}
 }

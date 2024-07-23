@@ -17,6 +17,7 @@ GSPlay::~GSPlay()
 	delete m_contactListener;
 	ResourcesManager::GetInstance()->GetSound(9)->Stop();
 	ResourcesManager::GetInstance()->GetSound(10)->Play(true);
+	m_dynamicCamera->Reset();
 }
 
 void GSPlay::Init()
@@ -660,6 +661,17 @@ void GSPlay::CreatePopUp()
 
 		CreateButton("Button/btn_retry.png", 220, 70, 190, 462, BUTTON_RETRY);
 		CreateButton("Button/btn_menu.png", 220, 70, 550, 462, BUTTON_MENU);
+
+		// Time
+		auto font = ResourcesManager::GetInstance()->GetFont(0);
+		auto staticCamera = SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA);
+		m_totalTimeEndText = std::make_shared<Text>(0);
+		m_totalTimeEndText->AttachCamera(staticCamera);
+		m_totalTimeEndText->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_TOPRIGHT));
+		m_totalTimeEndText->Init(font, std::to_string((GLint)m_totalTime) + "s");
+		m_totalTimeEndText->Set2DPosition(500, 340);
+		m_totalTimeEndText->Set2DScale(0.4f, 0.4f);
+		m_totalTimeEndText->SetTextColor(YELLOW);
 	}
 	else
 	{
@@ -738,7 +750,10 @@ void GSPlay::DrawPopup()
 	{
 		text->Draw();
 	}
-
+	if (m_isEndMatch)
+	{
+		m_totalTimeEndText->Draw();
+	}
 }
 
 void GSPlay::UpdatePopup(float deltaTime)

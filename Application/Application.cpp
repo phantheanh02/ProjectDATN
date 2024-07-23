@@ -107,8 +107,8 @@ void CleanUp()
 	SocketManager::DestroyInstance();
 }
 
-int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
-//int _tmain(int argc, _TCHAR* argv[])
+//int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+int _tmain(int argc, _TCHAR* argv[])
 {
 	// Define the gravity vector.
 

@@ -25,6 +25,7 @@ public:
 
 	void CalculateWorldMatrix();
 	void CalculateViewMatrix();
+	void Reset();
 
 	GLboolean m_changed = true;
 private:

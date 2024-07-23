@@ -100,3 +100,18 @@ void Camera::CalculateViewMatrix()
 	m_viewMatrix.m[2][0] = xaxis.z;		m_viewMatrix.m[2][1] = yaxis.z;		m_viewMatrix.m[2][2] = zaxis.z;		m_viewMatrix.m[2][3] = 0.0f;
 	m_viewMatrix.m[3][0] = -m_pos.Dot(xaxis);		m_viewMatrix.m[3][1] = -m_pos.Dot(yaxis);			m_viewMatrix.m[3][2] = -m_pos.Dot(zaxis);			m_viewMatrix.m[3][3] = 1.0f;
 }
+
+void Camera::Reset()
+{
+	m_up = Vector3(0, 1, 0);
+	m_pos = Vector3(0.0f, 0.0f, 0.0f);
+	m_target = Vector3(0.0f, 0.0f, -1.0f);
+	m_fMoveSpeed = 0.5f;
+	m_fRotateSpeed = 0.5f;
+	m_fNear = -1.0f;
+	m_fFar = 1.0f;
+	m_fov = 1.0f;
+	m_projectionMatrix.SetOrthographic(m_fNear, m_fFar, 0.0f, Globals::screenWidth, 0.0f, Globals::screenHeight);
+	CalculateWorldMatrix();
+	CalculateViewMatrix();
+}

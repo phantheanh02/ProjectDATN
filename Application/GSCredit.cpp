@@ -23,7 +23,7 @@ void GSCredit::Init()
 	m_guide = std::make_shared<Sprite2D>("Background/bg_guide.png");
 	m_guide->SetModel(ResourcesManager::GetInstance()->GetModel(ModelType::R_RETANGLE_CENTER));
 	m_guide->Set2DPosition(Globals::screenWidth / 2, Globals::screenHeight / 2);
-	m_guide->Set2DSize(585, 480);
+	m_guide->Set2DSize(400, 480);
 	m_guide->AttachCamera(SceneManager::GetInstance()->GetCamera(CameraType::STATIC_CAMERA));
 }
 
